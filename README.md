@@ -1,5 +1,8 @@
 # music-timeline
 
+  [![license][license-image]][license-url]
+  ![code size][code-size-image]
+
 Visualization of last.fm stats.
 
 The idea is to collect all scrobbles for a given timeframe, slice by days (or weeks, months) into chunks, group by artists and sort by tags (genres) inside each chunk. Then, map to pixels (colored according to tags) and place on a timeline, forming some kind of summary bar chart.
@@ -49,3 +52,7 @@ $ # TBD
 ## Scripts
 
 TBD.
+
+[license-image]: https://img.shields.io/github/license/oleksmarkh/music-timeline.svg?style=flat-square
+[license-url]: https://github.com/oleksmarkh/music-timeline/blob/master/LICENSE
+[code-size-image]: https://img.shields.io/github/languages/code-size/oleksmarkh/music-timeline.svg?style=flat-square
