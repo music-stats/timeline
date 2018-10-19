@@ -7,14 +7,16 @@ Visualization of last.fm stats.
 
 The idea is to collect all scrobbles for a given timeframe, slice by days (or weeks, months) into chunks, group by artists and sort by tags (genres) inside each chunk. Then, map to pixels (colored according to tags) and place on a timeline, forming some kind of summary bar chart.
 
+"Pixel" is a metaphoric term here, in fact there could be boxes of different height, depending on corresponding track duration. Those boxes could have some interaction, e.g. on hover reveals a tiny popup with metadata. Could also be a fixed info box, if a popup turns to be annoying.
+
 That should aim to showcase the ratio between different tags over time.
 
 ```
 ^
 |··········
-|······●●··
-|··●●·●●○●·
-|·●○●●○○○●·
+|······●●··/------------+
+|··●●·●●○●<  ♭ metadata |
+|·●○●●○○○●·\------------+
 |·●○○●○○○○·
 +---------->
            t (days)
@@ -32,8 +34,7 @@ deps: TBD.
 last.fm:
 - [ ] [`user.getTopArtists`](https://www.last.fm/api/show/user.getTopArtists) (pagination is fine)
 - [ ] [`user.getArtistTracks`](https://www.last.fm/api/show/user.getArtistTracks) (pagination seems to be weird, always giving `"totalPages": "0"`)
-- [ ] [`artist.getTags`](https://www.last.fm/api/show/artist.getTags)
-- [ ] [`track.getTags`](https://www.last.fm/api/show/track.getTags)
+- [ ] [`artist.getInfo`](https://www.last.fm/api/show/artist.getInfo) and [`track.getInfo`](https://www.last.fm/api/show/track.getInfo) (there are also `artist.getTags` and `track.getTags` endpoints but those simply return lists of tag names and URLs, while `.getInfo` also supplies tags plus additional data, e.g. track duration)
 
 ## Setup
 
