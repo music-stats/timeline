@@ -12,14 +12,17 @@ The idea is to collect all scrobbles for a given timeframe, slice by days (or we
 That should aim to showcase the ratio between different tags over time.
 
 ```
-^
-|··········
-|······●●··/------------+
-|··●●·●●○●<  ♭ metadata |
-|·●○●●○○○●·\------------+
-|·●○○●○○○○·
-+---------->
-           t (days)
+// x-progression                   // y-progression
+
+scrobbles                                     scrobbles
+⌃                                  +---------->
+|··········                        |●●········
+|······●●··/------------⌝          |○○●·/------------⌝
+|··●●·●●○●<  ♭ metadata |          |○●●<  ♭ metadata |
+|·●○●●○○○●·\------------⌟          |●●··\------------⌟
+|·●○○●○○○○·                        |○○●·······
++---------->                       ⌄
+           t (days)                t (days)
 ```
 
 ## Tech stack
