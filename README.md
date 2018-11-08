@@ -5,11 +5,11 @@
 
 Visualization of last.fm stats.
 
-The idea is to collect all scrobbles for a given timeframe, slice by days (or weeks, months) into chunks, group by artists and sort by tags (genres) inside each chunk. Then, map to pixels (colored according to tags) and place on a timeline, forming some kind of summary bar chart.
+The idea is to collect all scrobbles for a given timeframe, slice by days (or weeks, months) into chunks, optionally group by artists and sort by tags (genres) inside each chunk. Then, map to pixels (colored according to tags) and place on a timeline, forming some kind of summary bar chart. Without grouping that might form an exact log of all scrobbles.
 
-"Pixel" is a metaphoric term here, in fact there could be boxes of different height, depending on corresponding track duration. Those boxes could have some interaction, e.g. on hover reveals a tiny popup with metadata. Could also be a fixed info box, if a popup turns to be annoying.
+"Pixel" is a metaphoric term here, in fact there could be boxes of different height, depending on corresponding track duration. Those boxes could have some interaction, e.g. on hover reveals a tiny popup with metadata. Could also be a fixed info box, if a popup turns to be annoying. Another interactivity example - highlighting all scrobbles that relate to a hovered one (same track, album, artist or tag).
 
-That should aim to showcase the ratio between different tags over time.
+All that should aim to showcase the ratio between different aspects of how musical taste evolves (or prove that it doesn't).
 
 ```
 // x-progression                   // y-progression
