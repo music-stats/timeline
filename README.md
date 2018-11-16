@@ -5,7 +5,9 @@
 
 Visualization of last.fm stats.
 
-The idea is to collect all scrobbles for a given timeframe, slice by days (or weeks, months) into chunks, optionally group by artists and sort by tags (genres) inside each chunk. Then, map to pixels (colored according to tags) and place on a timeline, forming some kind of summary bar chart. Without grouping that might form an exact log of all scrobbles.
+The idea is to collect all scrobbles for a given timeframe, slice by days (or weeks, months) into chunks, optionally group by artists and sort by tags (genres) inside each chunk. Then, map to pixels (colored according to tags) and place on a timeline, forming some kind of summary bar chart.
+
+Without grouping that might form an exact log of all scrobbles. Speaking of which, not only a bar chart is potentially interesting - another form is "playtime timeline within daily timeline", showing exact minutes with music on, for each day. Basically, stripping silent time out leads to a bar chart :) And keeping it there means exact visualization of listening habits.
 
 "Pixel" is a metaphoric term here, in fact there could be boxes of different height, depending on corresponding track duration. Those boxes could have some interaction, e.g. on hover reveals a tiny popup with metadata. Could also be a fixed info box, if a popup turns to be annoying. Another interactivity example - highlighting all scrobbles that relate to a hovered one (same track, album, artist or tag).
 
@@ -14,15 +16,15 @@ All that should aim to showcase the ratio between different aspects of how music
 ```
 // x-progression                   // y-progression
 
-scrobbles                                     scrobbles
-⌃                                  +---------->
+scrobbles
+⌃                                  +----------> scrobbles
 |··········                        |●●········
 |······●●··/------------⌝          |○○●·/------------⌝
 |··●●·●●○●<  ♭ metadata |          |○●●<  ♭ metadata |
 |·●○●●○○○●·\------------⌟          |●●··\------------⌟
 |·●○○●○○○○·                        |○○●·······
-+---------->                       ⌄
-           t (days)                t (days)
++----------> t (days)              ⌄
+                                   t (days)
 ```
 
 ## Tech stack
