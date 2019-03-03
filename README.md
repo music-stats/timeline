@@ -1,4 +1,4 @@
-# music-timeline
+# music-stats timeline
 
   [![license][license-image]][license-url]
   ![code size][code-size-image]
@@ -86,6 +86,6 @@ $ # TBD
 
 TBD.
 
-[license-image]: https://img.shields.io/github/license/oleksmarkh/music-timeline.svg?style=flat-square
-[license-url]: https://github.com/oleksmarkh/music-timeline/blob/master/LICENSE
-[code-size-image]: https://img.shields.io/github/languages/code-size/oleksmarkh/music-timeline.svg?style=flat-square
+[license-image]: https://img.shields.io/github/license/music-stats/timeline.svg?style=flat-square
+[license-url]: https://github.com/music-stats/timeline/blob/master/LICENSE
+[code-size-image]: https://img.shields.io/github/languages/code-size/music-stats/timeline.svg?style=flat-square
