@@ -1,0 +1,59 @@
+{
+  "name": "music-stats-timeline",
+  "version": "0.0.0",
+  "description": "visualization of listening habits",
+  "main": "src/app.js",
+  "scripts": {
+    "upgrade-interactive": "npm-check --update",
+    "lint": "eslint ./*.js && eslint ./src/",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf ./dist/* && mkdir -p ./dist/",
+    "copy:dev": "cp ./src/index-dev.html ./dist/index.html && cp -r ./data/ ./dist/data/",
+    "copy:prod": "cp ./src/index-prod.html ./dist/index.html && cp -r ./data/ ./dist/data/",
+    "build:dev": "npm run clean && npm run copy:dev && set -o allexport && source .env-dev && rollup --config --no-treeshake",
+    "build:prod": "npm run clean && npm run copy:prod && set -o allexport && source .env-prod && rollup --config",
+    "build:watch": "npm run build:dev -- --watch",
+    "serve": "cd ./dist/ && python3 -m http.server",
+    "deploy": "gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/music-stats/timeline.git"
+  },
+  "keywords": [
+    "music",
+    "stats",
+    "data",
+    "visualization",
+    "chart"
+  ],
+  "author": "Oleksii Markhovskyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/music-stats/timeline/issues"
+  },
+  "homepage": "https://github.com/music-stats/timeline#readme",
+  "devDependencies": {
+    "@babel/core": "7.7.4",
+    "@babel/preset-env": "7.7.4",
+    "@babel/register": "7.7.4",
+    "eslint": "6.7.1",
+    "eslint-config-developit": "1.1.1",
+    "gh-pages": "2.1.1",
+    "npm-check": "5.9.0",
+    "rollup": "1.27.5",
+    "rollup-plugin-babel": "4.3.3",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-eslint": "7.0.0",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-postcss": "2.0.3",
+    "rollup-plugin-uglify": "6.0.3"
+  },
+  "dependencies": {
+    "classnames": "2.2.6",
+    "d3-scale": "3.2.1",
+    "htm": "2.2.1",
+    "vhtml": "2.1.0"
+  }
+}

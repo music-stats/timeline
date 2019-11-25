@@ -1,0 +1,15 @@
+.Timeline {
+}
+
+.Timeline__chart {
+  max-height: 600px;
+  background-color: var(--color-dark-blue);
+}
+
+.Timeline__scrobble {
+}
+
+.Timeline__scrobble:hover {
+  opacity: 1;
+  fill: var(--color-light-grey-1);
+}

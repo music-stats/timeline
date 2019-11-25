@@ -62,8 +62,7 @@ All that should aim to showcase the ratio between different aspects of how music
 
 ## Tech stack
 
-dev deps:
-[`elm`](https://guide.elm-lang.org).
+dev deps: TBD.
 
 deps: TBD.
 

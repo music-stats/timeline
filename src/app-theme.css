@@ -1,0 +1,15 @@
+body {
+  --color-black: #000;
+
+  --color-dark-grey-1: #222;
+  --color-dark-grey-2: #444;
+  --color-grey: #888;
+  --color-light-grey-1: #ccc;
+  --color-light-grey-2: #ddd;
+  --color-light-grey-3: #f0f0f0;
+  --color-light-grey-4: #f8f8f8;
+
+  --color-white: #fff;
+
+  --color-dark-blue: #234;
+}
