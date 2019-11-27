@@ -4,7 +4,8 @@ export default {
 
   darkGrey1: '#222',
   darkGrey2: '#444',
-  grey: '#888',
+  grey1: '#888',
+  grey2: '#aaa',
   lightGrey1: '#ccc',
   lightGrey2: '#ddd',
   lightGrey3: '#f0f0f0',

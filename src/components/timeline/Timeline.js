@@ -9,9 +9,18 @@ import './Timeline.css';
 export default class Timeline {
   static getDefaultProps() {
     return {
-      infoBoxHeight: 200,
-      timeAxisOffset: 20,
+      infoBoxHeight: 160,
+      plotPadding: 20,
       scrobbleSize: 4,
+      scrobbleMargin: 2,
+      timeAxisWidth: 2,
+      colors: {
+        background: cssColors.darkBlue,
+        scrobble: cssColors.darkGrey2,
+        artistHighlight: cssColors.grey1,
+        scrobbleHighlight: cssColors.lightGrey2,
+        timeAxis: cssColors.grey1,
+      },
     };
   }
 
@@ -38,8 +47,10 @@ export default class Timeline {
     this.timeRangeScale = null;
     this.artistPlaycountScale = null;
 
-    this.scrobbleOffset = scrobbleSize / 2;
+    this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleBuffer = {};
+    this.scrobbleHighlightPointList = [];
+    this.scrobbleArtistIndex = {};
 
     this.handleCanvasMouseMove = this.handleCanvasMouseMove.bind(this);
   }
@@ -65,51 +76,112 @@ export default class Timeline {
   }
 
   initializeScales() {
-    const {scrobbleList, timeAxisOffset} = this.props;
+    const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin} = this.props;
     const [width, height] = this.canvasDimensions;
+
+    const minDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
+    const maxDateTimestamp = dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
+
+    const minPlaycount = 1;
+    const maxPlaycount = Math.max(...this.artistPlaycountList);
+
+    const scrobbleAreaLeft = plotPadding;
+    const scrobbleAreaRight = width - plotPadding;
+
+    // All those "scrobbleAreaHeight" calculations are needed
+    // to guarantee equal vertical distances between points (aka margins).
+    // Since rounded range is used for vertical (playcount) scale,
+    // the range itself should be aliquot to point size + margin.
+    const scrobbleAreaBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
+    const plotAreaHeight = scrobbleAreaBottom - plotPadding;
+    const scrobbleAreaHeight = plotAreaHeight - plotAreaHeight % ((maxPlaycount - 1) * (scrobbleSize + scrobbleMargin));
+    const scrobbleAreaTop = scrobbleAreaHeight > 0
+      ? scrobbleAreaBottom - scrobbleAreaHeight
+      : plotPadding;
 
     this.timeRangeScale = d3Scale.scaleLinear()
       .domain([
-        dateStringToTimestamp(scrobbleList[0].date),
-        dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date),
+        minDateTimestamp,
+        maxDateTimestamp,
       ])
-      .range([timeAxisOffset, width - timeAxisOffset]);
+      .rangeRound([
+        scrobbleAreaLeft,
+        scrobbleAreaRight,
+      ]);
 
     this.artistPlaycountScale = d3Scale.scaleLinear()
       .domain([
-        Math.min(...this.artistPlaycountList),
-        Math.max(...this.artistPlaycountList),
+        minPlaycount,
+        maxPlaycount,
       ])
-      .range([height - timeAxisOffset, timeAxisOffset]);
+      .rangeRound([
+        scrobbleAreaBottom,
+        scrobbleAreaTop,
+      ]);
   }
 
-  putScrobbleIntoBuffer(x, y, scrobble) {
+  plotScrobbleOnBuffer(x, y, scrobble) {
     if (!this.scrobbleBuffer[x]) {
       this.scrobbleBuffer[x] = {};
     }
 
-    if (!this.scrobbleBuffer[x][y]) {
-      this.scrobbleBuffer[x][y] = [];
-    }
-
-    this.scrobbleBuffer[x][y].push(scrobble);
+    this.scrobbleBuffer[x][y] = scrobble;
   }
 
-  getFirstScrobbleFromBuffer(x, y) {
-    return this.scrobbleBuffer[x] && this.scrobbleBuffer[x][y] && this.scrobbleBuffer[x][y][0];
+  getPlottedScrobbleFromBuffer(x, y) {
+    const xFrom = x - this.scrobbleHalfSize;
+    const xTo = x + this.scrobbleHalfSize;
+    const yFrom = y - this.scrobbleHalfSize;
+    const yTo = y + this.scrobbleHalfSize;
+    let scrobble = null;
+
+    for (let xi = xFrom; xi <= xTo; xi += 1) {
+      for (let yj = yFrom; yj <= yTo; yj += 1) {
+        scrobble = this.scrobbleBuffer[xi] && this.scrobbleBuffer[xi][yj];
+
+        if (scrobble) {
+          return {
+            ...scrobble,
+            x: xi,
+            y: yj,
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  putScrobbleIntoArtistIndex(x, y, scrobble) {
+    const {artist: {name}} = scrobble;
+
+    if (!this.scrobbleArtistIndex[name]) {
+      this.scrobbleArtistIndex[name] = [];
+    }
+
+    this.scrobbleArtistIndex[name].push({
+      ...scrobble,
+      x,
+      y,
+    });
+  }
+
+  getScrobblesForArtist(artistName) {
+    return this.scrobbleArtistIndex[artistName];
   }
 
   drawBackground() {
+    const {colors} = this.props;
     const [width, height] = this.canvasDimensions;
 
-    this.ctx.fillStyle = cssColors.darkBlue;
+    this.ctx.fillStyle = colors.background;
     this.ctx.fillRect(0, 0, width, height);
   }
 
   drawScrobbleList() {
-    const {scrobbleList} = this.props;
+    const {scrobbleList, colors} = this.props;
 
-    this.ctx.fillStyle = cssColors.grey;
+    this.ctx.fillStyle = colors.scrobble;
 
     scrobbleList
       // .slice(0, 100)
@@ -118,41 +190,78 @@ export default class Timeline {
 
   drawScrobble(scrobble) {
     const {date, artist} = scrobble;
-    const {scrobbleSize} = this.props;
-    const x = Math.round(this.timeRangeScale(dateStringToTimestamp(date)));
-    const y = Math.round(this.artistPlaycountScale(artist.playcount));
+    const x = this.timeRangeScale(dateStringToTimestamp(date));
+    const y = this.artistPlaycountScale(artist.playcount);
 
-    this.ctx.fillRect(x - this.scrobbleOffset, y - this.scrobbleOffset, scrobbleSize, scrobbleSize);
-    this.putScrobbleIntoBuffer(x, y, scrobble);
+    this.drawScrobblePoint(x, y);
+    this.plotScrobbleOnBuffer(x, y, scrobble);
+    this.putScrobbleIntoArtistIndex(x, y, scrobble);
   }
 
-  drawScrobbleHighlight(x, y) {
+  drawScrobbleHighlight(x, y, scrobble) {
+    const {colors} = this.props;
+
+    // redraw previously highlighted scrobbles
+    if (this.scrobbleHighlightPointList.length) {
+      this.ctx.fillStyle = colors.scrobble;
+
+      for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
+        this.drawScrobblePoint(
+          this.scrobbleHighlightPointList[i],
+          this.scrobbleHighlightPointList[i + 1],
+        );
+      }
+    }
+
+    this.scrobbleHighlightPointList = [];
+
+    this.getScrobblesForArtist(scrobble.artist.name).forEach(({track, x: xi, y: yi}) => {
+      this.ctx.fillStyle = track.name === scrobble.track.name
+        ? colors.scrobbleHighlight
+        : colors.artistHighlight;
+      this.drawScrobblePoint(xi, yi);
+      this.scrobbleHighlightPointList.push(xi, yi);
+    });
+  }
+
+  drawScrobblePoint(x, y) {
     const {scrobbleSize} = this.props;
 
-    this.ctx.fillStyle = cssColors.lightGrey1;
-    this.ctx.fillRect(x - this.scrobbleOffset, y - this.scrobbleOffset, scrobbleSize, scrobbleSize);
+    this.ctx.fillRect(
+      x - this.scrobbleHalfSize,
+      y - this.scrobbleHalfSize,
+      scrobbleSize,
+      scrobbleSize,
+    );
   }
 
   drawTimeAxis() {
-    const {timeAxisOffset} = this.props;
+    const {plotPadding, timeAxisWidth, colors} = this.props;
     const [width, height] = this.canvasDimensions;
 
-    this.ctx.strokeStyle = cssColors.lightGrey1;
+    this.ctx.strokeStyle = colors.timeAxis;
+    this.ctx.lineWidth = timeAxisWidth;
     this.ctx.beginPath();
-    this.ctx.moveTo(timeAxisOffset, height - timeAxisOffset);
-    this.ctx.lineTo(width - timeAxisOffset, height - timeAxisOffset);
+    this.ctx.moveTo(
+      plotPadding,
+      height - plotPadding,
+    );
+    this.ctx.lineTo(
+      width - plotPadding,
+      height - plotPadding,
+    );
     this.ctx.stroke();
   }
 
-  // @todo: introduce scrobbleOffset-based tolerance
   handleCanvasMouseMove(event) {
     const {offsetX: x, offsetY: y} = event;
-    const scrobble = this.getFirstScrobbleFromBuffer(x, y);
+    const scrobble = this.getPlottedScrobbleFromBuffer(x, y);
 
     if (scrobble) {
-      const {date, artist, album, track} = scrobble;
+      const {date, artist, album, track, x: xBuffer, y: yBuffer} = scrobble;
 
-      this.drawScrobbleHighlight(x, y);
+      this.drawScrobbleHighlight(xBuffer, yBuffer, scrobble);
+
       this.dateElement.innerText = `date: ${date}`;
       this.artistNameElement.innerText = `artist: ${artist.name} (${artist.playcount})`;
       this.albumNameElement.innerText = `album: ${album.name} (${album.playcount})`;
