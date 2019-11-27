@@ -2,14 +2,15 @@
 }
 
 .Timeline__chart {
-  max-height: 600px;
-  background-color: var(--color-dark-blue);
+  display: block;
 }
 
-.Timeline__scrobble {
+.Timeline__info-box {
+  display: grid;
+  grid-row-gap: 10px;
+  padding: 20px;
 }
 
-.Timeline__scrobble:hover {
-  opacity: 1;
-  fill: var(--color-light-grey-1);
+.Timeline__info-box-field {
+  margin: 0;
 }

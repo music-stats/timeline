@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-Basic static playcount-based chart (SVG + `d3-scale`).
+Basic static playcount-based chart (canvas + `d3-scale`).
 
 ## [0.0.0] - 2019-08-23
 ### Added
