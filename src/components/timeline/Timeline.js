@@ -9,7 +9,6 @@ import './Timeline.css';
 export default class Timeline {
   static getDefaultProps() {
     return {
-      infoBoxHeight: 160,
       plotPadding: 20,
       scrobbleSize: 4,
       scrobbleMargin: 2,
@@ -18,7 +17,7 @@ export default class Timeline {
         background: cssColors.darkBlue,
         scrobble: cssColors.darkGrey2,
         artistHighlight: cssColors.grey1,
-        scrobbleHighlight: cssColors.lightGrey2,
+        scrobbleHighlight: cssColors.lightGrey3,
         timeAxis: cssColors.grey1,
       },
     };
@@ -30,16 +29,19 @@ export default class Timeline {
       ...props,
     };
 
-    const {scrobbleList, infoBoxHeight, scrobbleSize} = this.props;
+    const {scrobbleList, scrobbleSize} = this.props;
     const {width, height} = document.body.getBoundingClientRect();
 
+    this.toShowIntroMessage = true;
+
+    this.introMessageElementList = null;
     this.dateElement = null;
     this.artistNameElement = null;
     this.albumNameElement = null;
     this.trackNameElement = null;
 
     // @todo: listen to "window.resize" for updating dimensions and scales
-    this.canvasDimensions = [width, height - infoBoxHeight];
+    this.canvasDimensions = [width, height];
     this.canvasElement = null;
     this.ctx = null;
 
@@ -59,6 +61,7 @@ export default class Timeline {
     const dpr = window.devicePixelRatio;
     const [width, height] = this.canvasDimensions;
 
+    this.introMessageElementList = document.querySelectorAll('.Timeline__info-box-field--intro-message');
     this.dateElement = document.getElementById('date');
     this.artistNameElement = document.getElementById('artist-name');
     this.albumNameElement = document.getElementById('album-name');
@@ -258,15 +261,23 @@ export default class Timeline {
     const scrobble = this.getPlottedScrobbleFromBuffer(x, y);
 
     if (scrobble) {
-      const {date, artist, album, track, x: xBuffer, y: yBuffer} = scrobble;
+      const {x: xBuffer, y: yBuffer} = scrobble;
 
       this.drawScrobbleHighlight(xBuffer, yBuffer, scrobble);
-
-      this.dateElement.innerText = `date: ${date}`;
-      this.artistNameElement.innerText = `artist: ${artist.name} (${artist.playcount})`;
-      this.albumNameElement.innerText = `album: ${album.name} (${album.playcount})`;
-      this.trackNameElement.innerText = `track: ${track.name} (${track.playcount})`;
+      this.renderInfoBoxContent(scrobble);
     }
+  }
+
+  renderInfoBoxContent({date, artist, album, track}) {
+    if (this.toShowIntroMessage) {
+      this.toShowIntroMessage = false;
+      this.introMessageElementList.forEach((element) => element.remove());
+    }
+
+    this.dateElement.innerText = `date: ${date}`;
+    this.artistNameElement.innerHTML = html`<span>artist: ${artist.name} <small>(${artist.playcount})</small></span>`;
+    this.albumNameElement.innerHTML = html`<span>album: ${album.name} <small>(${album.playcount})</small></span>`;
+    this.trackNameElement.innerHTML = html`<span>track: ${track.name} <small>(${track.playcount})</small></span>`;
   }
 
   render() {
@@ -291,6 +302,24 @@ export default class Timeline {
         <aside
           class="Timeline__info-box"
         >
+          <p
+            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
+          >
+            GitHub: <a href="https://github.com/music-stats/timeline/">music-stats/timeline</a>
+          </p>
+
+          <p
+            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
+          >
+            Twitter: <a href="https://twitter.com/oleksmarkh/">@oleksmarkh</a>
+          </p>
+
+          <p
+            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
+          >
+            (hover over a scrobble)
+          </p>
+
           <p
             id="date"
             class="Timeline__info-box-field"

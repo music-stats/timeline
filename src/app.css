@@ -5,3 +5,12 @@ body {
   color: var(--color-light-grey-1);
   background-color: var(--color-dark-grey-2);
 }
+
+a {
+  text-decoration: none;
+  color: var(--color-grey-2);
+}
+
+a:hover {
+  text-decoration: underline;
+}

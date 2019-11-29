@@ -6,9 +6,12 @@
 }
 
 .Timeline__info-box {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: grid;
   grid-row-gap: 10px;
-  padding: 20px;
+  margin: 20px;
 }
 
 .Timeline__info-box-field {
