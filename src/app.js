@@ -1,3 +1,4 @@
+import config from './config';
 import Timeline from './components/timeline/Timeline';
 
 import './app.css';
@@ -16,5 +17,5 @@ function initialize(scrobbleList) {
   document.body.innerHTML = timeline.render();
 }
 
-retrieve('data/scrobbles.json')
+retrieve(config.dataUrl)
   .then(initialize);

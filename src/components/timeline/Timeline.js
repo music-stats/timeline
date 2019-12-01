@@ -1,6 +1,7 @@
 import * as d3Scale from 'd3-scale';
 import html from '../../lib/html';
 
+import config from '../../config';
 import cssColors from '../../app-theme';
 import {dateStringToTimestamp} from '../../utils/date';
 
@@ -275,12 +276,16 @@ export default class Timeline {
     }
 
     this.dateElement.innerText = `date: ${date}`;
+    // @todo: add last.fm links
+    // @see: "url``" from "music-stats/map/src/utils/string.ts"
     this.artistNameElement.innerHTML = html`<span>artist: ${artist.name} <small>(${artist.playcount})</small></span>`;
     this.albumNameElement.innerHTML = html`<span>album: ${album.name} <small>(${album.playcount})</small></span>`;
     this.trackNameElement.innerHTML = html`<span>track: ${track.name} <small>(${track.playcount})</small></span>`;
   }
 
   render() {
+    const {links} = config;
+
     requestAnimationFrame(() => {
       this.initializeElements();
       this.initializeScales();
@@ -305,13 +310,13 @@ export default class Timeline {
           <p
             class="Timeline__info-box-field Timeline__info-box-field--intro-message"
           >
-            GitHub: <a href="https://github.com/music-stats/timeline/">music-stats/timeline</a>
+            GitHub: <a href=${links.github.url}>${links.github.text}</a>
           </p>
 
           <p
             class="Timeline__info-box-field Timeline__info-box-field--intro-message"
           >
-            Twitter: <a href="https://twitter.com/oleksmarkh/">@oleksmarkh</a>
+            Twitter: <a href=${links.twitter.url}>${links.twitter.text}</a>
           </p>
 
           <p
