@@ -7,6 +7,10 @@ import {dateStringToTimestamp} from '../../utils/date';
 
 import './Timeline.css';
 
+// @todo: add keyboard navigation
+//        * top/right arrow keys for moving forward and left/down for moving backward
+//        * ESC for removing highlights and showing the intro message
+
 export default class Timeline {
   static getDefaultProps() {
     return {
@@ -58,22 +62,27 @@ export default class Timeline {
     this.handleCanvasMouseMove = this.handleCanvasMouseMove.bind(this);
   }
 
-  initializeElements() {
-    const dpr = window.devicePixelRatio;
-    const [width, height] = this.canvasDimensions;
+  subscribe() {
+    this.canvasElement.addEventListener('mousemove', this.handleCanvasMouseMove);
+  }
 
+  initializeElements() {
     this.introMessageElementList = document.querySelectorAll('.Timeline__info-box-field--intro-message');
     this.dateElement = document.getElementById('date');
     this.artistNameElement = document.getElementById('artist-name');
     this.albumNameElement = document.getElementById('album-name');
     this.trackNameElement = document.getElementById('track-name');
-
     this.canvasElement = document.getElementById('canvas');
+  }
+
+  initializeCanvasContext() {
+    const dpr = window.devicePixelRatio;
+    const [width, height] = this.canvasDimensions;
+
     this.canvasElement.width = width * dpr;
     this.canvasElement.height = height * dpr;
     this.canvasElement.style.width = `${width}px`;
     this.canvasElement.style.height = `${height}px`;
-    this.canvasElement.addEventListener('mousemove', this.handleCanvasMouseMove);
 
     this.ctx = this.canvasElement.getContext('2d', {alpha: false});
     this.ctx.scale(dpr, dpr);
@@ -283,17 +292,19 @@ export default class Timeline {
     this.trackNameElement.innerHTML = html`<span>track: ${track.name} <small>(${track.playcount})</small></span>`;
   }
 
+  draw() {
+    this.initializeElements();
+    this.initializeCanvasContext();
+    this.initializeScales();
+    this.subscribe();
+
+    this.drawBackground();
+    this.drawScrobbleList();
+    this.drawTimeAxis();
+  }
+
   render() {
     const {links} = config;
-
-    requestAnimationFrame(() => {
-      this.initializeElements();
-      this.initializeScales();
-
-      this.drawBackground();
-      this.drawScrobbleList();
-      this.drawTimeAxis();
-    });
 
     return html`
       <main
@@ -307,6 +318,12 @@ export default class Timeline {
         <aside
           class="Timeline__info-box"
         >
+          <p
+            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
+          >
+            Last.fm: <a href=${links.lastfm.url}>${links.lastfm.text}</a>
+          </p>
+
           <p
             class="Timeline__info-box-field Timeline__info-box-field--intro-message"
           >

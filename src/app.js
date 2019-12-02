@@ -15,6 +15,7 @@ function initialize(scrobbleList) {
   });
 
   document.body.innerHTML = timeline.render();
+  timeline.draw();
 }
 
 retrieve(config.dataUrl)
