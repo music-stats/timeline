@@ -11,6 +11,12 @@ import './Timeline.css';
 //        * top/right arrow keys for moving forward and left/down for moving backward
 //        * ESC for removing highlights and showing the intro message
 
+// @todo: highlight the same album (use a pale color) when highlighting a scrobble
+
+// @todo: show a date of the first scrobble for highlighted artist (render it below the time axis)
+
+// @todo: expand summary - add total numbers (artists, albums, tracks, scrobbles)
+
 export default class Timeline {
   static getDefaultProps() {
     return {
