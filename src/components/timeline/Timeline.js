@@ -60,7 +60,7 @@ export default class Timeline {
     this.scrobbleBuffer = {};
     this.scrobbleHighlightPointList = [];
     this.scrobbleArtistRegistry = {};
-    this.highlightedScrobbleIndex = null;
+    this.highlightedScrobble = null;
 
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handleCanvasMouseMove = this.handleCanvasMouseMove.bind(this);
@@ -174,7 +174,15 @@ export default class Timeline {
     return null;
   }
 
-  putScrobbleIntoArtistRegistry(x, y, scrobble) {
+  getLeftAdjacentScrobbleFromBuffer(scrobble) {
+    console.log(scrobble.x, scrobble.y);
+  }
+
+  getRightAdjacentScrobbleFromBuffer(scrobble) {
+    console.log(scrobble.x, scrobble.y);
+  }
+
+  putScrobbleIntoArtistRegistry(x, y, scrobble, index) {
     const {artist: {name}} = scrobble;
 
     if (!this.scrobbleArtistRegistry[name]) {
@@ -183,12 +191,13 @@ export default class Timeline {
 
     this.scrobbleArtistRegistry[name].push({
       ...scrobble,
+      index,
       x,
       y,
     });
   }
 
-  getScrobblesForArtist(artistName) {
+  getScrobbleListForArtist(artistName) {
     return this.scrobbleArtistRegistry[artistName];
   }
 
@@ -214,22 +223,27 @@ export default class Timeline {
 
     this.drawScrobblePoint(x, y);
     this.plotScrobbleOnBuffer(x, y, scrobble, index);
-    this.putScrobbleIntoArtistRegistry(x, y, scrobble);
+    this.putScrobbleIntoArtistRegistry(x, y, scrobble, index);
   }
 
-  drawScrobbleHighlight(scrobble) {
+  drawArtistScrobbleListHighlight(scrobble) {
     const {colors} = this.props;
     const {index, artist, track} = scrobble;
 
-    this.removeScrobbleHighlight();
-    this.highlightedScrobbleIndex = index;
-
-    this.getScrobblesForArtist(artist.name).forEach(({track: {name}, x: xi, y: yi}) => {
+    this.getScrobbleListForArtist(artist.name).forEach(({track: {name}, index: i, x: xi, y: yi}) => {
       this.ctx.fillStyle = name === track.name
         ? colors.scrobbleHighlight
         : colors.artistHighlight;
       this.drawScrobblePoint(xi, yi);
       this.scrobbleHighlightPointList.push(xi, yi);
+
+      if (i === index) {
+        this.highlightedScrobble = {
+          ...scrobble,
+          x: xi,
+          y: yi,
+        };
+      }
     });
   }
 
@@ -281,35 +295,24 @@ export default class Timeline {
     this.ctx.stroke();
   }
 
-  selectHighlightedScrobble() {
-    const {scrobbleList} = this.props;
-
-    this.selectScrobble({
-      ...scrobbleList[this.highlightedScrobbleIndex],
-      index: this.highlightedScrobbleIndex,
-    });
-  }
-
   selectScrobble(scrobble) {
-    this.drawScrobbleHighlight(scrobble);
+    this.removeScrobbleHighlight();
+    this.drawArtistScrobbleListHighlight(scrobble);
     this.renderInfoBoxContent(scrobble);
   }
 
   handleDocumentKeydown(event) {
     switch (event.key) {
-      case 'Escape':
-        return this.handleEscKeydown();
-
-      case 'ArrowUp':
-        return this.handleArrowUpKeydown();
-
-      case 'ArrowDown':
-        return this.handleArrowDownKeydown();
+      case 'Escape': return this.handleEscKeydown();
+      case 'ArrowUp': return this.handleArrowUpKeydown();
+      case 'ArrowDown': return this.handleArrowDownKeydown();
+      case 'ArrowLeft': return this.handleArrowLeftKeydown();
+      case 'ArrowRight': return this.handleArrowRightKeydown();
     }
   }
 
   handleEscKeydown() {
-    this.highlightedScrobbleIndex = null;
+    this.highlightedScrobble = null;
     this.removeScrobbleHighlight();
     this.showIntroMessage();
   }
@@ -318,19 +321,51 @@ export default class Timeline {
     const {scrobbleList} = this.props;
 
     if (
-      this.highlightedScrobbleIndex !== null &&
-      this.highlightedScrobbleIndex < scrobbleList.length - 1
+      this.highlightedScrobble &&
+      this.highlightedScrobble.index < scrobbleList.length - 1
     ) {
-      this.highlightedScrobbleIndex += 1;
-      this.selectHighlightedScrobble();
+      const index = this.highlightedScrobble.index + 1;
+
+      this.selectScrobble({
+        ...scrobbleList[index],
+        index,
+      });
     }
   }
 
   handleArrowDownKeydown() {
-    // neither null nor 0
-    if (this.highlightedScrobbleIndex) {
-      this.highlightedScrobbleIndex -= 1;
-      this.selectHighlightedScrobble();
+    const {scrobbleList} = this.props;
+
+    if (
+      this.highlightedScrobble &&
+      this.highlightedScrobble.index > 0
+    ) {
+      const index = this.highlightedScrobble.index - 1;
+
+      this.selectScrobble({
+        ...scrobbleList[index],
+        index,
+      });
+    }
+  }
+
+  handleArrowLeftKeydown() {
+    if (this.highlightedScrobble) {
+      const scrobble = this.getLeftAdjacentScrobbleFromBuffer(this.highlightedScrobble);
+
+      if (scrobble) {
+        this.selectScrobble(scrobble);
+      }
+    }
+  }
+
+  handleArrowRightKeydown() {
+    if (this.highlightedScrobble) {
+      const scrobble = this.getRightAdjacentScrobbleFromBuffer(this.highlightedScrobble);
+
+      if (scrobble) {
+        this.selectScrobble(scrobble);
+      }
     }
   }
 
