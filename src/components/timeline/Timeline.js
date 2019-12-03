@@ -7,15 +7,11 @@ import {dateStringToTimestamp} from '../../utils/date';
 
 import './Timeline.css';
 
-// @todo: add keyboard navigation
-//        * top/right arrow keys for moving forward and left/down for moving backward
-//        * ESC for removing highlights and showing the intro message
-
-// @todo: highlight the same album (use a pale color) when highlighting a scrobble
-
-// @todo: show a date of the first scrobble for highlighted artist (render it below the time axis)
-
-// @todo: expand summary - add total numbers (artists, albums, tracks, scrobbles)
+// @todo:
+// * use left/right arrow keys for navigating to previous/next scrobbles with the same artist playcount
+// * highlight the same album (use a pale color) when highlighting a scrobble
+// * show a date of the first scrobble for highlighted artist (render it below the time axis)
+// * expand summary - add total numbers (artists, albums, tracks, scrobbles)
 
 export default class Timeline {
   static getDefaultProps() {
@@ -63,12 +59,15 @@ export default class Timeline {
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleBuffer = {};
     this.scrobbleHighlightPointList = [];
-    this.scrobbleArtistIndex = {};
+    this.scrobbleArtistRegistry = {};
+    this.highlightedScrobbleIndex = null;
 
+    this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handleCanvasMouseMove = this.handleCanvasMouseMove.bind(this);
   }
 
   subscribe() {
+    document.addEventListener('keydown', this.handleDocumentKeydown);
     this.canvasElement.addEventListener('mousemove', this.handleCanvasMouseMove);
   }
 
@@ -139,12 +138,15 @@ export default class Timeline {
       ]);
   }
 
-  plotScrobbleOnBuffer(x, y, scrobble) {
+  plotScrobbleOnBuffer(x, y, scrobble, index) {
     if (!this.scrobbleBuffer[x]) {
       this.scrobbleBuffer[x] = {};
     }
 
-    this.scrobbleBuffer[x][y] = scrobble;
+    this.scrobbleBuffer[x][y] = {
+      ...scrobble,
+      index,
+    };
   }
 
   getPlottedScrobbleFromBuffer(x, y) {
@@ -152,18 +154,19 @@ export default class Timeline {
     const xTo = x + this.scrobbleHalfSize;
     const yFrom = y - this.scrobbleHalfSize;
     const yTo = y + this.scrobbleHalfSize;
+    let xBuffer = null;
     let scrobble = null;
 
     for (let xi = xFrom; xi <= xTo; xi += 1) {
-      for (let yj = yFrom; yj <= yTo; yj += 1) {
-        scrobble = this.scrobbleBuffer[xi] && this.scrobbleBuffer[xi][yj];
+      xBuffer = this.scrobbleBuffer[xi];
 
-        if (scrobble) {
-          return {
-            ...scrobble,
-            x: xi,
-            y: yj,
-          };
+      if (xBuffer) {
+        for (let yj = yFrom; yj <= yTo; yj += 1) {
+          scrobble = xBuffer[yj];
+
+          if (scrobble) {
+            return scrobble;
+          }
         }
       }
     }
@@ -171,14 +174,14 @@ export default class Timeline {
     return null;
   }
 
-  putScrobbleIntoArtistIndex(x, y, scrobble) {
+  putScrobbleIntoArtistRegistry(x, y, scrobble) {
     const {artist: {name}} = scrobble;
 
-    if (!this.scrobbleArtistIndex[name]) {
-      this.scrobbleArtistIndex[name] = [];
+    if (!this.scrobbleArtistRegistry[name]) {
+      this.scrobbleArtistRegistry[name] = [];
     }
 
-    this.scrobbleArtistIndex[name].push({
+    this.scrobbleArtistRegistry[name].push({
       ...scrobble,
       x,
       y,
@@ -186,7 +189,7 @@ export default class Timeline {
   }
 
   getScrobblesForArtist(artistName) {
-    return this.scrobbleArtistIndex[artistName];
+    return this.scrobbleArtistRegistry[artistName];
   }
 
   drawBackground() {
@@ -201,46 +204,52 @@ export default class Timeline {
     const {scrobbleList, colors} = this.props;
 
     this.ctx.fillStyle = colors.scrobble;
-
-    scrobbleList
-      // .slice(0, 100)
-      .forEach(this.drawScrobble, this);
+    scrobbleList.forEach(this.drawScrobble, this);
   }
 
-  drawScrobble(scrobble) {
+  drawScrobble(scrobble, index) {
     const {date, artist} = scrobble;
     const x = this.timeRangeScale(dateStringToTimestamp(date));
     const y = this.artistPlaycountScale(artist.playcount);
 
     this.drawScrobblePoint(x, y);
-    this.plotScrobbleOnBuffer(x, y, scrobble);
-    this.putScrobbleIntoArtistIndex(x, y, scrobble);
+    this.plotScrobbleOnBuffer(x, y, scrobble, index);
+    this.putScrobbleIntoArtistRegistry(x, y, scrobble);
   }
 
-  drawScrobbleHighlight(x, y, scrobble) {
+  drawScrobbleHighlight(scrobble) {
     const {colors} = this.props;
+    const {index, artist, track} = scrobble;
 
-    // redraw previously highlighted scrobbles
-    if (this.scrobbleHighlightPointList.length) {
-      this.ctx.fillStyle = colors.scrobble;
+    this.removeScrobbleHighlight();
+    this.highlightedScrobbleIndex = index;
 
-      for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
-        this.drawScrobblePoint(
-          this.scrobbleHighlightPointList[i],
-          this.scrobbleHighlightPointList[i + 1],
-        );
-      }
-    }
-
-    this.scrobbleHighlightPointList = [];
-
-    this.getScrobblesForArtist(scrobble.artist.name).forEach(({track, x: xi, y: yi}) => {
-      this.ctx.fillStyle = track.name === scrobble.track.name
+    this.getScrobblesForArtist(artist.name).forEach(({track: {name}, x: xi, y: yi}) => {
+      this.ctx.fillStyle = name === track.name
         ? colors.scrobbleHighlight
         : colors.artistHighlight;
       this.drawScrobblePoint(xi, yi);
       this.scrobbleHighlightPointList.push(xi, yi);
     });
+  }
+
+  removeScrobbleHighlight() {
+    if (!this.scrobbleHighlightPointList.length) {
+      return;
+    }
+
+    const {colors} = this.props;
+
+    this.ctx.fillStyle = colors.scrobble;
+
+    for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
+      this.drawScrobblePoint(
+        this.scrobbleHighlightPointList[i],
+        this.scrobbleHighlightPointList[i + 1],
+      );
+    }
+
+    this.scrobbleHighlightPointList = [];
   }
 
   drawScrobblePoint(x, y) {
@@ -272,25 +281,91 @@ export default class Timeline {
     this.ctx.stroke();
   }
 
+  selectHighlightedScrobble() {
+    const {scrobbleList} = this.props;
+
+    this.selectScrobble({
+      ...scrobbleList[this.highlightedScrobbleIndex],
+      index: this.highlightedScrobbleIndex,
+    });
+  }
+
+  selectScrobble(scrobble) {
+    this.drawScrobbleHighlight(scrobble);
+    this.renderInfoBoxContent(scrobble);
+  }
+
+  handleDocumentKeydown(event) {
+    switch (event.key) {
+      case 'Escape':
+        return this.handleEscKeydown();
+
+      case 'ArrowUp':
+        return this.handleArrowUpKeydown();
+
+      case 'ArrowDown':
+        return this.handleArrowDownKeydown();
+    }
+  }
+
+  handleEscKeydown() {
+    this.highlightedScrobbleIndex = null;
+    this.removeScrobbleHighlight();
+    this.showIntroMessage();
+  }
+
+  handleArrowUpKeydown() {
+    const {scrobbleList} = this.props;
+
+    if (
+      this.highlightedScrobbleIndex !== null &&
+      this.highlightedScrobbleIndex < scrobbleList.length - 1
+    ) {
+      this.highlightedScrobbleIndex += 1;
+      this.selectHighlightedScrobble();
+    }
+  }
+
+  handleArrowDownKeydown() {
+    // neither null nor 0
+    if (this.highlightedScrobbleIndex) {
+      this.highlightedScrobbleIndex -= 1;
+      this.selectHighlightedScrobble();
+    }
+  }
+
   handleCanvasMouseMove(event) {
     const {offsetX: x, offsetY: y} = event;
     const scrobble = this.getPlottedScrobbleFromBuffer(x, y);
 
     if (scrobble) {
-      const {x: xBuffer, y: yBuffer} = scrobble;
-
-      this.drawScrobbleHighlight(xBuffer, yBuffer, scrobble);
-      this.renderInfoBoxContent(scrobble);
+      this.selectScrobble(scrobble);
     }
+  }
+
+  showIntroMessage() {
+    this.toShowIntroMessage = true;
+    this.introMessageElementList.forEach((element) => element.style.display = 'block');
+    [
+      this.dateElement,
+      this.artistNameElement,
+      this.albumNameElement,
+      this.trackNameElement,
+    ].forEach((element) => element.innerText = '');
+  }
+
+  hideIntroMessage() {
+    this.toShowIntroMessage = false;
+    this.introMessageElementList.forEach((element) => element.style.display = 'none');
   }
 
   renderInfoBoxContent({date, artist, album, track}) {
     if (this.toShowIntroMessage) {
-      this.toShowIntroMessage = false;
-      this.introMessageElementList.forEach((element) => element.remove());
+      this.hideIntroMessage();
     }
 
     this.dateElement.innerText = `date: ${date}`;
+
     // @todo: add last.fm links
     // @see: "url``" from "music-stats/map/src/utils/string.ts"
     this.artistNameElement.innerHTML = html`<span>artist: ${artist.name} <small>(${artist.playcount})</small></span>`;
@@ -345,7 +420,7 @@ export default class Timeline {
           <p
             class="Timeline__info-box-field Timeline__info-box-field--intro-message"
           >
-            (hover over a scrobble)
+            (hover over a scrobble and use arrow keys for navigation)
           </p>
 
           <p
