@@ -8,7 +8,6 @@ import {dateStringToTimestamp} from '../../utils/date';
 import './Timeline.css';
 
 // @todo:
-// * use left/right arrow keys for navigating to previous/next scrobbles with the same artist playcount
 // * highlight the same album (use a pale color) when highlighting a scrobble
 // * show a date of the first scrobble for highlighted artist (render it below the time axis)
 // * expand summary - add total numbers (artists, albums, tracks, scrobbles)
@@ -57,7 +56,7 @@ export default class Timeline {
     this.artistPlaycountScale = null;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
-    this.scrobbleBuffer = {};
+    this.scrobbleBuffer = {}; // [y][x] matrix (y-coord is first because of horizontal traversal optimization)
     this.scrobbleHighlightPointList = [];
     this.scrobbleArtistRegistry = {};
     this.highlightedScrobble = null;
@@ -139,11 +138,11 @@ export default class Timeline {
   }
 
   plotScrobbleOnBuffer(x, y, scrobble, index) {
-    if (!this.scrobbleBuffer[x]) {
-      this.scrobbleBuffer[x] = {};
+    if (!this.scrobbleBuffer[y]) {
+      this.scrobbleBuffer[y] = {};
     }
 
-    this.scrobbleBuffer[x][y] = {
+    this.scrobbleBuffer[y][x] = {
       ...scrobble,
       index,
     };
@@ -154,15 +153,15 @@ export default class Timeline {
     const xTo = x + this.scrobbleHalfSize;
     const yFrom = y - this.scrobbleHalfSize;
     const yTo = y + this.scrobbleHalfSize;
-    let xBuffer = null;
+    let yBuffer = null;
     let scrobble = null;
 
-    for (let xi = xFrom; xi <= xTo; xi += 1) {
-      xBuffer = this.scrobbleBuffer[xi];
+    for (let yi = yFrom; yi <= yTo; yi += 1) {
+      yBuffer = this.scrobbleBuffer[yi];
 
-      if (xBuffer) {
-        for (let yj = yFrom; yj <= yTo; yj += 1) {
-          scrobble = xBuffer[yj];
+      if (yBuffer) {
+        for (let xj = xFrom; xj <= xTo; xj += 1) {
+          scrobble = yBuffer[xj];
 
           if (scrobble) {
             return scrobble;
@@ -174,12 +173,12 @@ export default class Timeline {
     return null;
   }
 
-  getLeftAdjacentScrobbleFromBuffer(scrobble) {
-    console.log(scrobble.x, scrobble.y);
-  }
+  getHorizontallyAdjacentScrobbleFromBuffer({x, y}, shift) {
+    const yBuffer = this.scrobbleBuffer[y];
+    const xList = Object.keys(yBuffer);
+    const prevX = xList[xList.indexOf(String(x)) + shift];
 
-  getRightAdjacentScrobbleFromBuffer(scrobble) {
-    console.log(scrobble.x, scrobble.y);
+    return yBuffer[prevX];
   }
 
   putScrobbleIntoArtistRegistry(x, y, scrobble, index) {
@@ -301,11 +300,37 @@ export default class Timeline {
     this.renderInfoBoxContent(scrobble);
   }
 
+  selectVerticallyAdjacentScrobble(scrobble, shift) {
+    const {scrobbleList} = this.props;
+    const condition = shift > 0
+      ? () => scrobble && scrobble.index < scrobbleList.length - 1
+      : () => scrobble && scrobble.index > 0;
+
+    if (condition()) {
+      const index = scrobble.index + shift;
+
+      this.selectScrobble({
+        ...scrobbleList[index],
+        index,
+      });
+    }
+  }
+
+  selectHorizontallyAdjacentScrobble(scrobble, shift) {
+    if (scrobble) {
+      const adjacentScrobble = this.getHorizontallyAdjacentScrobbleFromBuffer(scrobble, shift);
+
+      if (adjacentScrobble) {
+        this.selectScrobble(adjacentScrobble);
+      }
+    }
+  }
+
   handleDocumentKeydown(event) {
     switch (event.key) {
       case 'Escape': return this.handleEscKeydown();
-      case 'ArrowUp': return this.handleArrowUpKeydown();
       case 'ArrowDown': return this.handleArrowDownKeydown();
+      case 'ArrowUp': return this.handleArrowUpKeydown();
       case 'ArrowLeft': return this.handleArrowLeftKeydown();
       case 'ArrowRight': return this.handleArrowRightKeydown();
     }
@@ -317,56 +342,20 @@ export default class Timeline {
     this.showIntroMessage();
   }
 
-  handleArrowUpKeydown() {
-    const {scrobbleList} = this.props;
-
-    if (
-      this.highlightedScrobble &&
-      this.highlightedScrobble.index < scrobbleList.length - 1
-    ) {
-      const index = this.highlightedScrobble.index + 1;
-
-      this.selectScrobble({
-        ...scrobbleList[index],
-        index,
-      });
-    }
+  handleArrowDownKeydown() {
+    this.selectVerticallyAdjacentScrobble(this.highlightedScrobble, -1);
   }
 
-  handleArrowDownKeydown() {
-    const {scrobbleList} = this.props;
-
-    if (
-      this.highlightedScrobble &&
-      this.highlightedScrobble.index > 0
-    ) {
-      const index = this.highlightedScrobble.index - 1;
-
-      this.selectScrobble({
-        ...scrobbleList[index],
-        index,
-      });
-    }
+  handleArrowUpKeydown() {
+    this.selectVerticallyAdjacentScrobble(this.highlightedScrobble, 1);
   }
 
   handleArrowLeftKeydown() {
-    if (this.highlightedScrobble) {
-      const scrobble = this.getLeftAdjacentScrobbleFromBuffer(this.highlightedScrobble);
-
-      if (scrobble) {
-        this.selectScrobble(scrobble);
-      }
-    }
+    this.selectHorizontallyAdjacentScrobble(this.highlightedScrobble, -1);
   }
 
   handleArrowRightKeydown() {
-    if (this.highlightedScrobble) {
-      const scrobble = this.getRightAdjacentScrobbleFromBuffer(this.highlightedScrobble);
-
-      if (scrobble) {
-        this.selectScrobble(scrobble);
-      }
-    }
+    this.selectHorizontallyAdjacentScrobble(this.highlightedScrobble, 1);
   }
 
   handleCanvasMouseMove(event) {
