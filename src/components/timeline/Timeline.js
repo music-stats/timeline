@@ -20,7 +20,7 @@ export default class Timeline {
       scrobbleMargin: 2,
       timeAxisWidth: 2,
       colors: {
-        background: cssColors.darkBlue,
+        background: cssColors.darkGreyBlue,
         scrobble: cssColors.darkGrey2,
         artistHighlight: cssColors.grey1,
         scrobbleHighlight: cssColors.lightGrey3,

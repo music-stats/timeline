@@ -2,7 +2,8 @@ body {
   --color-black: #000;
 
   --color-dark-grey-1: #222;
-  --color-dark-grey-2: #444;
+  --color-dark-grey-2: #484848;
+  --color-dark-grey-blue: #283038;
   --color-grey-1: #888;
   --color-grey-2: #aaa;
   --color-light-grey-1: #ccc;
@@ -11,6 +12,4 @@ body {
   --color-light-grey-4: #f8f8f8;
 
   --color-white: #fff;
-
-  --color-dark-blue: #234;
 }
