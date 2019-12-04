@@ -30,7 +30,7 @@ See [scripts supporting the scrobble timeline](https://github.com/music-stats/sc
 
 ### deps
 * templates: [`htm`](https://github.com/developit/htm) + [`vhtml`](https://github.com/developit/vhtml)
-* dataviz utils: [`d3-scale`](https://github.com/d3/d3-scale)
+* dataviz utils: [`d3-scale`](https://github.com/d3/d3-scale), [`d3-scale-chromatic`](https://github.com/d3/d3-scale-chromatic)
 
 ## Development setup
 ```bash

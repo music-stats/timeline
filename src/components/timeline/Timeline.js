@@ -1,4 +1,5 @@
 import * as d3Scale from 'd3-scale';
+import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import html from '../../lib/html';
 
 import config from '../../config';
@@ -35,7 +36,7 @@ export default class Timeline {
       ...props,
     };
 
-    const {scrobbleList, scrobbleSize} = this.props;
+    const {scrobbleSize} = this.props;
     const {width, height} = document.body.getBoundingClientRect();
 
     this.toShowIntroMessage = true;
@@ -51,9 +52,9 @@ export default class Timeline {
     this.canvasElement = null;
     this.ctx = null;
 
-    this.artistPlaycountList = scrobbleList.map(({artist}) => artist.playcount);
     this.timeRangeScale = null;
     this.artistPlaycountScale = null;
+    this.albumPlaycountScale = null;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleBuffer = {}; // [y][x] matrix (y-coord is first because of horizontal traversal optimization)
@@ -99,8 +100,8 @@ export default class Timeline {
     const minDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
     const maxDateTimestamp = dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
 
-    const minPlaycount = 1;
-    const maxPlaycount = Math.max(...this.artistPlaycountList);
+    const maxArtistPlaycount = Math.max(...scrobbleList.map(({artist}) => artist.playcount));
+    const maxAlbumPlaycount = Math.max(...scrobbleList.map(({album}) => album.playcount));
 
     const scrobbleAreaLeft = plotPadding;
     const scrobbleAreaRight = width - plotPadding;
@@ -111,30 +112,22 @@ export default class Timeline {
     // the range itself should be aliquot to point size + margin.
     const scrobbleAreaBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
     const plotAreaHeight = scrobbleAreaBottom - plotPadding;
-    const scrobbleAreaHeight = plotAreaHeight - plotAreaHeight % ((maxPlaycount - 1) * (scrobbleSize + scrobbleMargin));
+    const scrobbleAreaHeight = plotAreaHeight - plotAreaHeight % ((maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin));
     const scrobbleAreaTop = scrobbleAreaHeight > 0
       ? scrobbleAreaBottom - scrobbleAreaHeight
       : plotPadding;
 
     this.timeRangeScale = d3Scale.scaleLinear()
-      .domain([
-        minDateTimestamp,
-        maxDateTimestamp,
-      ])
-      .rangeRound([
-        scrobbleAreaLeft,
-        scrobbleAreaRight,
-      ]);
+      .domain([minDateTimestamp, maxDateTimestamp])
+      .rangeRound([scrobbleAreaLeft, scrobbleAreaRight]);
 
     this.artistPlaycountScale = d3Scale.scaleLinear()
-      .domain([
-        minPlaycount,
-        maxPlaycount,
-      ])
-      .rangeRound([
-        scrobbleAreaBottom,
-        scrobbleAreaTop,
-      ]);
+      .domain([1, maxArtistPlaycount])
+      .rangeRound([scrobbleAreaBottom, scrobbleAreaTop]);
+
+    this.albumPlaycountScale = d3Scale.scaleLinear()
+      .domain([1, maxAlbumPlaycount])
+      .range([0.8, 0.4]);
   }
 
   plotScrobbleOnBuffer(x, y, scrobble, index) {
@@ -216,10 +209,12 @@ export default class Timeline {
   }
 
   drawScrobble(scrobble, index) {
-    const {date, artist} = scrobble;
+    const {date, artist, album} = scrobble;
     const x = this.timeRangeScale(dateStringToTimestamp(date));
     const y = this.artistPlaycountScale(artist.playcount);
 
+    // @todo: restore this color when highlighting is getting removed
+    this.ctx.fillStyle = d3ScaleChromatic.interpolateGreys(this.albumPlaycountScale(album.playcount));
     this.drawScrobblePoint(x, y);
     this.plotScrobbleOnBuffer(x, y, scrobble, index);
     this.putScrobbleIntoArtistRegistry(x, y, scrobble, index);
