@@ -35,9 +35,6 @@ export default class Timeline {
     };
 
     const {scrobbleSize} = this.props;
-    const {width, height} = document.body.getBoundingClientRect();
-
-    this.toShowIntroMessage = true;
 
     this.introMessageElementList = null;
     this.dateElement = null;
@@ -45,8 +42,7 @@ export default class Timeline {
     this.albumNameElement = null;
     this.trackNameElement = null;
 
-    // @todo: listen to "window.resize" for updating dimensions and scales
-    this.canvasDimensions = [width, height];
+    this.canvasDimensions = null;
     this.canvasElement = null;
     this.ctx = null;
 
@@ -59,12 +55,23 @@ export default class Timeline {
     this.scrobbleHighlightPointList = []; // [x1, y1, x2, y2, ...]
     this.scrobbleArtistRegistry = {};
     this.highlightedScrobble = null;
+    this.isFirstDraw = true;
+    this.toShowIntroMessage = true;
 
+    this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handleCanvasMouseMove = this.handleCanvasMouseMove.bind(this);
   }
 
+  reset() {
+    this.scrobbleBuffer = {};
+    this.scrobbleHighlightPointList = [];
+    this.scrobbleArtistRegistry = {};
+    this.highlightedScrobble = null;
+  }
+
   subscribe() {
+    window.addEventListener('resize', this.handleWindowResize);
     document.addEventListener('keydown', this.handleDocumentKeydown);
     this.canvasElement.addEventListener('mousemove', this.handleCanvasMouseMove);
   }
@@ -80,7 +87,10 @@ export default class Timeline {
 
   initializeCanvasContext() {
     const dpr = window.devicePixelRatio;
-    const [width, height] = this.canvasDimensions;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    this.canvasDimensions = [width, height];
 
     this.canvasElement.width = width * dpr;
     this.canvasElement.height = height * dpr;
@@ -103,17 +113,12 @@ export default class Timeline {
 
     const scrobbleAreaLeft = plotPadding;
     const scrobbleAreaRight = width - plotPadding;
-
-    // All those "scrobbleAreaHeight" calculations are needed
-    // to guarantee equal vertical distances between points (aka margins).
-    // Since rounded range is used for vertical (playcount) scale,
-    // the vertical range itself should be aliquot to point size + margin.
     const scrobbleAreaBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
-    const plotAreaHeight = scrobbleAreaBottom - plotPadding;
-    const scrobbleAreaHeight = plotAreaHeight - plotAreaHeight % ((maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin));
-    const scrobbleAreaTop = scrobbleAreaHeight > 0
-      ? scrobbleAreaBottom - scrobbleAreaHeight
-      : plotPadding;
+    const scrobbleAreaHeight = Math.min(
+      scrobbleAreaBottom - plotPadding,
+      (maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin),
+    );
+    const scrobbleAreaTop = scrobbleAreaBottom - scrobbleAreaHeight;
 
     this.timeRangeScale = d3Scale.scaleLinear()
       .domain([minDateTimestamp, maxDateTimestamp])
@@ -329,6 +334,12 @@ export default class Timeline {
     }
   }
 
+  handleWindowResize() {
+    this.reset();
+    this.draw();
+    this.showIntroMessage();
+  }
+
   handleDocumentKeydown(event) {
     switch (event.key) {
       case 'Escape': return this.handleEscKeydown();
@@ -401,10 +412,14 @@ export default class Timeline {
   }
 
   draw() {
-    this.initializeElements();
+    if (this.isFirstDraw) {
+      this.isFirstDraw = false;
+      this.initializeElements();
+      this.subscribe();
+    }
+
     this.initializeCanvasContext();
     this.initializeScales();
-    this.subscribe();
 
     this.drawBackground();
     this.drawScrobbleList();
