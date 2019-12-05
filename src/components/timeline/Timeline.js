@@ -9,7 +9,6 @@ import {dateStringToTimestamp} from '../../utils/date';
 import './Timeline.css';
 
 // @todo:
-// * highlight the same album (use a pale color) when highlighting a scrobble
 // * show a date of the first scrobble for highlighted artist (render it below the time axis)
 // * expand summary - add total numbers (artists, albums, tracks, scrobbles)
 
@@ -23,8 +22,7 @@ export default class Timeline {
       colors: {
         background: cssColors.darkGreyBlue,
         scrobble: cssColors.darkGrey2,
-        artistHighlight: cssColors.grey1,
-        scrobbleHighlight: cssColors.lightGrey3,
+        scrobbleHighlight: cssColors.white,
         timeAxis: cssColors.grey1,
       },
     };
@@ -58,7 +56,7 @@ export default class Timeline {
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleBuffer = {}; // [y][x] matrix (y-coord is first because of horizontal traversal optimization)
-    this.scrobbleHighlightPointList = [];
+    this.scrobbleHighlightPointList = []; // [x1, y1, x2, y2, ...]
     this.scrobbleArtistRegistry = {};
     this.highlightedScrobble = null;
 
@@ -109,7 +107,7 @@ export default class Timeline {
     // All those "scrobbleAreaHeight" calculations are needed
     // to guarantee equal vertical distances between points (aka margins).
     // Since rounded range is used for vertical (playcount) scale,
-    // the range itself should be aliquot to point size + margin.
+    // the vertical range itself should be aliquot to point size + margin.
     const scrobbleAreaBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
     const plotAreaHeight = scrobbleAreaBottom - plotPadding;
     const scrobbleAreaHeight = plotAreaHeight - plotAreaHeight % ((maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin));
@@ -130,7 +128,7 @@ export default class Timeline {
       .range([0.8, 0.4]);
   }
 
-  plotScrobbleOnBuffer(x, y, scrobble, index) {
+  plotScrobbleOnBuffer(x, y, scrobble, index, color) {
     if (!this.scrobbleBuffer[y]) {
       this.scrobbleBuffer[y] = {};
     }
@@ -138,6 +136,7 @@ export default class Timeline {
     this.scrobbleBuffer[y][x] = {
       ...scrobble,
       index,
+      color,
     };
   }
 
@@ -193,82 +192,20 @@ export default class Timeline {
     return this.scrobbleArtistRegistry[artistName];
   }
 
+  getColorByAlbumPlaycount(playcount) {
+    return d3ScaleChromatic.interpolateGreys(this.albumPlaycountScale(playcount));
+  }
+
+  getHighlightColorByAlbumPlaycount(playcount) {
+    return d3ScaleChromatic.interpolateWarm(this.albumPlaycountScale(playcount));
+  }
+
   drawBackground() {
     const {colors} = this.props;
     const [width, height] = this.canvasDimensions;
 
     this.ctx.fillStyle = colors.background;
     this.ctx.fillRect(0, 0, width, height);
-  }
-
-  drawScrobbleList() {
-    const {scrobbleList, colors} = this.props;
-
-    this.ctx.fillStyle = colors.scrobble;
-    scrobbleList.forEach(this.drawScrobble, this);
-  }
-
-  drawScrobble(scrobble, index) {
-    const {date, artist, album} = scrobble;
-    const x = this.timeRangeScale(dateStringToTimestamp(date));
-    const y = this.artistPlaycountScale(artist.playcount);
-
-    // @todo: restore this color when highlighting is getting removed
-    this.ctx.fillStyle = d3ScaleChromatic.interpolateGreys(this.albumPlaycountScale(album.playcount));
-    this.drawScrobblePoint(x, y);
-    this.plotScrobbleOnBuffer(x, y, scrobble, index);
-    this.putScrobbleIntoArtistRegistry(x, y, scrobble, index);
-  }
-
-  drawArtistScrobbleListHighlight(scrobble) {
-    const {colors} = this.props;
-    const {index, artist, track} = scrobble;
-
-    this.getScrobbleListForArtist(artist.name).forEach(({track: {name}, index: i, x: xi, y: yi}) => {
-      this.ctx.fillStyle = name === track.name
-        ? colors.scrobbleHighlight
-        : colors.artistHighlight;
-      this.drawScrobblePoint(xi, yi);
-      this.scrobbleHighlightPointList.push(xi, yi);
-
-      if (i === index) {
-        this.highlightedScrobble = {
-          ...scrobble,
-          x: xi,
-          y: yi,
-        };
-      }
-    });
-  }
-
-  removeScrobbleHighlight() {
-    if (!this.scrobbleHighlightPointList.length) {
-      return;
-    }
-
-    const {colors} = this.props;
-
-    this.ctx.fillStyle = colors.scrobble;
-
-    for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
-      this.drawScrobblePoint(
-        this.scrobbleHighlightPointList[i],
-        this.scrobbleHighlightPointList[i + 1],
-      );
-    }
-
-    this.scrobbleHighlightPointList = [];
-  }
-
-  drawScrobblePoint(x, y) {
-    const {scrobbleSize} = this.props;
-
-    this.ctx.fillRect(
-      x - this.scrobbleHalfSize,
-      y - this.scrobbleHalfSize,
-      scrobbleSize,
-      scrobbleSize,
-    );
   }
 
   drawTimeAxis() {
@@ -287,6 +224,77 @@ export default class Timeline {
       height - plotPadding,
     );
     this.ctx.stroke();
+  }
+
+  drawScrobbleList() {
+    const {scrobbleList} = this.props;
+
+    scrobbleList.forEach((scrobble, index) => {
+      const {date, artist, album} = scrobble;
+      const x = this.timeRangeScale(dateStringToTimestamp(date));
+      const y = this.artistPlaycountScale(artist.playcount);
+      const color = this.getColorByAlbumPlaycount(album.playcount);
+
+      this.drawScrobblePoint(x, y, color);
+      this.plotScrobbleOnBuffer(x, y, scrobble, index, color);
+      this.putScrobbleIntoArtistRegistry(x, y, scrobble, index);
+    });
+  }
+
+  drawArtistScrobbleListHighlight(scrobble) {
+    const {colors} = this.props;
+    const {index, artist, track} = scrobble;
+
+    this.getScrobbleListForArtist(artist.name).forEach(({
+      album: {playcount},
+      track: {name},
+      index: i,
+      x: xi,
+      y: yi,
+    }) => {
+      const color = name === track.name
+        ? colors.scrobbleHighlight
+        : this.getHighlightColorByAlbumPlaycount(playcount);
+
+      this.drawScrobblePoint(xi, yi, color);
+      this.scrobbleHighlightPointList.push(xi, yi);
+
+      if (i === index) {
+        this.highlightedScrobble = {
+          ...scrobble,
+          x: xi,
+          y: yi,
+        };
+      }
+    });
+  }
+
+  removeScrobbleHighlight() {
+    if (!this.scrobbleHighlightPointList.length) {
+      return;
+    }
+
+    for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
+      const x = this.scrobbleHighlightPointList[i];
+      const y = this.scrobbleHighlightPointList[i + 1];
+      const {color} = this.getPlottedScrobbleFromBuffer(x, y);
+
+      this.drawScrobblePoint(x, y, color);
+    }
+
+    this.scrobbleHighlightPointList = [];
+  }
+
+  drawScrobblePoint(x, y, color) {
+    const {scrobbleSize} = this.props;
+
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(
+      x - this.scrobbleHalfSize,
+      y - this.scrobbleHalfSize,
+      scrobbleSize,
+      scrobbleSize,
+    );
   }
 
   selectScrobble(scrobble) {
