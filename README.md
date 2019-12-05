@@ -12,9 +12,11 @@ Showcasing a ratio between different aspects of how musical taste evolves (or pr
 *In progress*, *experimental*.
 
 ## How does it look like?
-<a href="https://user-images.githubusercontent.com/2470363/70138768-42806080-1691-11ea-8a58-194b05ec6e47.png">
-  <img width="320" src="https://user-images.githubusercontent.com/2470363/70138768-42806080-1691-11ea-8a58-194b05ec6e47.png" />
-</a>
+<p align="center">
+  <a href="https://user-images.githubusercontent.com/2470363/70239729-1daceb80-176c-11ea-9ff7-c9a749c58508.png">
+    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/70239729-1daceb80-176c-11ea-9ff7-c9a749c58508.png" />
+  </a>
+</p>
 
 ## Design
 HTML strings as component templates, canvas as a rendering target, and a static dataset.
