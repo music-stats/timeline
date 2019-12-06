@@ -25,6 +25,12 @@ export default class Timeline {
         scrobbleHighlight: cssColors.white,
         timeAxis: cssColors.grey1,
       },
+      colorRanges: {
+        albumPlaycount: {
+          from: 0.8,
+          to: 0.4,
+        },
+      },
     };
   }
 
@@ -102,7 +108,7 @@ export default class Timeline {
   }
 
   initializeScales() {
-    const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin} = this.props;
+    const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin, colorRanges} = this.props;
     const [width, height] = this.canvasDimensions;
 
     const minDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
@@ -120,17 +126,20 @@ export default class Timeline {
     );
     const scrobbleAreaTop = scrobbleAreaBottom - scrobbleAreaHeight;
 
+    // X axis
     this.timeRangeScale = d3Scale.scaleLinear()
       .domain([minDateTimestamp, maxDateTimestamp])
       .rangeRound([scrobbleAreaLeft, scrobbleAreaRight]);
 
+    // Y axis
     this.artistPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxArtistPlaycount])
       .rangeRound([scrobbleAreaBottom, scrobbleAreaTop]);
 
+    // scrobble point color
     this.albumPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxAlbumPlaycount])
-      .range([0.8, 0.4]);
+      .range([colorRanges.albumPlaycount.from, colorRanges.albumPlaycount.to]);
   }
 
   plotScrobbleOnBuffer(x, y, scrobble, index, color) {
