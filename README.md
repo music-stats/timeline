@@ -13,8 +13,8 @@ Showcasing a ratio between different aspects of how musical taste evolves (or pr
 
 ## How does it look like?
 <p align="center">
-  <a href="https://user-images.githubusercontent.com/2470363/70239729-1daceb80-176c-11ea-9ff7-c9a749c58508.png">
-    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/70239729-1daceb80-176c-11ea-9ff7-c9a749c58508.png" />
+  <a href="https://user-images.githubusercontent.com/2470363/70378960-5e9d2f80-1927-11ea-8367-de163c2d7862.png">
+    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/70378960-5e9d2f80-1927-11ea-8367-de163c2d7862.png" />
   </a>
 </p>
 

@@ -9,10 +9,8 @@ import {dateStringToTimestamp} from '../../utils/date';
 import './Timeline.css';
 
 // @todo:
-// * remove "mbid" from the dataset
 // * add unit tests (use "tape")
 // * show a date of the first scrobble for highlighted artist (render it below the time axis)
-// * expand summary - add total numbers (artists, albums, tracks, scrobbles)
 
 export default class Timeline {
   static getDefaultProps() {
@@ -59,7 +57,8 @@ export default class Timeline {
     this.albumPlaycountScale = null;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
-    this.scrobbleBuffer = {}; // [y][x] matrix (y-coord is first because of horizontal traversal optimization)
+    this.scrobbleTotalRegistry = null;
+    this.scrobblePlotBuffer = {}; // [y][x] matrix (y-coord is first because of horizontal traversal optimization)
     this.scrobbleHighlightPointList = []; // [x1, y1, x2, y2, ...]
     this.scrobbleArtistRegistry = {};
     this.highlightedScrobble = null;
@@ -72,7 +71,7 @@ export default class Timeline {
   }
 
   reset() {
-    this.scrobbleBuffer = {};
+    this.scrobblePlotBuffer = {};
     this.scrobbleHighlightPointList = [];
     this.scrobbleArtistRegistry = {};
     this.highlightedScrobble = null;
@@ -109,15 +108,85 @@ export default class Timeline {
     this.ctx.scale(dpr, dpr);
   }
 
+  initializeTotals() {
+    const {scrobbleList} = this.props;
+    const registry = {};
+
+    scrobbleList.forEach(({track, album, artist}) => {
+      if (!registry[artist.name]) {
+        // A track can be present in different albums, so tracks playcount values are not nested into albums.
+        // It matches aggregation logic in "music-stats/scripts/src/ETL/transformers/aggregate.ts".
+        registry[artist.name] = {
+          albums: {},
+          tracks: {},
+        };
+      }
+
+      registry[artist.name].playcount = artist.playcount;
+      registry[artist.name].albums[album.name] = album.playcount;
+      registry[artist.name].tracks[track.name] = track.playcount;
+    });
+
+    this.scrobbleTotalRegistry = registry;
+  }
+
+  getMaxPlaycounts() {
+    let artistRecord = null;
+    let artistPlaycount = null;
+    let albumPlaycount = null;
+    let maxArtistPlaycount = 0;
+    let maxAlbumPlaycount = 0;
+
+    for (let artistName in this.scrobbleTotalRegistry) {
+      artistRecord = this.scrobbleTotalRegistry[artistName];
+      artistPlaycount = artistRecord.playcount;
+
+      if (artistPlaycount > maxArtistPlaycount) {
+        maxArtistPlaycount = artistPlaycount;
+      }
+
+      for (let albumName in artistRecord.albums) {
+        albumPlaycount = artistRecord.albums[albumName];
+
+        if (albumPlaycount > maxAlbumPlaycount) {
+          maxAlbumPlaycount = albumPlaycount;
+        }
+      }
+    }
+
+    return [
+      maxArtistPlaycount,
+      maxAlbumPlaycount,
+    ];
+  }
+
+  getScrobbleTotals({artist, album, track}) {
+    const artistRecord = this.scrobbleTotalRegistry[artist.name];
+
+    return [
+      artistRecord.playcount,
+      artistRecord.albums[album.name],
+      artistRecord.tracks[track.name],
+    ];
+  }
+
+  getDayAverageScrobbleCount() {
+    const {scrobbleList} = this.props;
+    const firstScrobbleDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
+    const lastScrobbleDateTimestamp = dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
+    const msInDay = 24 * 60 * 60 * 1000;
+    const daysCount = (lastScrobbleDateTimestamp - firstScrobbleDateTimestamp) / msInDay;
+
+    return Math.round(10 * scrobbleList.length / daysCount) / 10;
+  }
+
   initializeScales() {
     const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin, colorRanges} = this.props;
     const [width, height] = this.canvasDimensions;
 
     const minDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
     const maxDateTimestamp = dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
-
-    const maxArtistPlaycount = Math.max(...scrobbleList.map(({artist}) => artist.playcount));
-    const maxAlbumPlaycount = Math.max(...scrobbleList.map(({album}) => album.playcount));
+    const [maxArtistPlaycount, maxAlbumPlaycount] = this.getMaxPlaycounts();
 
     // plot width calculation avoids stretching the timeline in case of few points
     const plotLeft = plotPadding;
@@ -152,11 +221,11 @@ export default class Timeline {
   }
 
   plotScrobbleOnBuffer(x, y, scrobble, index, color) {
-    if (!this.scrobbleBuffer[y]) {
-      this.scrobbleBuffer[y] = {};
+    if (!this.scrobblePlotBuffer[y]) {
+      this.scrobblePlotBuffer[y] = {};
     }
 
-    this.scrobbleBuffer[y][x] = {
+    this.scrobblePlotBuffer[y][x] = {
       ...scrobble,
       index,
       color,
@@ -172,7 +241,7 @@ export default class Timeline {
     let scrobble = null;
 
     for (let yi = yFrom; yi <= yTo; yi += 1) {
-      yBuffer = this.scrobbleBuffer[yi];
+      yBuffer = this.scrobblePlotBuffer[yi];
 
       if (yBuffer) {
         for (let xj = xFrom; xj <= xTo; xj += 1) {
@@ -189,7 +258,7 @@ export default class Timeline {
   }
 
   getHorizontallyAdjacentScrobbleFromBuffer({x, y}, shift) {
-    const yBuffer = this.scrobbleBuffer[y];
+    const yBuffer = this.scrobblePlotBuffer[y];
     const xList = Object.keys(yBuffer);
     const prevX = xList[xList.indexOf(String(x)) + shift];
 
@@ -411,7 +480,10 @@ export default class Timeline {
     this.introMessageElementList.forEach((element) => element.style.display = 'none');
   }
 
-  renderInfoBoxContent({date, artist, album, track}) {
+  renderInfoBoxContent(scrobble) {
+    const {date, artist, album, track} = scrobble;
+    const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = this.getScrobbleTotals(scrobble);
+
     if (this.toShowIntroMessage) {
       this.hideIntroMessage();
     }
@@ -420,14 +492,21 @@ export default class Timeline {
 
     // @todo: add last.fm links
     // @see: "url``" from "music-stats/map/src/utils/string.ts"
-    this.artistNameElement.innerHTML = html`<span>artist: ${artist.name} <small>(${artist.playcount})</small></span>`;
-    this.albumNameElement.innerHTML = html`<span>album: ${album.name} <small>(${album.playcount})</small></span>`;
-    this.trackNameElement.innerHTML = html`<span>track: ${track.name} <small>(${track.playcount})</small></span>`;
+    this.artistNameElement.innerHTML = html`
+      <span>artist: ${artist.name} <small>(${artist.playcount}/${artistTotalPlaycount})</small></span>
+    `;
+    this.albumNameElement.innerHTML = html`
+      <span>album: ${album.name} <small>(${album.playcount}/${albumTotalPlaycount})</small></span>
+    `;
+    this.trackNameElement.innerHTML = html`
+      <span>track: ${track.name} <small>(${track.playcount}/${trackTotalPlaycount})</small></span>
+    `;
   }
 
   draw() {
     if (this.isFirstDraw) {
       this.isFirstDraw = false;
+      this.initializeTotals();
       this.initializeElements();
       this.subscribe();
     }
@@ -441,7 +520,11 @@ export default class Timeline {
   }
 
   render() {
+    const {scrobbleList} = this.props;
     const {links} = config;
+    const firstScrobble = scrobbleList[0];
+    const lastScrobble = scrobbleList[scrobbleList.length - 1];
+    const scrobbleCount = scrobbleList.length;
 
     return html`
       <main
@@ -471,6 +554,12 @@ export default class Timeline {
             class="Timeline__info-box-field Timeline__info-box-field--intro-message"
           >
             Twitter: <a href=${links.twitter.url}>${links.twitter.text}</a>
+          </p>
+
+          <p
+            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
+          >
+            total: ${scrobbleCount} (${this.getDayAverageScrobbleCount()} per day, from ${firstScrobble.date} to ${lastScrobble.date})
           </p>
 
           <p
