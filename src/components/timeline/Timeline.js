@@ -9,6 +9,8 @@ import {dateStringToTimestamp} from '../../utils/date';
 import './Timeline.css';
 
 // @todo:
+// * remove "mbid" from the dataset
+// * add unit tests (use "tape")
 // * show a date of the first scrobble for highlighted artist (render it below the time axis)
 // * expand summary - add total numbers (artists, albums, tracks, scrobbles)
 
@@ -117,24 +119,31 @@ export default class Timeline {
     const maxArtistPlaycount = Math.max(...scrobbleList.map(({artist}) => artist.playcount));
     const maxAlbumPlaycount = Math.max(...scrobbleList.map(({album}) => album.playcount));
 
-    const scrobbleAreaLeft = plotPadding;
-    const scrobbleAreaRight = width - plotPadding;
-    const scrobbleAreaBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
-    const scrobbleAreaHeight = Math.min(
-      scrobbleAreaBottom - plotPadding,
+    // plot width calculation avoids stretching the timeline in case of few points
+    const plotLeft = plotPadding;
+    const plotWidth = Math.min(
+      width - 2 * plotPadding,
+      scrobbleList.length * scrobbleSize,
+    );
+    const plotRight = plotPadding + plotWidth;
+
+    // plot height calculation is ensuring equal vertical gaps between points
+    const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
+    const plotHeight = Math.min(
+      plotBottom - plotPadding,
       (maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin),
     );
-    const scrobbleAreaTop = scrobbleAreaBottom - scrobbleAreaHeight;
+    const plotTop = plotBottom - plotHeight;
 
     // X axis
     this.timeRangeScale = d3Scale.scaleLinear()
       .domain([minDateTimestamp, maxDateTimestamp])
-      .rangeRound([scrobbleAreaLeft, scrobbleAreaRight]);
+      .rangeRound([plotLeft, plotRight]);
 
     // Y axis
     this.artistPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxArtistPlaycount])
-      .rangeRound([scrobbleAreaBottom, scrobbleAreaTop]);
+      .rangeRound([plotBottom, plotTop]);
 
     // scrobble point color
     this.albumPlaycountScale = d3Scale.scaleLinear()
@@ -224,19 +233,15 @@ export default class Timeline {
 
   drawTimeAxis() {
     const {plotPadding, timeAxisWidth, colors} = this.props;
-    const [width, height] = this.canvasDimensions;
+    const height = this.canvasDimensions[1];
+    const [xFrom, xTo] = this.timeRangeScale.range();
+    const y = height - plotPadding;
 
     this.ctx.strokeStyle = colors.timeAxis;
     this.ctx.lineWidth = timeAxisWidth;
     this.ctx.beginPath();
-    this.ctx.moveTo(
-      plotPadding,
-      height - plotPadding,
-    );
-    this.ctx.lineTo(
-      width - plotPadding,
-      height - plotPadding,
-    );
+    this.ctx.moveTo(xFrom, y);
+    this.ctx.lineTo(xTo, y);
     this.ctx.stroke();
   }
 
