@@ -9,8 +9,9 @@ import {dateStringToTimestamp} from '../../utils/date';
 import './Timeline.css';
 
 // @todo:
+// * add last.fm links (see "url``" from "music-stats/map/src/utils/string.ts")
+// * break down into smaller components
 // * add unit tests (use "tape")
-// * show a date of the first scrobble for highlighted artist (render it below the time axis)
 
 export default class Timeline {
   static getDefaultProps() {
@@ -42,6 +43,7 @@ export default class Timeline {
 
     const {scrobbleSize} = this.props;
 
+    this.firstArtistScrobbleDateElement = null;
     this.introMessageElementList = null;
     this.dateElement = null;
     this.artistNameElement = null;
@@ -84,6 +86,7 @@ export default class Timeline {
   }
 
   initializeElements() {
+    this.firstArtistScrobbleDateElement = document.getElementById('first-artist-scrobble-date');
     this.introMessageElementList = document.querySelectorAll('.Timeline__info-box-field--intro-message');
     this.dateElement = document.getElementById('date');
     this.artistNameElement = document.getElementById('artist-name');
@@ -331,15 +334,19 @@ export default class Timeline {
 
   drawArtistScrobbleListHighlight(scrobble) {
     const {colors} = this.props;
-    const {index, artist, track} = scrobble;
+    const {index: highlightedScrobbleGlobalIndex, artist, track} = scrobble;
 
-    this.getScrobbleListForArtist(artist.name).forEach(({
-      album: {playcount},
-      track: {name},
-      index: i,
-      x: xi,
-      y: yi,
-    }) => {
+    this.getScrobbleListForArtist(artist.name).forEach((
+      {
+        date,
+        album: {playcount},
+        track: {name},
+        index: artistScrobbleGlobalIndex,
+        x: xi,
+        y: yi,
+      },
+      artistScrobbleLocalIndex,
+    ) => {
       const color = name === track.name
         ? colors.scrobbleHighlight
         : this.getHighlightColorByAlbumPlaycount(playcount);
@@ -347,7 +354,11 @@ export default class Timeline {
       this.drawScrobblePoint(xi, yi, color);
       this.scrobbleHighlightPointList.push(xi, yi);
 
-      if (i === index) {
+      if (artistScrobbleLocalIndex === 0) {
+        this.renderFirstArtistScrobbleDate(xi, date);
+      }
+
+      if (artistScrobbleGlobalIndex === highlightedScrobbleGlobalIndex) {
         this.highlightedScrobble = {
           ...scrobble,
           x: xi,
@@ -468,6 +479,7 @@ export default class Timeline {
     this.toShowIntroMessage = true;
     this.introMessageElementList.forEach((element) => element.style.display = 'block');
     [
+      this.firstArtistScrobbleDateElement,
       this.dateElement,
       this.artistNameElement,
       this.albumNameElement,
@@ -480,6 +492,34 @@ export default class Timeline {
     this.introMessageElementList.forEach((element) => element.style.display = 'none');
   }
 
+  renderFirstArtistScrobbleDate(x, date) {
+    const {plotPadding, scrobbleMargin: margin} = this.props;
+    const [canvasWidth] = this.canvasDimensions;
+
+    this.firstArtistScrobbleDateElement.innerText = date;
+
+    const {offsetWidth: width} = this.firstArtistScrobbleDateElement;
+    const halfWidth = Math.ceil(width / 2);
+    const [left, right] = (() => {
+      // stick to left
+      if (x - halfWidth < margin) {
+        return [`${margin}px`, 'auto'];
+      }
+
+      // stick to right
+      if (x + halfWidth > canvasWidth - margin) {
+        return ['auto', `${margin}px`];
+      }
+
+      // center under "x"
+      return [`${x - halfWidth}px`, 'auto'];
+    })();
+
+    this.firstArtistScrobbleDateElement.style.top = `calc(100vh - ${plotPadding - margin}px)`;
+    this.firstArtistScrobbleDateElement.style.left = left;
+    this.firstArtistScrobbleDateElement.style.right = right;
+  }
+
   renderInfoBoxContent(scrobble) {
     const {date, artist, album, track} = scrobble;
     const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = this.getScrobbleTotals(scrobble);
@@ -490,8 +530,6 @@ export default class Timeline {
 
     this.dateElement.innerText = `date: ${date}`;
 
-    // @todo: add last.fm links
-    // @see: "url``" from "music-stats/map/src/utils/string.ts"
     this.artistNameElement.innerHTML = html`
       <span>artist: ${artist.name} <small>(${artist.playcount}/${artistTotalPlaycount})</small></span>
     `;
@@ -534,6 +572,12 @@ export default class Timeline {
           id="canvas"
           class="Timeline__chart"
         />
+
+        <aside
+          id="first-artist-scrobble-date"
+          class="Timeline__x-axis-caption"
+        >
+        </aside>
 
         <aside
           class="Timeline__info-box"

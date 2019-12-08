@@ -2,6 +2,13 @@
   display: block;
 }
 
+.Timeline__x-axis-caption {
+  font-size: 10px;
+  position: absolute;
+  white-space: nowrap;
+  color: var(--color-grey-2);
+}
+
 .Timeline__info-box {
   position: absolute;
   top: 0;
