@@ -4,19 +4,15 @@ import Timeline from './components/timeline/Timeline';
 import './app.css';
 import './app-theme.css';
 
-function retrieve(url) {
-  return fetch(url)
-    .then((data) => data.json());
-}
+fetch(config.dataUrl)
+  .then((data) => data.json())
+  .then((scrobbleList) => {
+    const timeline = new Timeline({
+      scrobbleList,
+    });
 
-function initialize(scrobbleList) {
-  const timeline = new Timeline({
-    scrobbleList,
+    timeline.beforeRender();
+    document.body.innerHTML = timeline.render();
+    timeline.afterRender();
+    timeline.draw();
   });
-
-  document.body.innerHTML = timeline.render();
-  timeline.draw();
-}
-
-retrieve(config.dataUrl)
-  .then(initialize);

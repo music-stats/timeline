@@ -1,0 +1,12 @@
+.TimelineInfoBox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-row-gap: 10px;
+  margin: 20px;
+}
+
+.TimelineInfoBox__field {
+  margin: 0;
+}

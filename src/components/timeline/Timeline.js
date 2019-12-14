@@ -4,13 +4,13 @@ import html from '../../lib/html';
 
 import config from '../../config';
 import cssColors from '../../app-theme';
-import {dateStringToTimestamp} from '../../utils/date';
+import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../../utils/date';
+import TimelineInfoBox from './TimelineInfoBox';
 
 import './Timeline.css';
 
 // @todo:
 // * add last.fm links (see "url``" from "music-stats/map/src/utils/string.ts")
-// * break down into smaller components
 // * add unit tests (use "tape")
 
 export default class Timeline {
@@ -40,15 +40,11 @@ export default class Timeline {
       ...this.constructor.getDefaultProps(),
       ...props,
     };
+    this.children = {};
 
     const {scrobbleSize} = this.props;
 
     this.firstArtistScrobbleDateElement = null;
-    this.introMessageElementList = null;
-    this.dateElement = null;
-    this.artistNameElement = null;
-    this.albumNameElement = null;
-    this.trackNameElement = null;
 
     this.canvasDimensions = null;
     this.canvasElement = null;
@@ -60,11 +56,11 @@ export default class Timeline {
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleTotalRegistry = null;
+    this.scrobbleSummary = null;
     this.scrobblePlotBuffer = {}; // [y][x] matrix (y-coord is first because of horizontal traversal optimization)
     this.scrobbleHighlightPointList = []; // [x1, y1, x2, y2, ...]
     this.scrobbleArtistRegistry = {};
     this.highlightedScrobble = null;
-    this.isFirstDraw = true;
     this.toShowIntroMessage = true;
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
@@ -87,12 +83,33 @@ export default class Timeline {
 
   initializeElements() {
     this.firstArtistScrobbleDateElement = document.getElementById('first-artist-scrobble-date');
-    this.introMessageElementList = document.querySelectorAll('.Timeline__info-box-field--intro-message');
-    this.dateElement = document.getElementById('date');
-    this.artistNameElement = document.getElementById('artist-name');
-    this.albumNameElement = document.getElementById('album-name');
-    this.trackNameElement = document.getElementById('track-name');
     this.canvasElement = document.getElementById('canvas');
+  }
+
+  initializeChildrenComponents() {
+    const {scrobbleList} = this.props;
+    const {links} = config;
+    const firstScrobbleDate = dataTimeStringToDateString(scrobbleList[0].date);
+    const lastScrobbleDate = dataTimeStringToDateString(scrobbleList[scrobbleList.length - 1].date);
+    const [dayCount, perDayCount] = this.getPeriodCounts();
+    const {artistCount, albumCount, trackCount} = this.scrobbleSummary;
+    const scrobbleCount = scrobbleList.length;
+
+    this.children.infoBox = new TimelineInfoBox({
+      links,
+      dates: {
+        firstScrobbleDate,
+        lastScrobbleDate,
+      },
+      counts: {
+        artistCount,
+        albumCount,
+        trackCount,
+        scrobbleCount,
+        dayCount,
+        perDayCount,
+      },
+    });
   }
 
   initializeCanvasContext() {
@@ -114,10 +131,15 @@ export default class Timeline {
   initializeTotals() {
     const {scrobbleList} = this.props;
     const registry = {};
+    const summary = {
+      artistCount: 0,
+      albumCount: 0,
+      trackCount: 0,
+    };
 
-    scrobbleList.forEach(({track, album, artist}) => {
+    scrobbleList.forEach(({artist, album, track}) => {
       if (!registry[artist.name]) {
-        // A track can be present in different albums, so tracks playcount values are not nested into albums.
+        // The same track can appear on different albums, so track playcount values are not nested into albums.
         // It matches aggregation logic in "music-stats/scripts/src/ETL/transformers/aggregate.ts".
         registry[artist.name] = {
           albums: {},
@@ -130,7 +152,17 @@ export default class Timeline {
       registry[artist.name].tracks[track.name] = track.playcount;
     });
 
+    summary.artistCount = Object.keys(registry).length;
+
+    for (const artistName in registry) {
+      const artistRecord = registry[artistName];
+
+      summary.albumCount += Object.keys(artistRecord.albums).length;
+      summary.trackCount += Object.keys(artistRecord.tracks).length;
+    }
+
     this.scrobbleTotalRegistry = registry;
+    this.scrobbleSummary = summary;
   }
 
   getMaxPlaycounts() {
@@ -140,7 +172,7 @@ export default class Timeline {
     let maxArtistPlaycount = 0;
     let maxAlbumPlaycount = 0;
 
-    for (let artistName in this.scrobbleTotalRegistry) {
+    for (const artistName in this.scrobbleTotalRegistry) {
       artistRecord = this.scrobbleTotalRegistry[artistName];
       artistPlaycount = artistRecord.playcount;
 
@@ -148,7 +180,7 @@ export default class Timeline {
         maxArtistPlaycount = artistPlaycount;
       }
 
-      for (let albumName in artistRecord.albums) {
+      for (const albumName in artistRecord.albums) {
         albumPlaycount = artistRecord.albums[albumName];
 
         if (albumPlaycount > maxAlbumPlaycount) {
@@ -173,22 +205,26 @@ export default class Timeline {
     ];
   }
 
-  getDayAverageScrobbleCount() {
+  getPeriodCounts() {
     const {scrobbleList} = this.props;
-    const firstScrobbleDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
-    const lastScrobbleDateTimestamp = dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
+    const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(scrobbleList[0].date);
+    const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
     const msInDay = 24 * 60 * 60 * 1000;
-    const daysCount = (lastScrobbleDateTimestamp - firstScrobbleDateTimestamp) / msInDay;
+    const dayCount = Math.ceil((lastScrobbleDateTimestamp - firstScrobbleDateTimestamp) / msInDay);
+    const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
 
-    return Math.round(10 * scrobbleList.length / daysCount) / 10;
+    return [
+      dayCount,
+      perDayCount,
+    ];
   }
 
   initializeScales() {
     const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin, colorRanges} = this.props;
     const [width, height] = this.canvasDimensions;
 
-    const minDateTimestamp = dateStringToTimestamp(scrobbleList[0].date);
-    const maxDateTimestamp = dateStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
+    const minDateTimestamp = dateTimeStringToTimestamp(scrobbleList[0].date);
+    const maxDateTimestamp = dateTimeStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
     const [maxArtistPlaycount, maxAlbumPlaycount] = this.getMaxPlaycounts();
 
     // plot width calculation avoids stretching the timeline in case of few points
@@ -322,7 +358,7 @@ export default class Timeline {
 
     scrobbleList.forEach((scrobble, index) => {
       const {date, artist, album} = scrobble;
-      const x = this.timeRangeScale(dateStringToTimestamp(date));
+      const x = this.timeRangeScale(dateTimeStringToTimestamp(date));
       const y = this.artistPlaycountScale(artist.playcount);
       const color = this.getColorByAlbumPlaycount(album.playcount);
 
@@ -397,9 +433,13 @@ export default class Timeline {
   }
 
   selectScrobble(scrobble) {
+    if (this.toShowIntroMessage) {
+      this.hideIntroMessage();
+    }
+
     this.removeScrobbleHighlight();
     this.drawArtistScrobbleListHighlight(scrobble);
-    this.renderInfoBoxContent(scrobble);
+    this.renderScrobbleInfo(scrobble);
   }
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
@@ -476,20 +516,18 @@ export default class Timeline {
   }
 
   showIntroMessage() {
+    const {infoBox} = this.children;
+
     this.toShowIntroMessage = true;
-    this.introMessageElementList.forEach((element) => element.style.display = 'block');
-    [
-      this.firstArtistScrobbleDateElement,
-      this.dateElement,
-      this.artistNameElement,
-      this.albumNameElement,
-      this.trackNameElement,
-    ].forEach((element) => element.innerText = '');
+    this.firstArtistScrobbleDateElement.innerText = '';
+    infoBox.showIntroMessage();
   }
 
   hideIntroMessage() {
+    const {infoBox} = this.children;
+
     this.toShowIntroMessage = false;
-    this.introMessageElementList.forEach((element) => element.style.display = 'none');
+    infoBox.hideIntroMessage();
   }
 
   renderFirstArtistScrobbleDate(x, date) {
@@ -520,35 +558,17 @@ export default class Timeline {
     this.firstArtistScrobbleDateElement.style.right = right;
   }
 
-  renderInfoBoxContent(scrobble) {
-    const {date, artist, album, track} = scrobble;
-    const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = this.getScrobbleTotals(scrobble);
+  renderScrobbleInfo(scrobble) {
+    const {infoBox} = this.children;
 
-    if (this.toShowIntroMessage) {
-      this.hideIntroMessage();
-    }
-
-    this.dateElement.innerText = `date: ${date}`;
-
-    this.artistNameElement.innerHTML = html`
-      <span>artist: ${artist.name} <small>(${artist.playcount}/${artistTotalPlaycount})</small></span>
-    `;
-    this.albumNameElement.innerHTML = html`
-      <span>album: ${album.name} <small>(${album.playcount}/${albumTotalPlaycount})</small></span>
-    `;
-    this.trackNameElement.innerHTML = html`
-      <span>track: ${track.name} <small>(${track.playcount}/${trackTotalPlaycount})</small></span>
-    `;
+    infoBox.renderScrobbleInfo({
+      scrobble,
+      totals: this.getScrobbleTotals(scrobble),
+    });
   }
 
+  // everything inside this method depends on canvas dimensions
   draw() {
-    if (this.isFirstDraw) {
-      this.isFirstDraw = false;
-      this.initializeTotals();
-      this.initializeElements();
-      this.subscribe();
-    }
-
     this.initializeCanvasContext();
     this.initializeScales();
 
@@ -557,12 +577,21 @@ export default class Timeline {
     this.drawTimeAxis();
   }
 
+  // things needed for the first render
+  beforeRender() {
+    this.initializeTotals();
+    this.initializeChildrenComponents();
+  }
+
+  // things to initialize after the first render
+  afterRender() {
+    this.initializeElements();
+    this.children.infoBox.initializeElements();
+    this.subscribe();
+  }
+
   render() {
-    const {scrobbleList} = this.props;
-    const {links} = config;
-    const firstScrobble = scrobbleList[0];
-    const lastScrobble = scrobbleList[scrobbleList.length - 1];
-    const scrobbleCount = scrobbleList.length;
+    const {infoBox} = this.children;
 
     return html`
       <main
@@ -579,59 +608,7 @@ export default class Timeline {
         >
         </aside>
 
-        <aside
-          class="Timeline__info-box"
-        >
-          <p
-            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
-          >
-            Last.fm: <a href=${links.lastfm.url}>${links.lastfm.text}</a>
-          </p>
-
-          <p
-            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
-          >
-            GitHub: <a href=${links.github.url}>${links.github.text}</a>
-          </p>
-
-          <p
-            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
-          >
-            Twitter: <a href=${links.twitter.url}>${links.twitter.text}</a>
-          </p>
-
-          <p
-            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
-          >
-            total: ${scrobbleCount} (${this.getDayAverageScrobbleCount()} per day, from ${firstScrobble.date} to ${lastScrobble.date})
-          </p>
-
-          <p
-            class="Timeline__info-box-field Timeline__info-box-field--intro-message"
-          >
-            (hover over a scrobble and use arrow keys for navigation)
-          </p>
-
-          <p
-            id="date"
-            class="Timeline__info-box-field"
-          />
-
-          <p
-            id="artist-name"
-            class="Timeline__info-box-field"
-          />
-
-          <p
-            id="album-name"
-            class="Timeline__info-box-field"
-          />
-
-          <p
-            id="track-name"
-            class="Timeline__info-box-field"
-          />
-        </aside>
+        ${infoBox.render()}
       </main>
     `;
   }
