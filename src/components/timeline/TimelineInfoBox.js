@@ -1,5 +1,7 @@
 import html from '../../lib/html';
 
+import {url} from '../../utils/string';
+
 import './TimelineInfoBox.css';
 
 export default class TimelineInfoBox {
@@ -40,16 +42,28 @@ export default class TimelineInfoBox {
     const {date, artist, album, track} = scrobble;
     const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = totals;
 
+    const artistUrl = url`https://www.last.fm/music/${artist.name}`;
+    const albumUrl = url`https://www.last.fm/music/${artist.name}/${album.name}`;
+    const trackUrl = url`https://www.last.fm/music/${artist.name}/_/${track.name}`;
+
     this.dateElement.innerText = `date: ${date}`;
 
     this.artistNameElement.innerHTML = html`
-      <span>artist: ${artist.name} <small>(${artist.playcount}/${artistTotalPlaycount})</small></span>
+      <span>
+        artist: <a href=${artistUrl}>${artist.name}</a> <small>(${artist.playcount}/${artistTotalPlaycount})</small>
+      </span>
     `;
+
     this.albumNameElement.innerHTML = html`
-      <span>album: ${album.name} <small>(${album.playcount}/${albumTotalPlaycount})</small></span>
+      <span>
+        album: <a href=${albumUrl}>${album.name}</a> <small>(${album.playcount}/${albumTotalPlaycount})</small>
+      </span>
     `;
+
     this.trackNameElement.innerHTML = html`
-      <span>track: ${track.name} <small>(${track.playcount}/${trackTotalPlaycount})</small></span>
+      <span>
+        track: <a href=${trackUrl}>${track.name}</a> <small>(${track.playcount}/${trackTotalPlaycount})</small>
+      </span>
     `;
   }
 

@@ -10,7 +10,11 @@ import TimelineInfoBox from './TimelineInfoBox';
 import './Timeline.css';
 
 // @todo:
-// * add last.fm links (see "url``" from "music-stats/map/src/utils/string.ts")
+// * split this big class into:
+//   * <Timeline /> - the main component
+//   * <Plot /> - only canvas drawing
+//   * <ScrobbleDate /> - positioning and styling of a given date
+//   * <InfoBox /> - summary and scrobble info
 // * add unit tests (use "tape")
 
 export default class Timeline {
