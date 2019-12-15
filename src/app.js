@@ -1,5 +1,5 @@
 import config from './config';
-import Timeline from './components/timeline/Timeline';
+import Timeline from './containers/Timeline';
 
 import './app.css';
 import './app-theme.css';

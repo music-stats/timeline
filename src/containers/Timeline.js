@@ -1,17 +1,17 @@
 import * as d3Scale from 'd3-scale';
 import * as d3ScaleChromatic from 'd3-scale-chromatic';
-import html from '../../lib/html';
+import html from '../lib/html';
 
-import config from '../../config';
-import cssColors from '../../app-theme';
-import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../../utils/date';
-import TimelineInfoBox from './TimelineInfoBox';
+import config from '../config';
+import cssColors from '../app-theme';
+import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
+import InfoBox from '../components/InfoBox';
 
 import './Timeline.css';
 
 // @todo:
 // * split this big class into:
-//   * <Timeline /> - the main component
+//   * <Timeline /> - the main component with logic (aka container)
 //   * <Plot /> - only canvas drawing
 //   * <ScrobbleDate /> - positioning and styling of a given date
 //   * <InfoBox /> - summary and scrobble info
@@ -99,7 +99,7 @@ export default class Timeline {
     const {artistCount, albumCount, trackCount} = this.scrobbleSummary;
     const scrobbleCount = scrobbleList.length;
 
-    this.children.infoBox = new TimelineInfoBox({
+    this.children.infoBox = new InfoBox({
       links,
       dates: {
         firstScrobbleDate,

@@ -1,4 +1,4 @@
-.TimelineInfoBox {
+.InfoBox {
   position: absolute;
   top: 0;
   left: 0;
@@ -7,6 +7,6 @@
   margin: 20px;
 }
 
-.TimelineInfoBox__field {
+.InfoBox__field {
   margin: 0;
 }

@@ -1,10 +1,10 @@
-import html from '../../lib/html';
+import html from '../lib/html';
 
-import {url} from '../../utils/string';
+import {url} from '../utils/string';
 
-import './TimelineInfoBox.css';
+import './InfoBox.css';
 
-export default class TimelineInfoBox {
+export default class InfoBox {
   constructor(props) {
     this.props = props;
 
@@ -16,11 +16,11 @@ export default class TimelineInfoBox {
   }
 
   initializeElements() {
-    this.introMessageElementList = document.querySelectorAll('.TimelineInfoBox__field--intro-message');
-    this.dateElement = document.getElementById('date');
-    this.artistNameElement = document.getElementById('artist-name');
-    this.albumNameElement = document.getElementById('album-name');
-    this.trackNameElement = document.getElementById('track-name');
+    this.introMessageElementList = document.querySelectorAll('.InfoBox__field--intro-message');
+    this.dateElement = document.getElementById('info-box-field-date');
+    this.artistNameElement = document.getElementById('info-box-field-artist-name');
+    this.albumNameElement = document.getElementById('info-box-field-album-name');
+    this.trackNameElement = document.getElementById('info-box-field-track-name');
   }
 
   showIntroMessage() {
@@ -86,34 +86,34 @@ export default class TimelineInfoBox {
 
     return html`
       <aside
-        class="TimelineInfoBox"
+        class="InfoBox"
       >
         <p
-          class="TimelineInfoBox__field TimelineInfoBox__field--intro-message"
+          class="InfoBox__field InfoBox__field--intro-message"
         >
           Last.fm: <a href=${links.lastfm.url}>${links.lastfm.text}</a>
         </p>
 
         <p
-          class="TimelineInfoBox__field TimelineInfoBox__field--intro-message"
+          class="InfoBox__field InfoBox__field--intro-message"
         >
           GitHub: <a href=${links.github.url}>${links.github.text}</a>
         </p>
 
         <p
-          class="TimelineInfoBox__field TimelineInfoBox__field--intro-message"
+          class="InfoBox__field InfoBox__field--intro-message"
         >
           Twitter: <a href=${links.twitter.url}>${links.twitter.text}</a>
         </p>
 
         <p
-          class="TimelineInfoBox__field TimelineInfoBox__field--intro-message"
+          class="InfoBox__field InfoBox__field--intro-message"
         >
           period: ${firstScrobbleDate} - ${lastScrobbleDate} (${dayCount} days)
         </p>
 
         <p
-          class="TimelineInfoBox__field TimelineInfoBox__field--intro-message"
+          class="InfoBox__field InfoBox__field--intro-message"
         >
           total: ${[
             `${artistCount} artists`,
@@ -124,29 +124,29 @@ export default class TimelineInfoBox {
         </p>
 
         <p
-          class="TimelineInfoBox__field TimelineInfoBox__field--intro-message"
+          class="InfoBox__field InfoBox__field--intro-message"
         >
           (hover over a scrobble and use arrow keys for navigation)
         </p>
 
         <p
-          id="date"
-          class="TimelineInfoBox__field"
+          id="info-box-field-date"
+          class="InfoBox__field"
         />
 
         <p
-          id="artist-name"
-          class="TimelineInfoBox__field"
+          id="info-box-field-artist-name"
+          class="InfoBox__field"
         />
 
         <p
-          id="album-name"
-          class="TimelineInfoBox__field"
+          id="info-box-field-album-name"
+          class="InfoBox__field"
         />
 
         <p
-          id="track-name"
-          class="TimelineInfoBox__field"
+          id="info-box-field-track-name"
+          class="InfoBox__field"
         />
       </aside>
     `;
