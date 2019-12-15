@@ -1,5 +1,6 @@
 import html from '../lib/html';
 
+import config from '../config';
 import {url} from '../utils/string';
 
 import './InfoBox.css';
@@ -73,7 +74,6 @@ export default class InfoBox {
 
   render() {
     const {
-      links,
       dates: {
         firstScrobbleDate,
         lastScrobbleDate,
@@ -87,6 +87,7 @@ export default class InfoBox {
         perDayCount,
       },
     } = this.props;
+    const {links} = config;
 
     return html`
       <aside

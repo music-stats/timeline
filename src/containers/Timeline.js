@@ -2,21 +2,14 @@ import * as d3Scale from 'd3-scale';
 import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import html from '../lib/html';
 
-import config from '../config';
 import cssColors from '../app-theme';
 import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
 
+import Plot from '../components/Plot';
 import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
-import './Timeline.css';
-
 // @todo:
-// * split this big class into:
-//   * <Timeline /> - the main component with logic (aka container)
-//   * <Plot /> - only canvas drawing
-//   * <TimeAxisLabel /> - positioning and styling of a given text
-//   * <InfoBox /> - summary and scrobble info
 // * add unit tests (use "tape")
 
 export default class Timeline {
@@ -50,14 +43,7 @@ export default class Timeline {
 
     const {scrobbleSize} = this.props;
 
-    this.canvasDimensions = null;
-    this.canvasElement = null;
-    this.ctx = null;
-
-    this.timeRangeScale = null;
-    this.artistPlaycountScale = null;
-    this.albumPlaycountScale = null;
-
+    this.scales = {};
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleTotalRegistry = null;
     this.scrobbleSummary = null;
@@ -69,7 +55,7 @@ export default class Timeline {
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
-    this.handleCanvasMouseMove = this.handleCanvasMouseMove.bind(this);
+    this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
   }
 
   reset() {
@@ -82,55 +68,38 @@ export default class Timeline {
   subscribe() {
     window.addEventListener('resize', this.handleWindowResize);
     document.addEventListener('keydown', this.handleDocumentKeydown);
-    this.canvasElement.addEventListener('mousemove', this.handleCanvasMouseMove);
-  }
-
-  initializeElements() {
-    this.canvasElement = document.getElementById('canvas');
   }
 
   initializeChildrenComponents() {
-    const {scrobbleList} = this.props;
-    const {links} = config;
-    const firstScrobbleDate = dataTimeStringToDateString(scrobbleList[0].date);
-    const lastScrobbleDate = dataTimeStringToDateString(scrobbleList[scrobbleList.length - 1].date);
+    const {scrobbleList, scrobbleSize, plotPadding, timeAxisWidth, colors} = this.props;
     const [dayCount, perDayCount] = this.getPeriodCounts();
-    const {artistCount, albumCount, trackCount} = this.scrobbleSummary;
-    const scrobbleCount = scrobbleList.length;
+
+    this.children.plot = new Plot({
+      pointSize: scrobbleSize,
+      pointHalfSize: this.scrobbleHalfSize,
+      padding: plotPadding,
+      timeAxisWidth,
+      colors: {
+        background: colors.background,
+        timeAxis: colors.timeAxis,
+      },
+      onMouseMove: this.handlePlotMouseMove,
+    });
 
     this.children.timeAxisLabel = new TimeAxisLabel();
 
     this.children.infoBox = new InfoBox({
-      links,
       dates: {
-        firstScrobbleDate,
-        lastScrobbleDate,
+        firstScrobbleDate: dataTimeStringToDateString(scrobbleList[0].date),
+        lastScrobbleDate: dataTimeStringToDateString(scrobbleList[scrobbleList.length - 1].date),
       },
       counts: {
-        artistCount,
-        albumCount,
-        trackCount,
-        scrobbleCount,
+        ...this.scrobbleSummary,
+        scrobbleCount: scrobbleList.length,
         dayCount,
         perDayCount,
       },
     });
-  }
-
-  initializeCanvasContext() {
-    const dpr = window.devicePixelRatio;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    this.canvasDimensions = [width, height];
-
-    this.canvasElement.width = width * dpr;
-    this.canvasElement.height = height * dpr;
-    this.canvasElement.style.width = `${width}px`;
-    this.canvasElement.style.height = `${height}px`;
-
-    this.ctx = this.canvasElement.getContext('2d', {alpha: false});
-    this.ctx.scale(dpr, dpr);
   }
 
   initializeTotals() {
@@ -226,7 +195,8 @@ export default class Timeline {
 
   initializeScales() {
     const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin, colorRanges} = this.props;
-    const [width, height] = this.canvasDimensions;
+    const {plot} = this.children;
+    const [width, height] = plot.getDimensions();
 
     const minDateTimestamp = dateTimeStringToTimestamp(scrobbleList[0].date);
     const maxDateTimestamp = dateTimeStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
@@ -249,17 +219,17 @@ export default class Timeline {
     const plotTop = plotBottom - plotHeight;
 
     // X axis
-    this.timeRangeScale = d3Scale.scaleLinear()
+    this.scales.timeRangeScale = d3Scale.scaleLinear()
       .domain([minDateTimestamp, maxDateTimestamp])
       .rangeRound([plotLeft, plotRight]);
 
     // Y axis
-    this.artistPlaycountScale = d3Scale.scaleLinear()
+    this.scales.artistPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxArtistPlaycount])
       .rangeRound([plotBottom, plotTop]);
 
     // scrobble point color
-    this.albumPlaycountScale = d3Scale.scaleLinear()
+    this.scales.albumPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxAlbumPlaycount])
       .range([colorRanges.albumPlaycount.from, colorRanges.albumPlaycount.to]);
   }
@@ -329,52 +299,16 @@ export default class Timeline {
   }
 
   getColorByAlbumPlaycount(playcount) {
-    return d3ScaleChromatic.interpolateGreys(this.albumPlaycountScale(playcount));
+    return d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount));
   }
 
   getHighlightColorByAlbumPlaycount(playcount) {
-    return d3ScaleChromatic.interpolateWarm(this.albumPlaycountScale(playcount));
+    return d3ScaleChromatic.interpolateWarm(this.scales.albumPlaycountScale(playcount));
   }
 
-  drawBackground() {
-    const {colors} = this.props;
-    const [width, height] = this.canvasDimensions;
-
-    this.ctx.fillStyle = colors.background;
-    this.ctx.fillRect(0, 0, width, height);
-  }
-
-  drawTimeAxis() {
-    const {plotPadding, timeAxisWidth, colors} = this.props;
-    const height = this.canvasDimensions[1];
-    const [xFrom, xTo] = this.timeRangeScale.range();
-    const y = height - plotPadding;
-
-    this.ctx.strokeStyle = colors.timeAxis;
-    this.ctx.lineWidth = timeAxisWidth;
-    this.ctx.beginPath();
-    this.ctx.moveTo(xFrom, y);
-    this.ctx.lineTo(xTo, y);
-    this.ctx.stroke();
-  }
-
-  drawScrobbleList() {
-    const {scrobbleList} = this.props;
-
-    scrobbleList.forEach((scrobble, index) => {
-      const {date, artist, album} = scrobble;
-      const x = this.timeRangeScale(dateTimeStringToTimestamp(date));
-      const y = this.artistPlaycountScale(artist.playcount);
-      const color = this.getColorByAlbumPlaycount(album.playcount);
-
-      this.drawScrobblePoint(x, y, color);
-      this.plotScrobbleOnBuffer(x, y, scrobble, index, color);
-      this.putScrobbleIntoArtistRegistry(x, y, scrobble, index);
-    });
-  }
-
-  drawArtistScrobbleListHighlight(scrobble) {
-    const {colors} = this.props;
+  highlightArtistScrobbleList(scrobble) {
+    const {plotPadding, scrobbleMargin, colors} = this.props;
+    const {plot, timeAxisLabel} = this.children;
     const {index: highlightedScrobbleGlobalIndex, artist, track} = scrobble;
 
     this.getScrobbleListForArtist(artist.name).forEach((
@@ -392,11 +326,11 @@ export default class Timeline {
         ? colors.scrobbleHighlight
         : this.getHighlightColorByAlbumPlaycount(playcount);
 
-      this.drawScrobblePoint(xi, yi, color);
+      plot.drawPoint(xi, yi, color);
       this.scrobbleHighlightPointList.push(xi, yi);
 
       if (artistScrobbleLocalIndex === 0) {
-        this.renderFirstArtistScrobbleDate(xi, date);
+        timeAxisLabel.renderText(xi, plot.getDimensions()[0], scrobbleMargin, plotPadding, date);
       }
 
       if (artistScrobbleGlobalIndex === highlightedScrobbleGlobalIndex) {
@@ -414,37 +348,33 @@ export default class Timeline {
       return;
     }
 
+    const {plot} = this.children;
+
     for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
       const x = this.scrobbleHighlightPointList[i];
       const y = this.scrobbleHighlightPointList[i + 1];
       const {color} = this.getPlottedScrobbleFromBuffer(x, y);
 
-      this.drawScrobblePoint(x, y, color);
+      plot.drawPoint(x, y, color);
     }
 
     this.scrobbleHighlightPointList = [];
   }
 
-  drawScrobblePoint(x, y, color) {
-    const {scrobbleSize} = this.props;
-
-    this.ctx.fillStyle = color;
-    this.ctx.fillRect(
-      x - this.scrobbleHalfSize,
-      y - this.scrobbleHalfSize,
-      scrobbleSize,
-      scrobbleSize,
-    );
-  }
-
   selectScrobble(scrobble) {
+    const {infoBox} = this.children;
+
     if (this.toShowIntroMessage) {
       this.hideIntroMessage();
     }
 
     this.removeScrobbleHighlight();
-    this.drawArtistScrobbleListHighlight(scrobble);
-    this.renderScrobbleInfo(scrobble);
+    this.highlightArtistScrobbleList(scrobble);
+
+    infoBox.renderScrobbleInfo({
+      scrobble,
+      totals: this.getScrobbleTotals(scrobble),
+    });
   }
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
@@ -511,7 +441,7 @@ export default class Timeline {
     this.selectHorizontallyAdjacentScrobble(this.highlightedScrobble, 1);
   }
 
-  handleCanvasMouseMove(event) {
+  handlePlotMouseMove(event) {
     const {offsetX: x, offsetY: y} = event;
     const scrobble = this.getPlottedScrobbleFromBuffer(x, y);
 
@@ -535,31 +465,27 @@ export default class Timeline {
     infoBox.hideIntroMessage();
   }
 
-  renderFirstArtistScrobbleDate(x, date) {
-    const {plotPadding, scrobbleMargin} = this.props;
-    const {timeAxisLabel} = this.children;
-    const [canvasWidth] = this.canvasDimensions;
-
-    timeAxisLabel.renderText(x, canvasWidth, scrobbleMargin, plotPadding, date);
-  }
-
-  renderScrobbleInfo(scrobble) {
-    const {infoBox} = this.children;
-
-    infoBox.renderScrobbleInfo({
-      scrobble,
-      totals: this.getScrobbleTotals(scrobble),
-    });
-  }
-
-  // everything inside this method depends on canvas dimensions
   draw() {
-    this.initializeCanvasContext();
-    this.initializeScales();
+    const {scrobbleList} = this.props;
+    const {plot} = this.children;
 
-    this.drawBackground();
-    this.drawScrobbleList();
-    this.drawTimeAxis();
+    // subsequent calls depend on plot dimensions
+    plot.scale();
+    this.initializeScales();
+    plot.drawBackground();
+
+    scrobbleList.forEach((scrobble, index) => {
+      const {date, artist, album} = scrobble;
+      const x = this.scales.timeRangeScale(dateTimeStringToTimestamp(date));
+      const y = this.scales.artistPlaycountScale(artist.playcount);
+      const color = this.getColorByAlbumPlaycount(album.playcount);
+
+      plot.drawPoint(x, y, color);
+      this.plotScrobbleOnBuffer(x, y, scrobble, index, color);
+      this.putScrobbleIntoArtistRegistry(x, y, scrobble, index);
+    });
+
+    plot.drawTimeAxis(...this.scales.timeRangeScale.range());
   }
 
   // things needed for the first render
@@ -570,8 +496,6 @@ export default class Timeline {
 
   // things to initialize after the first render
   afterRender() {
-    this.initializeElements();
-
     Object.values(this.children).forEach((child) => {
       if (typeof child.afterRender === 'function') {
         child.afterRender();
@@ -582,17 +506,11 @@ export default class Timeline {
   }
 
   render() {
-    const {timeAxisLabel, infoBox} = this.children;
+    const {plot, timeAxisLabel, infoBox} = this.children;
 
     return html`
-      <main
-        class="Timeline"
-      >
-        <canvas
-          id="canvas"
-          class="Timeline__chart"
-        />
-
+      <main>
+        ${plot.render()}
         ${timeAxisLabel.render()}
         ${infoBox.render()}
       </main>
