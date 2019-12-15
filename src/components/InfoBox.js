@@ -67,6 +67,10 @@ export default class InfoBox {
     `;
   }
 
+  afterRender() {
+    this.initializeElements();
+  }
+
   render() {
     const {
       links,

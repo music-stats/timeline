@@ -5,6 +5,8 @@ import html from '../lib/html';
 import config from '../config';
 import cssColors from '../app-theme';
 import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
+
+import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 import './Timeline.css';
@@ -13,7 +15,7 @@ import './Timeline.css';
 // * split this big class into:
 //   * <Timeline /> - the main component with logic (aka container)
 //   * <Plot /> - only canvas drawing
-//   * <ScrobbleDate /> - positioning and styling of a given date
+//   * <TimeAxisLabel /> - positioning and styling of a given text
 //   * <InfoBox /> - summary and scrobble info
 // * add unit tests (use "tape")
 
@@ -47,8 +49,6 @@ export default class Timeline {
     this.children = {};
 
     const {scrobbleSize} = this.props;
-
-    this.firstArtistScrobbleDateElement = null;
 
     this.canvasDimensions = null;
     this.canvasElement = null;
@@ -86,7 +86,6 @@ export default class Timeline {
   }
 
   initializeElements() {
-    this.firstArtistScrobbleDateElement = document.getElementById('first-artist-scrobble-date');
     this.canvasElement = document.getElementById('canvas');
   }
 
@@ -98,6 +97,8 @@ export default class Timeline {
     const [dayCount, perDayCount] = this.getPeriodCounts();
     const {artistCount, albumCount, trackCount} = this.scrobbleSummary;
     const scrobbleCount = scrobbleList.length;
+
+    this.children.timeAxisLabel = new TimeAxisLabel();
 
     this.children.infoBox = new InfoBox({
       links,
@@ -520,10 +521,10 @@ export default class Timeline {
   }
 
   showIntroMessage() {
-    const {infoBox} = this.children;
+    const {timeAxisLabel, infoBox} = this.children;
 
     this.toShowIntroMessage = true;
-    this.firstArtistScrobbleDateElement.innerText = '';
+    timeAxisLabel.clear();
     infoBox.showIntroMessage();
   }
 
@@ -535,31 +536,11 @@ export default class Timeline {
   }
 
   renderFirstArtistScrobbleDate(x, date) {
-    const {plotPadding, scrobbleMargin: margin} = this.props;
+    const {plotPadding, scrobbleMargin} = this.props;
+    const {timeAxisLabel} = this.children;
     const [canvasWidth] = this.canvasDimensions;
 
-    this.firstArtistScrobbleDateElement.innerText = date;
-
-    const {offsetWidth: width} = this.firstArtistScrobbleDateElement;
-    const halfWidth = Math.ceil(width / 2);
-    const [left, right] = (() => {
-      // stick to left
-      if (x - halfWidth < margin) {
-        return [`${margin}px`, 'auto'];
-      }
-
-      // stick to right
-      if (x + halfWidth > canvasWidth - margin) {
-        return ['auto', `${margin}px`];
-      }
-
-      // center under "x"
-      return [`${x - halfWidth}px`, 'auto'];
-    })();
-
-    this.firstArtistScrobbleDateElement.style.top = `calc(100vh - ${plotPadding - margin}px)`;
-    this.firstArtistScrobbleDateElement.style.left = left;
-    this.firstArtistScrobbleDateElement.style.right = right;
+    timeAxisLabel.renderText(x, canvasWidth, scrobbleMargin, plotPadding, date);
   }
 
   renderScrobbleInfo(scrobble) {
@@ -590,12 +571,18 @@ export default class Timeline {
   // things to initialize after the first render
   afterRender() {
     this.initializeElements();
-    this.children.infoBox.initializeElements();
+
+    Object.values(this.children).forEach((child) => {
+      if (typeof child.afterRender === 'function') {
+        child.afterRender();
+      }
+    });
+
     this.subscribe();
   }
 
   render() {
-    const {infoBox} = this.children;
+    const {timeAxisLabel, infoBox} = this.children;
 
     return html`
       <main
@@ -606,12 +593,7 @@ export default class Timeline {
           class="Timeline__chart"
         />
 
-        <aside
-          id="first-artist-scrobble-date"
-          class="Timeline__x-axis-caption"
-        >
-        </aside>
-
+        ${timeAxisLabel.render()}
         ${infoBox.render()}
       </main>
     `;
