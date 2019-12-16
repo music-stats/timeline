@@ -42,7 +42,7 @@
     "eslint-config-developit": "1.1.1",
     "gh-pages": "2.1.1",
     "npm-check": "5.9.0",
-    "rollup": "1.27.12",
+    "rollup": "1.27.13",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-eslint": "7.0.0",

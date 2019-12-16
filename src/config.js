@@ -1,8 +1,6 @@
 export default {
   dataUrl: 'data/scrobbles.json',
 
-  username: 'markhovskiy', // last.fm
-
   links: {
     lastfm: {
       url: 'https://www.last.fm/user/markhovskiy/',

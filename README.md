@@ -19,7 +19,22 @@ Showcasing a ratio between different aspects of how musical taste evolves (or pr
 </p>
 
 ## Design
-HTML strings as component templates, canvas as a rendering target, and a static dataset.
+This is a dataviz app that runs a couple of steps:
+1. Fetches a static dataset and prepares data for rendering (initializes scales and helpers).
+1. Plots data on canvas and shows stats as DOM elements using HTML strings as component templates.
+1. Listens for user interactions (mouse and keyboard events) and highlights points on the plot.
+
+Codebase is organized according to simple rules:
+```
+src/
+├── components  # "dumb" components - layout and styling
+├── containers  # "smart" components - data processing, interaction and mediation logic
+├── lib         # configured dependencies
+├── stores      # stateful classes acting as data accessors
+├── utils       # stateless helpers, no app logic
+├── app.js      # app entry point
+├── config.js   # hardcoded values go there (except of styling-related consts)
+```
 
 ## What makes it possible?
 ### data source

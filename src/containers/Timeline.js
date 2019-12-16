@@ -21,7 +21,6 @@ export default class Timeline {
       timeAxisWidth: 2,
       colors: {
         background: cssColors.darkGreyBlue,
-        scrobble: cssColors.darkGrey2,
         scrobbleHighlight: cssColors.white,
         timeAxis: cssColors.grey1,
       },
