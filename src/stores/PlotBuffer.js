@@ -9,7 +9,10 @@ export default class PlotBuffer {
   }
 
   putPoint(x, y, point, index, color) {
-    // y-coord is first because of horizontal traversal optimization
+    // y-coord is the first lookup index
+    // because in ".getPoint()" it's faster to locate "buffer[y]" entries (rows)
+    // since there are as many rows as the largest artist playcount value,
+    // which is generally less then it would have been columns (x-coords spread)
     if (!this.buffer[y]) {
       this.buffer[y] = {};
     }
@@ -42,13 +45,5 @@ export default class PlotBuffer {
     }
 
     return null;
-  }
-
-  getHorizontallyAdjacentPoint({x, y}, shift) {
-    const yBuffer = this.buffer[y];
-    const xList = Object.keys(yBuffer);
-    const prevX = xList[xList.indexOf(x.toString()) + shift];
-
-    return yBuffer[prevX];
   }
 }

@@ -318,13 +318,18 @@ export default class Timeline {
   }
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
-    const {scrobbleList} = this.props;
-    const condition = shift > 0
-      ? () => scrobble && scrobble.index < scrobbleList.length - 1
-      : () => scrobble && scrobble.index > 0;
+    if (!scrobble) {
+      return;
+    }
 
-    if (condition()) {
-      const index = scrobble.index + shift;
+    const {scrobbleList} = this.props;
+    let {index} = scrobble;
+    const stepCondition = shift > 0
+      ? () => index < scrobbleList.length - 1
+      : () => index > 0;
+
+    if (stepCondition()) {
+      index += shift;
 
       this.selectScrobble({
         ...scrobbleList[index],
@@ -334,11 +339,28 @@ export default class Timeline {
   }
 
   selectHorizontallyAdjacentScrobble(scrobble, shift) {
-    if (scrobble) {
-      const adjacentScrobble = this.plotBuffer.getHorizontallyAdjacentPoint(scrobble, shift);
+    if (!scrobble) {
+      return;
+    }
 
-      if (adjacentScrobble) {
-        this.selectScrobble(adjacentScrobble);
+    const {scrobbleList} = this.props;
+    const {artist: {playcount}} = scrobble;
+    let {index} = scrobble;
+    const stepCondition = shift > 0
+      ? () => index < scrobbleList.length - 1
+      : () => index > 0;
+    const finishCondition = () => scrobbleList[index].artist.playcount === playcount;
+
+    while (stepCondition()) {
+      index += shift;
+
+      if (finishCondition()) {
+        this.selectScrobble({
+          ...scrobbleList[index],
+          index,
+        });
+
+        return;
       }
     }
   }
