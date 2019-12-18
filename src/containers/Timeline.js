@@ -5,9 +5,9 @@ import html from '../lib/html';
 import cssColors from '../app-theme';
 import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
 
-import ScrobbleCollection from '../stores/ScrobbleCollection';
-import PlotBuffer from '../stores/PlotBuffer';
-import ArtistRegistry from '../stores/ArtistRegistry';
+import PointCollection from '../stores/PointCollection';
+import PointBuffer from '../stores/PointBuffer';
+import PointRegistry from '../stores/PointRegistry';
 
 import Plot from '../components/Plot';
 import TimeAxisLabel from '../components/TimeAxisLabel';
@@ -54,9 +54,10 @@ export default class Timeline {
     this.toShowIntroMessage = true;
 
     this.scales = {};
-    this.scrobbleCollection = new ScrobbleCollection(scrobbleList);
-    this.plotBuffer = new PlotBuffer(this.scrobbleHalfSize);
-    this.artistRegistry = new ArtistRegistry();
+    this.scrobbleCollection = new PointCollection(scrobbleList);
+    this.scrobbleBuffer = new PointBuffer(this.scrobbleHalfSize);
+    this.scrobbleRegistry = new PointRegistry(({artist: {name}}) => name);
+    // this.highlightedScrobbleCollection = new PointCollection();
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
@@ -64,8 +65,8 @@ export default class Timeline {
   }
 
   reset() {
-    this.plotBuffer.reset();
-    this.artistRegistry.reset();
+    this.scrobbleBuffer.reset();
+    this.scrobbleRegistry.reset();
 
     this.scrobbleHighlightPointList = [];
     this.highlightedScrobble = null;
@@ -253,7 +254,7 @@ export default class Timeline {
     const {plot, timeAxisLabel} = this.children;
     const {index: highlightedScrobbleGlobalIndex, artist, track} = scrobble;
 
-    this.artistRegistry.getArtistScrobbleList(artist.name).forEach((
+    this.scrobbleRegistry.getPointList(artist.name).forEach((
       {
         date,
         album: {playcount},
@@ -295,7 +296,7 @@ export default class Timeline {
     for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
       const x = this.scrobbleHighlightPointList[i];
       const y = this.scrobbleHighlightPointList[i + 1];
-      const {color} = this.plotBuffer.getPoint(x, y);
+      const {color} = this.scrobbleBuffer.getPoint(x, y);
 
       plot.drawPoint(x, y, color);
     }
@@ -384,7 +385,7 @@ export default class Timeline {
 
   handlePlotMouseMove(event) {
     const {offsetX: x, offsetY: y} = event;
-    const scrobble = this.plotBuffer.getPoint(x, y);
+    const scrobble = this.scrobbleBuffer.getPoint(x, y);
 
     if (scrobble) {
       this.selectScrobble(scrobble);
@@ -420,10 +421,17 @@ export default class Timeline {
       const x = this.scales.timeRangeScale(dateTimeStringToTimestamp(date));
       const y = this.scales.artistPlaycountScale(artist.playcount);
       const color = this.getColorByAlbumPlaycount(album.playcount);
+      const point = {
+        ...scrobble,
+        x,
+        y,
+        index,
+        color,
+      };
 
       plot.drawPoint(x, y, color);
-      this.plotBuffer.putPoint(x, y, scrobble, index, color);
-      this.artistRegistry.putScrobble(x, y, scrobble, index);
+      this.scrobbleBuffer.putPoint(point);
+      this.scrobbleRegistry.putPoint(point);
     });
 
     plot.drawTimeAxis(...this.scales.timeRangeScale.range());

@@ -1,4 +1,4 @@
-export default class PlotBuffer {
+export default class PointBuffer {
   constructor(tolerance) {
     this.tolerance = tolerance;
     this.buffer = {};
@@ -8,7 +8,7 @@ export default class PlotBuffer {
     this.buffer = {};
   }
 
-  putPoint(x, y, point, index, color) {
+  putPoint({x, y, ...point}) {
     // y-coord is the first lookup index
     // because in ".getPoint()" it's faster to locate "buffer[y]" entries (rows)
     // since there are as many rows as the largest artist playcount value,
@@ -17,11 +17,7 @@ export default class PlotBuffer {
       this.buffer[y] = {};
     }
 
-    this.buffer[y][x] = {
-      ...point,
-      index,
-      color,
-    };
+    this.buffer[y][x] = point;
   }
 
   getPoint(x, y) {
