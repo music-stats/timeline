@@ -5,6 +5,7 @@ import html from '../lib/html';
 import cssColors from '../app-theme';
 import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
 
+import ScrobbleCollection from '../stores/ScrobbleCollection';
 import PlotBuffer from '../stores/PlotBuffer';
 import ArtistRegistry from '../stores/ArtistRegistry';
 
@@ -43,7 +44,7 @@ export default class Timeline {
     };
     this.children = {};
 
-    const {scrobbleSize} = this.props;
+    const {scrobbleList, scrobbleSize} = this.props;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.scrobbleTotalRegistry = null;
@@ -53,6 +54,7 @@ export default class Timeline {
     this.toShowIntroMessage = true;
 
     this.scales = {};
+    this.scrobbleCollection = new ScrobbleCollection(scrobbleList);
     this.plotBuffer = new PlotBuffer(this.scrobbleHalfSize);
     this.artistRegistry = new ArtistRegistry();
 
@@ -94,8 +96,8 @@ export default class Timeline {
 
     this.children.infoBox = new InfoBox({
       dates: {
-        firstScrobbleDate: dataTimeStringToDateString(scrobbleList[0].date),
-        lastScrobbleDate: dataTimeStringToDateString(scrobbleList[scrobbleList.length - 1].date),
+        firstScrobbleDate: dataTimeStringToDateString(this.scrobbleCollection.getFirst().date),
+        lastScrobbleDate: dataTimeStringToDateString(this.scrobbleCollection.getLast().date),
       },
       counts: {
         ...this.scrobbleSummary,
@@ -185,8 +187,8 @@ export default class Timeline {
 
   getPeriodCounts() {
     const {scrobbleList} = this.props;
-    const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(scrobbleList[0].date);
-    const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
+    const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getFirst().date);
+    const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getLast().date);
     const msInDay = 24 * 60 * 60 * 1000;
     const dayCount = Math.ceil((lastScrobbleDateTimestamp - firstScrobbleDateTimestamp) / msInDay);
     const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
@@ -202,8 +204,8 @@ export default class Timeline {
     const {plot} = this.children;
     const [width, height] = plot.getDimensions();
 
-    const minDateTimestamp = dateTimeStringToTimestamp(scrobbleList[0].date);
-    const maxDateTimestamp = dateTimeStringToTimestamp(scrobbleList[scrobbleList.length - 1].date);
+    const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getFirst().date);
+    const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getLast().date);
     const [maxArtistPlaycount, maxAlbumPlaycount] = this.getMaxPlaycounts();
 
     // plot width calculation avoids stretching the timeline in case of few points
@@ -224,7 +226,7 @@ export default class Timeline {
 
     // X axis
     this.scales.timeRangeScale = d3Scale.scaleLinear()
-      .domain([minDateTimestamp, maxDateTimestamp])
+      .domain([firstScrobbleDateTimestamp, lastScrobbleDateTimestamp])
       .rangeRound([plotLeft, plotRight]);
 
     // Y axis
@@ -318,49 +320,26 @@ export default class Timeline {
   }
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
-    if (!scrobble) {
-      return;
-    }
+    if (scrobble) {
+      const adjacentScrobble = this.scrobbleCollection.getAdjacent(scrobble, shift);
 
-    const {scrobbleList} = this.props;
-    let {index} = scrobble;
-    const stepCondition = shift > 0
-      ? () => index < scrobbleList.length - 1
-      : () => index > 0;
-
-    if (stepCondition()) {
-      index += shift;
-
-      this.selectScrobble({
-        ...scrobbleList[index],
-        index,
-      });
+      if (adjacentScrobble) {
+        this.selectScrobble(adjacentScrobble);
+      }
     }
   }
 
   selectHorizontallyAdjacentScrobble(scrobble, shift) {
-    if (!scrobble) {
-      return;
-    }
+    if (scrobble) {
+      const {artist: {playcount}} = scrobble;
+      const adjacentScrobble = this.scrobbleCollection.getAdjacent(
+        scrobble,
+        shift,
+        ({artist: {playcount: p}}) => p === playcount,
+      );
 
-    const {scrobbleList} = this.props;
-    const {artist: {playcount}} = scrobble;
-    let {index} = scrobble;
-    const stepCondition = shift > 0
-      ? () => index < scrobbleList.length - 1
-      : () => index > 0;
-    const finishCondition = () => scrobbleList[index].artist.playcount === playcount;
-
-    while (stepCondition()) {
-      index += shift;
-
-      if (finishCondition()) {
-        this.selectScrobble({
-          ...scrobbleList[index],
-          index,
-        });
-
-        return;
+      if (adjacentScrobble) {
+        this.selectScrobble(adjacentScrobble);
       }
     }
   }
