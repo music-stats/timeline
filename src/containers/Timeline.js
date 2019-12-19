@@ -15,6 +15,7 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 // @todo:
+// * choose a scrobble margin between 0 and "props.maxScrobbleMargin" that leads to equal margins after rounding
 // * add unit tests (use "tape")
 
 export default class Timeline {
