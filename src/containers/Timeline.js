@@ -8,6 +8,7 @@ import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/da
 import PointCollection from '../stores/PointCollection';
 import PointBuffer from '../stores/PointBuffer';
 import PointRegistry from '../stores/PointRegistry';
+import SummaryRegistry from '../stores/SummaryRegistry';
 
 import Plot from '../components/Plot';
 import TimeAxisLabel from '../components/TimeAxisLabel';
@@ -42,22 +43,21 @@ export default class Timeline {
       ...this.constructor.getDefaultProps(),
       ...props,
     };
+
     this.children = {};
+    this.scales = {};
 
     const {scrobbleList, scrobbleSize} = this.props;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
-    this.scrobbleTotalRegistry = null;
-    this.scrobbleSummary = null;
-    this.scrobbleHighlightPointList = []; // [x1, y1, x2, y2, ...]
-    this.highlightedScrobble = null;
+    this.selectedScrobble = null;
     this.toShowIntroMessage = true;
 
-    this.scales = {};
     this.scrobbleCollection = new PointCollection(scrobbleList);
+    this.highlightedScrobbleCollection = new PointCollection();
     this.scrobbleBuffer = new PointBuffer(this.scrobbleHalfSize);
     this.scrobbleRegistry = new PointRegistry(({artist: {name}}) => name);
-    // this.highlightedScrobbleCollection = new PointCollection();
+    this.summaryRegistry = new SummaryRegistry(scrobbleList);
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
@@ -67,9 +67,8 @@ export default class Timeline {
   reset() {
     this.scrobbleBuffer.reset();
     this.scrobbleRegistry.reset();
-
-    this.scrobbleHighlightPointList = [];
-    this.highlightedScrobble = null;
+    this.highlightedScrobbleCollection.reset();
+    this.selectedScrobble = null;
   }
 
   subscribe() {
@@ -101,89 +100,12 @@ export default class Timeline {
         lastScrobbleDate: dataTimeStringToDateString(this.scrobbleCollection.getLast().date),
       },
       counts: {
-        ...this.scrobbleSummary,
+        ...this.summaryRegistry.getSummary(),
         scrobbleCount: scrobbleList.length,
         dayCount,
         perDayCount,
       },
     });
-  }
-
-  initializeTotals() {
-    const {scrobbleList} = this.props;
-    const registry = {};
-    const summary = {
-      artistCount: 0,
-      albumCount: 0,
-      trackCount: 0,
-    };
-
-    scrobbleList.forEach(({artist, album, track}) => {
-      if (!registry[artist.name]) {
-        // The same track can appear on different albums, so track playcount values are not nested into albums.
-        // It matches aggregation logic in "music-stats/scripts/src/ETL/transformers/aggregate.ts".
-        registry[artist.name] = {
-          albums: {},
-          tracks: {},
-        };
-      }
-
-      registry[artist.name].playcount = artist.playcount;
-      registry[artist.name].albums[album.name] = album.playcount;
-      registry[artist.name].tracks[track.name] = track.playcount;
-    });
-
-    summary.artistCount = Object.keys(registry).length;
-
-    for (const artistName in registry) {
-      const artistRecord = registry[artistName];
-
-      summary.albumCount += Object.keys(artistRecord.albums).length;
-      summary.trackCount += Object.keys(artistRecord.tracks).length;
-    }
-
-    this.scrobbleTotalRegistry = registry;
-    this.scrobbleSummary = summary;
-  }
-
-  getMaxPlaycounts() {
-    let artistRecord = null;
-    let artistPlaycount = null;
-    let albumPlaycount = null;
-    let maxArtistPlaycount = 0;
-    let maxAlbumPlaycount = 0;
-
-    for (const artistName in this.scrobbleTotalRegistry) {
-      artistRecord = this.scrobbleTotalRegistry[artistName];
-      artistPlaycount = artistRecord.playcount;
-
-      if (artistPlaycount > maxArtistPlaycount) {
-        maxArtistPlaycount = artistPlaycount;
-      }
-
-      for (const albumName in artistRecord.albums) {
-        albumPlaycount = artistRecord.albums[albumName];
-
-        if (albumPlaycount > maxAlbumPlaycount) {
-          maxAlbumPlaycount = albumPlaycount;
-        }
-      }
-    }
-
-    return [
-      maxArtistPlaycount,
-      maxAlbumPlaycount,
-    ];
-  }
-
-  getScrobbleTotals({artist, album, track}) {
-    const artistRecord = this.scrobbleTotalRegistry[artist.name];
-
-    return [
-      artistRecord.playcount,
-      artistRecord.albums[album.name],
-      artistRecord.tracks[track.name],
-    ];
   }
 
   getPeriodCounts() {
@@ -207,7 +129,7 @@ export default class Timeline {
 
     const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getFirst().date);
     const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getLast().date);
-    const [maxArtistPlaycount, maxAlbumPlaycount] = this.getMaxPlaycounts();
+    const [maxArtistPlaycount, maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
 
     // plot width calculation avoids stretching the timeline in case of few points
     const plotLeft = plotPadding;
@@ -270,38 +192,29 @@ export default class Timeline {
         : this.getHighlightColorByAlbumPlaycount(playcount);
 
       plot.drawPoint(xi, yi, color);
-      this.scrobbleHighlightPointList.push(xi, yi);
 
       if (artistScrobbleLocalIndex === 0) {
         timeAxisLabel.renderText(xi, plot.getDimensions()[0], scrobbleMargin, plotPadding, date);
       }
 
+      this.highlightedScrobbleCollection.push({
+        x: xi,
+        y: yi,
+      });
+
       if (artistScrobbleGlobalIndex === highlightedScrobbleGlobalIndex) {
-        this.highlightedScrobble = {
-          ...scrobble,
-          x: xi,
-          y: yi,
-        };
+        this.selectedScrobble = scrobble;
       }
     });
   }
 
-  removeScrobbleHighlight() {
-    if (!this.scrobbleHighlightPointList.length) {
-      return;
-    }
-
+  removeScrobbleCollectionHighlight() {
     const {plot} = this.children;
 
-    for (let i = 0; i < this.scrobbleHighlightPointList.length - 1; i += 2) {
-      const x = this.scrobbleHighlightPointList[i];
-      const y = this.scrobbleHighlightPointList[i + 1];
-      const {color} = this.scrobbleBuffer.getPoint(x, y);
-
-      plot.drawPoint(x, y, color);
-    }
-
-    this.scrobbleHighlightPointList = [];
+    this.highlightedScrobbleCollection.getAll().forEach(
+      ({x, y}) => plot.drawPoint(x, y, this.scrobbleBuffer.getPoint(x, y).color),
+    );
+    this.highlightedScrobbleCollection.reset();
   }
 
   selectScrobble(scrobble) {
@@ -311,12 +224,12 @@ export default class Timeline {
       this.hideIntroMessage();
     }
 
-    this.removeScrobbleHighlight();
+    this.removeScrobbleCollectionHighlight();
     this.highlightArtistScrobbleList(scrobble);
 
     infoBox.renderScrobbleInfo({
       scrobble,
-      totals: this.getScrobbleTotals(scrobble),
+      totals: this.summaryRegistry.getTotals(scrobble),
     });
   }
 
@@ -362,25 +275,25 @@ export default class Timeline {
   }
 
   handleEscKeydown() {
-    this.highlightedScrobble = null;
-    this.removeScrobbleHighlight();
+    this.selectedScrobble = null;
+    this.removeScrobbleCollectionHighlight();
     this.showIntroMessage();
   }
 
   handleArrowDownKeydown() {
-    this.selectVerticallyAdjacentScrobble(this.highlightedScrobble, -1);
+    this.selectVerticallyAdjacentScrobble(this.selectedScrobble, -1);
   }
 
   handleArrowUpKeydown() {
-    this.selectVerticallyAdjacentScrobble(this.highlightedScrobble, 1);
+    this.selectVerticallyAdjacentScrobble(this.selectedScrobble, 1);
   }
 
   handleArrowLeftKeydown() {
-    this.selectHorizontallyAdjacentScrobble(this.highlightedScrobble, -1);
+    this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, -1);
   }
 
   handleArrowRightKeydown() {
-    this.selectHorizontallyAdjacentScrobble(this.highlightedScrobble, 1);
+    this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, 1);
   }
 
   handlePlotMouseMove(event) {
@@ -439,7 +352,6 @@ export default class Timeline {
 
   // things needed for the first render
   beforeRender() {
-    this.initializeTotals();
     this.initializeChildrenComponents();
   }
 

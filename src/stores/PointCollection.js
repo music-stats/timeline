@@ -1,6 +1,18 @@
 export default class PointCollection {
-  constructor(list) {
+  constructor(list = []) {
     this.list = list;
+  }
+
+  reset() {
+    this.list = [];
+  }
+
+  push(point) {
+    this.list.push(point);
+  }
+
+  getAll() {
+    return this.list;
   }
 
   getFirst() {

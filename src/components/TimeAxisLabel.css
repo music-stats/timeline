@@ -1,5 +1,5 @@
 .TimeAxisLabel {
-  font-size: 10px;
+  font-size: 0.625rem;
   position: absolute;
   white-space: nowrap;
   color: var(--color-grey-2);
