@@ -1,4 +1,5 @@
 import html from '../lib/html';
+import config from '../config';
 
 import './TimeAxisLabel.css';
 
@@ -15,7 +16,14 @@ export default class TimeAxisLabel {
     this.element.innerText = '';
   }
 
-  renderText(x, canvasWidth, scrobbleMargin, plotPadding, value) {
+  renderText(x, canvasWidth, value) {
+    const {
+      timeline: {
+        plot: {padding: plotPadding},
+        point: {maxMargin: scrobbleMargin},
+      },
+    } = config;
+
     const halfWidth = Math.ceil(this.element.offsetWidth / 2);
     const [left, right] = (() => {
       // stick to left

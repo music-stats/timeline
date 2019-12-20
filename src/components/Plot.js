@@ -1,4 +1,5 @@
 import html from '../lib/html';
+import config from '../config';
 
 import './Plot.css';
 
@@ -42,20 +43,20 @@ export default class Plot {
   }
 
   drawBackground() {
-    const {colors} = this.props;
+    const {timeline: {plot: {backgroundColor}}} = config;
     const [width, height] = this.dimensions;
 
-    this.ctx.fillStyle = colors.background;
+    this.ctx.fillStyle = backgroundColor;
     this.ctx.fillRect(0, 0, width, height);
   }
 
   drawTimeAxis(xFrom, xTo) {
-    const {padding, timeAxisWidth, colors} = this.props;
+    const {timeline: {plot: {padding}, timeAxis: {width, color}}} = config;
     const height = this.dimensions[1];
     const y = height - padding;
 
-    this.ctx.strokeStyle = colors.timeAxis;
-    this.ctx.lineWidth = timeAxisWidth;
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = width;
     this.ctx.beginPath();
     this.ctx.moveTo(xFrom, y);
     this.ctx.lineTo(xTo, y);
@@ -63,7 +64,8 @@ export default class Plot {
   }
 
   drawPoint(x, y, color) {
-    const {pointSize, pointHalfSize} = this.props;
+    const {timeline: {point: {size: pointSize}}} = config;
+    const {pointHalfSize} = this.props;
 
     this.ctx.fillStyle = color;
     this.ctx.fillRect(

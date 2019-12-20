@@ -33,7 +33,7 @@ src/
 ├── stores      # stateful classes acting as data accessors
 ├── utils       # stateless helpers, no app logic
 ├── app.js      # app entry point
-├── config.js   # hardcoded values go there (except of styling-related consts)
+└── config.js   # hardcoded values go there (including plot-specific styling)
 ```
 
 ## What makes it possible?

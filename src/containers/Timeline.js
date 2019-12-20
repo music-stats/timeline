@@ -2,7 +2,7 @@ import * as d3Scale from 'd3-scale';
 import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import html from '../lib/html';
 
-import cssColors from '../app-theme';
+import config from '../config';
 import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
 
 import PointCollection from '../stores/PointCollection';
@@ -15,40 +15,17 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 // @todo:
-// * choose a scrobble margin between 0 and "props.maxScrobbleMargin" that leads to equal margins after rounding
+// * choose a scrobble margin between 0 and "config.timeline.point.maxMargin" that leads to equal margins after rounding
 // * add unit tests (use "tape")
 
 export default class Timeline {
-  static getDefaultProps() {
-    return {
-      plotPadding: 20,
-      scrobbleSize: 4,
-      scrobbleMargin: 2,
-      timeAxisWidth: 2,
-      colors: {
-        background: cssColors.darkGreyBlue,
-        scrobbleHighlight: cssColors.white,
-        timeAxis: cssColors.grey1,
-      },
-      colorRanges: {
-        albumPlaycount: {
-          from: 0.8,
-          to: 0.4,
-        },
-      },
-    };
-  }
-
   constructor(props) {
-    this.props = {
-      ...this.constructor.getDefaultProps(),
-      ...props,
-    };
+    const {timeline: {point: {size: scrobbleSize}}} = config;
+    const {scrobbleList} = props;
 
+    this.props = props;
     this.children = {};
     this.scales = {};
-
-    const {scrobbleList, scrobbleSize} = this.props;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.selectedScrobble = null;
@@ -78,18 +55,11 @@ export default class Timeline {
   }
 
   initializeChildrenComponents() {
-    const {scrobbleList, scrobbleSize, plotPadding, timeAxisWidth, colors} = this.props;
+    const {scrobbleList} = this.props;
     const [dayCount, perDayCount] = this.getPeriodCounts();
 
     this.children.plot = new Plot({
-      pointSize: scrobbleSize,
       pointHalfSize: this.scrobbleHalfSize,
-      padding: plotPadding,
-      timeAxisWidth,
-      colors: {
-        background: colors.background,
-        timeAxis: colors.timeAxis,
-      },
       onMouseMove: this.handlePlotMouseMove,
     });
 
@@ -124,7 +94,16 @@ export default class Timeline {
   }
 
   initializeScales() {
-    const {scrobbleList, plotPadding, scrobbleSize, timeAxisWidth, scrobbleMargin, colorRanges} = this.props;
+    const {
+      timeline: {
+        plot: {padding: plotPadding},
+        point: {size: scrobbleSize, maxMargin: scrobbleMargin},
+        timeAxis: {width: timeAxisWidth},
+        scales: {albumPlaycount: {range: albumPlaycountScaleRange}},
+      },
+    } = config;
+
+    const {scrobbleList} = this.props;
     const {plot} = this.children;
     const [width, height] = plot.getDimensions();
 
@@ -161,7 +140,7 @@ export default class Timeline {
     // scrobble point color
     this.scales.albumPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxAlbumPlaycount])
-      .range([colorRanges.albumPlaycount.from, colorRanges.albumPlaycount.to]);
+      .range(albumPlaycountScaleRange);
   }
 
   getColorByAlbumPlaycount(playcount) {
@@ -173,7 +152,7 @@ export default class Timeline {
   }
 
   highlightArtistScrobbleList(scrobble) {
-    const {plotPadding, scrobbleMargin, colors} = this.props;
+    const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
     const {plot, timeAxisLabel} = this.children;
     const {index: highlightedScrobbleGlobalIndex, artist, track} = scrobble;
 
@@ -189,13 +168,13 @@ export default class Timeline {
       artistScrobbleLocalIndex,
     ) => {
       const color = name === track.name
-        ? colors.scrobbleHighlight
+        ? selectedTrackColor
         : this.getHighlightColorByAlbumPlaycount(playcount);
 
       plot.drawPoint(xi, yi, color);
 
       if (artistScrobbleLocalIndex === 0) {
-        timeAxisLabel.renderText(xi, plot.getDimensions()[0], scrobbleMargin, plotPadding, date);
+        timeAxisLabel.renderText(xi, plot.getDimensions()[0], date);
       }
 
       this.highlightedScrobbleCollection.push({
