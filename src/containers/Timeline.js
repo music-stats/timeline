@@ -15,7 +15,6 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 // @todo:
-// * choose a scrobble margin between 0 and "config.timeline.point.maxMargin" that leads to equal margins after rounding
 // * add unit tests (use "tape")
 
 export default class Timeline {
@@ -63,7 +62,9 @@ export default class Timeline {
       onMouseMove: this.handlePlotMouseMove,
     });
 
-    this.children.timeAxisLabel = new TimeAxisLabel();
+    this.children.timeAxisLabel = new TimeAxisLabel({
+      pointHalfSize: this.scrobbleHalfSize,
+    });
 
     this.children.infoBox = new InfoBox({
       dates: {
@@ -97,7 +98,7 @@ export default class Timeline {
     const {
       timeline: {
         plot: {padding: plotPadding},
-        point: {size: scrobbleSize, maxMargin: scrobbleMargin},
+        point: {size: scrobbleSize, maxMargin: scrobbleMaxMargin},
         timeAxis: {width: timeAxisWidth},
         scales: {albumPlaycount: {range: albumPlaycountScaleRange}},
       },
@@ -121,10 +122,19 @@ export default class Timeline {
 
     // plot height calculation is ensuring equal vertical gaps between points
     const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
-    const plotHeight = Math.min(
-      plotBottom - plotPadding,
-      (maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin),
-    );
+    const plotMaxHeight = plotBottom - plotPadding;
+    let scrobbleMargin = scrobbleMaxMargin;
+    let plotHeight = plotMaxHeight;
+    while (scrobbleMargin >= 0) {
+      const plotHeightNext = (maxArtistPlaycount - 1) * (scrobbleSize + scrobbleMargin);
+
+      if (plotHeightNext > plotMaxHeight) {
+        scrobbleMargin -= 1;
+      } else {
+        plotHeight = plotHeightNext;
+        break;
+      }
+    }
     const plotTop = plotBottom - plotHeight;
 
     // X axis
