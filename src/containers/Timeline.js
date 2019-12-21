@@ -62,9 +62,7 @@ export default class Timeline {
       onMouseMove: this.handlePlotMouseMove,
     });
 
-    this.children.timeAxisLabel = new TimeAxisLabel({
-      pointHalfSize: this.scrobbleHalfSize,
-    });
+    this.children.timeAxisLabel = new TimeAxisLabel();
 
     this.children.infoBox = new InfoBox({
       dates: {

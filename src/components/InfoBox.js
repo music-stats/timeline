@@ -39,40 +39,8 @@ export default class InfoBox {
     this.introMessageElementList.forEach((element) => element.style.display = 'none');
   }
 
-  renderScrobbleInfo({scrobble, totals}) {
-    const {date, artist, album, track} = scrobble;
-    const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = totals;
-
-    const artistUrl = url`https://www.last.fm/music/${artist.name}`;
-    const albumUrl = url`https://www.last.fm/music/${artist.name}/${album.name}`;
-    const trackUrl = url`https://www.last.fm/music/${artist.name}/_/${track.name}`;
-
-    this.dateElement.innerText = `date: ${date}`;
-
-    this.artistNameElement.innerHTML = html`
-      <span>
-        artist: <a href=${artistUrl}>${artist.name}</a> <small>(${artist.playcount}/${artistTotalPlaycount})</small>
-      </span>
-    `;
-
-    this.albumNameElement.innerHTML = html`
-      <span>
-        album: <a href=${albumUrl}>${album.name}</a> <small>(${album.playcount}/${albumTotalPlaycount})</small>
-      </span>
-    `;
-
-    this.trackNameElement.innerHTML = html`
-      <span>
-        track: <a href=${trackUrl}>${track.name}</a> <small>(${track.playcount}/${trackTotalPlaycount})</small>
-      </span>
-    `;
-  }
-
-  afterRender() {
-    this.initializeElements();
-  }
-
-  render() {
+  getLastfmLinks() {
+    const {links} = config;
     const {
       dates: {
         firstScrobbleDate,
@@ -83,11 +51,78 @@ export default class InfoBox {
         albumCount,
         trackCount,
         scrobbleCount,
+      },
+    } = this.props;
+    const baseUrl = `${links.lastfm.url}library`;
+    const queryString = `from=${firstScrobbleDate}&to=${lastScrobbleDate}`;
+
+    return {
+      scrobbleListLink: html`
+        <a href="${baseUrl}?${queryString}">${scrobbleCount}</a>
+      `,
+      artistListLink: html`
+        <a href="${baseUrl}/artists?${queryString}">${artistCount}</a>
+      `,
+      albumListLink: html`
+        <a href="${baseUrl}/albums?${queryString}">${albumCount}</a>
+      `,
+      trackListLink: html`
+        <a href="${baseUrl}/tracks?${queryString}">${trackCount}</a>
+      `,
+    };
+  }
+
+  renderScrobbleInfo({scrobble, totals}) {
+    const {date, artist, album, track} = scrobble;
+    const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = totals;
+
+    const artistUrl = url`https://www.last.fm/music/${artist.name}`;
+    const albumUrl = url`https://www.last.fm/music/${artist.name}/${album.name}`;
+    const trackUrl = url`https://www.last.fm/music/${artist.name}/_/${track.name}`;
+
+    this.dateElement.innerText = date;
+
+    this.artistNameElement.innerHTML = html`
+      <span>
+        <a href=${artistUrl}>${artist.name}</a> <small>(${artist.playcount}/${artistTotalPlaycount})</small>
+      </span>
+    `;
+
+    this.albumNameElement.innerHTML = html`
+      <span>
+        <a href=${albumUrl}>${album.name}</a> <small>(${album.playcount}/${albumTotalPlaycount})</small>
+      </span>
+    `;
+
+    this.trackNameElement.innerHTML = html`
+      <span>
+        <a href=${trackUrl}>${track.name}</a> <small>(${track.playcount}/${trackTotalPlaycount})</small>
+      </span>
+    `;
+  }
+
+  afterRender() {
+    this.initializeElements();
+  }
+
+  render() {
+    const {links} = config;
+    const {
+      dates: {
+        firstScrobbleDate,
+        lastScrobbleDate,
+      },
+      counts: {
         dayCount,
         perDayCount,
       },
     } = this.props;
-    const {links} = config;
+    const {
+      scrobbleListLink,
+      artistListLink,
+      albumListLink,
+      trackListLink,
+    } = this.getLastfmLinks();
 
     return html`
       <aside
@@ -96,36 +131,25 @@ export default class InfoBox {
         <p
           class="InfoBox__field InfoBox__field--intro-message"
         >
-          Last.fm: <a href=${links.lastfm.url}>${links.lastfm.text}</a>
+          <a href=${links.github.url}>${links.github.text}</a> <a href=${links.twitter.url}>${links.twitter.text}</a>
         </p>
 
         <p
           class="InfoBox__field InfoBox__field--intro-message"
         >
-          GitHub: <a href=${links.github.url}>${links.github.text}</a>
+          ${dayCount} days: ${firstScrobbleDate} - ${lastScrobbleDate}
         </p>
 
         <p
           class="InfoBox__field InfoBox__field--intro-message"
         >
-          Twitter: <a href=${links.twitter.url}>${links.twitter.text}</a>
+          ${scrobbleListLink} scrobbles (${perDayCount} per day)
         </p>
 
         <p
           class="InfoBox__field InfoBox__field--intro-message"
         >
-          period: ${firstScrobbleDate} - ${lastScrobbleDate} (${dayCount} days)
-        </p>
-
-        <p
-          class="InfoBox__field InfoBox__field--intro-message"
-        >
-          total: ${[
-            `${artistCount} artists`,
-            `${albumCount} albums`,
-            `${trackCount} tracks`,
-            `${scrobbleCount} scrobbles (${perDayCount} per day)`,
-          ].join(', ')}
+          ${artistListLink} artists, ${albumListLink} albums, ${trackListLink} tracks
         </p>
 
         <p

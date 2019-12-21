@@ -12,5 +12,7 @@ export default {
   lightGrey3: '#f0f0f0',
   lightGrey4: '#f8f8f8',
 
+  orange: '#fa9833',
+
   white: '#fff',
 };
