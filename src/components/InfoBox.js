@@ -88,11 +88,17 @@ export default class InfoBox {
       </span>
     `;
 
-    this.albumNameElement.innerHTML = html`
-      <span>
-        <a href=${albumUrl}>${album.name}</a> <small>(${album.playcount}/${albumTotalPlaycount})</small>
-      </span>
-    `;
+    this.albumNameElement.style.display = album.name
+      ? 'block'
+      : 'none';
+
+    this.albumNameElement.innerHTML = album.name
+      ? html`
+        <span>
+          <a href=${albumUrl}>${album.name}</a> <small>(${album.playcount}/${albumTotalPlaycount})</small>
+        </span>
+      `
+      : '';
 
     this.trackNameElement.innerHTML = html`
       <span>
