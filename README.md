@@ -47,7 +47,10 @@ See [scripts supporting the scrobble timeline](https://github.com/music-stats/sc
 
 ### deps
 * templates: [`htm`](https://github.com/developit/htm) + [`vhtml`](https://github.com/developit/vhtml)
-* dataviz utils: [`d3-scale`](https://github.com/d3/d3-scale), [`d3-scale-chromatic`](https://github.com/d3/d3-scale-chromatic)
+* dataviz utils: [`d3-scale`](https://github.com/d3/d3-scale), [`d3-scale-chromatic`](https://github.com/d3/d3-scale-chromatic), [`d3-color`](https://github.com/d3/d3-color)
+
+### colors
+Color ranges for genres are picked from Cynthia A. Brewer’s [ColorBrewer](http://colorbrewer2.org/).
 
 ## Development setup
 ```bash

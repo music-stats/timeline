@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Y axis: artist playcount.
   * Color: album playcount.
 * Summary: period, total numbers.
+* Colorized genres.
 * Highlighting on selection:
   * An info box with date, artist, album and track.
-  * Different color for all scrobbles of a given artist.
+  * Brighter color for all scrobbles of a given artist.
   * Date of the first scrobble of a given artist.
 * Keyboard navigation (traversing the timeline with arrow keys).
 

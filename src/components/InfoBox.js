@@ -84,7 +84,7 @@ export default class InfoBox {
 
     this.artistNameElement.innerHTML = html`
       <span>
-        <a href=${artistUrl}>${artist.name}</a> <small>(${artist.playcount}/${artistTotalPlaycount})</small>
+        <a href=${artistUrl}>${artist.name}</a> <small>(${artist.playcount}/${artistTotalPlaycount})</small> ${artist.genre && `[${artist.genre}]`}
       </span>
     `;
 

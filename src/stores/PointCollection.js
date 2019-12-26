@@ -31,11 +31,11 @@ export default class PointCollection {
 
     while (stepCondition()) {
       index += shift;
-      const adjacentScrobble = this.list[index];
+      const adjacentPoint = this.list[index];
 
-      if (filter(adjacentScrobble)) {
+      if (filter(adjacentPoint)) {
         return {
-          ...adjacentScrobble,
+          ...adjacentPoint,
           index,
         };
       }

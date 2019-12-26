@@ -1,18 +1,27 @@
 import config from './config';
+import {enrichArtistsWithGenres} from './utils/dataset';
 import Timeline from './containers/Timeline';
 
 import './app.css';
 import './app-theme.css';
 
-fetch(config.dataUrl)
-  .then((data) => data.json())
-  .then((scrobbleList) => {
+Promise.all([
+  config.dataUrls.scrobbles,
+  config.dataUrls.artistsByGenres,
+].map((url) => fetch(url).then((response) => response.json())))
+  .then(([scrobbleList, artistsByGenres]) => {
+    enrichArtistsWithGenres(scrobbleList, artistsByGenres);
+
     const timeline = new Timeline({
       scrobbleList,
+      artistsByGenres,
     });
 
     timeline.beforeRender();
     document.body.innerHTML = timeline.render();
     timeline.afterRender();
     timeline.draw();
+
+    // for debug only
+    // window.timeline = timeline;
   });

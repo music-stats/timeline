@@ -1,5 +1,6 @@
 import * as d3Scale from 'd3-scale';
 import * as d3ScaleChromatic from 'd3-scale-chromatic';
+import * as d3Color from 'd3-color';
 import html from '../lib/html';
 
 import config from '../config';
@@ -24,7 +25,6 @@ export default class Timeline {
 
     this.props = props;
     this.children = {};
-    this.scales = {};
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.selectedScrobble = null;
@@ -35,6 +35,9 @@ export default class Timeline {
     this.scrobbleBuffer = new PointBuffer(this.scrobbleHalfSize);
     this.scrobbleRegistry = new PointRegistry(({artist: {name}}) => name);
     this.summaryRegistry = new SummaryRegistry(scrobbleList);
+
+    this.scales = {};
+    this.genreColorScales = this.getGenreColorScales();
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
@@ -151,13 +154,44 @@ export default class Timeline {
       .range(albumPlaycountScaleRange);
   }
 
-  getColorByAlbumPlaycount(playcount) {
-    return d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount));
+  getGenreColorScales() {
+    const {genreColors} = config;
+    const scales = {};
+    const [maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
+
+    for (const genre in genreColors) {
+      if (!genreColors[genre].length) {
+        continue;
+      }
+
+      scales[genre] = d3Scale.scaleSequential()
+        .domain([1, maxAlbumPlaycount])
+        .range(genreColors[genre]);
+    }
+
+    return scales;
   }
 
-  getHighlightColorByAlbumPlaycount(playcount) {
-    return d3ScaleChromatic.interpolateWarm(this.scales.albumPlaycountScale(playcount));
+  getGenreColorByAlbumPlaycount(genre, playcount, toHighlight = false) {
+    const genreColorScale = this.genreColorScales[genre];
+    const color = d3Color.hsl(
+      genreColorScale
+        ? genreColorScale(playcount)
+        : d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount)),
+    );
+
+    if (!toHighlight) {
+      // @todo: tweak these consts and move them to config
+      color.s /= 3;
+      color.l /= 1.4;
+    }
+
+    return color;
   }
+
+  // getHighlightColorByAlbumPlaycount(playcount) {
+  //   return d3ScaleChromatic.interpolateWarm(this.scales.albumPlaycountScale(playcount));
+  // }
 
   highlightArtistScrobbleList(scrobble) {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
@@ -167,6 +201,7 @@ export default class Timeline {
     this.scrobbleRegistry.getPointList(artist.name).forEach((
       {
         date,
+        artist: {genre},
         album: {playcount},
         track: {name},
         index: artistScrobbleGlobalIndex,
@@ -177,7 +212,7 @@ export default class Timeline {
     ) => {
       const color = name === track.name
         ? selectedTrackColor
-        : this.getHighlightColorByAlbumPlaycount(playcount);
+        : this.getGenreColorByAlbumPlaycount(genre, playcount, true);
 
       plot.drawPoint(xi, yi, color);
 
@@ -321,7 +356,7 @@ export default class Timeline {
       const {date, artist, album} = scrobble;
       const x = this.scales.timeRangeScale(dateTimeStringToTimestamp(date));
       const y = this.scales.artistPlaycountScale(artist.playcount);
-      const color = this.getColorByAlbumPlaycount(album.playcount);
+      const color = this.getGenreColorByAlbumPlaycount(artist.genre, album.playcount);
       const point = {
         ...scrobble,
         x,
