@@ -182,8 +182,11 @@ export default class Timeline {
 
     if (!toHighlight) {
       // @todo: tweak these consts and move them to config
-      color.s /= 3;
-      color.l /= 1.4;
+      color.s /= 2;
+      color.l /= 1.2;
+    } else {
+      color.s *= 1.2;
+      color.l *= 1.8;
     }
 
     return color;
