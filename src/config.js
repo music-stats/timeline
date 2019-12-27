@@ -61,11 +61,13 @@ export default {
     "Darkwave":                ['#cc4c02', '#ec7014'],
     "Industrial":              ['#cc4c02', '#ec7014'],
     "Trip Hop":                ['#cc4c02', '#ec7014'],
+    "Dream Pop":               ['#cc4c02', '#ec7014'],
 
     // red - classical
     "Classical":               ['#cb181d', '#ef3b2c'],
 
     // yellow - jazz
+    "Cabaret":                 ['#fec44f', '#fee391'],
     "Jazz":                    ['#fec44f', '#fee391'],
     "Funk":                    ['#fec44f', '#fee391'],
     "Hip-hop":                 ['#fec44f', '#fee391'],
@@ -75,8 +77,10 @@ export default {
     "Bluegrass":               ['#238b45', '#41ab5d'],
     "Folk Rock":               ['#238b45', '#41ab5d'],
     "Folk Metal":              ['#238b45', '#41ab5d'],
+    "Dark Folk":               ['#238b45', '#41ab5d'],
 
     // blue - rock
+    "Rockabilly":              ['#2171b5', '#4292c6'],
     "Classic Rock":            ['#2171b5', '#4292c6'],
     "Alternative Rock":        ['#2171b5', '#4292c6'],
     "Gothic Rock":             ['#2171b5', '#4292c6'],
@@ -85,6 +89,7 @@ export default {
     "Post-rock":               ['#2171b5', '#4292c6'],
     "Progressive Rock":        ['#2171b5', '#4292c6'],
     "Stoner Rock":             ['#2171b5', '#4292c6'],
+    "Industrial Rock":         ['#2171b5', '#4292c6'],
 
     // violet - metal
     "Black Metal":             ['#88419d', '#8c6bb1'],
@@ -100,6 +105,7 @@ export default {
     "Death Metal":             ['#88419d', '#8c6bb1'],
     "Melodic Death Metal":     ['#88419d', '#8c6bb1'],
     "Progressive Death Metal": ['#88419d', '#8c6bb1'],
+    "Industrial Metal":        ['#88419d', '#8c6bb1'],
     "Neue Deutsche Härte":     ['#88419d', '#8c6bb1'],
     "Nu Metal":                ['#88419d', '#8c6bb1'],
     "Metalcore":               ['#88419d', '#8c6bb1'],

@@ -16,6 +16,7 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 // @todo:
+// * zoom the timeline (stretch it horizontally)
 // * add unit tests (use "tape")
 
 export default class Timeline {
