@@ -17,9 +17,10 @@ export default class Plot {
   }
 
   subscribe() {
-    const {onMouseMove} = this.props;
+    const {onMouseMove, onWheel} = this.props;
 
     this.element.addEventListener('mousemove', onMouseMove);
+    this.element.addEventListener('wheel', onWheel);
   }
 
   getDimensions() {

@@ -24,6 +24,12 @@ export default {
   },
 
   timeline: {
+    zoom: {
+      min: 1,
+      max: 10,
+      deltaFactor: 0.02,
+    },
+
     plot: {
       padding: 20,
       backgroundColor: cssColors.darkGreyBlue,

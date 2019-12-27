@@ -16,16 +16,16 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 // @todo:
-// * zoom the timeline (stretch it horizontally)
 // * add unit tests (use "tape")
 
 export default class Timeline {
   constructor(props) {
-    const {timeline: {point: {size: scrobbleSize}}} = config;
+    const {timeline: {zoom: {min: minZoom}, point: {size: scrobbleSize}}} = config;
     const {scrobbleList} = props;
 
     this.props = props;
     this.children = {};
+    this.scrobbleList = scrobbleList;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.selectedScrobble = null;
@@ -39,10 +39,12 @@ export default class Timeline {
 
     this.scales = {};
     this.genreColorScales = this.getGenreColorScales();
+    this.zoom = minZoom;
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
+    this.handlePlotWheel = this.handlePlotWheel.bind(this);
   }
 
   reset() {
@@ -64,6 +66,7 @@ export default class Timeline {
     this.children.plot = new Plot({
       pointHalfSize: this.scrobbleHalfSize,
       onMouseMove: this.handlePlotMouseMove,
+      onWheel: this.handlePlotWheel,
     });
 
     this.children.timeAxisLabel = new TimeAxisLabel();
@@ -330,6 +333,46 @@ export default class Timeline {
     if (scrobble) {
       this.selectScrobble(scrobble);
     }
+  }
+
+  handlePlotWheel(event) {
+    const {
+      timeline: {
+        zoom: {min: minZoom, max: maxZoom, deltaFactor},
+        plot: {padding: plotPadding},
+      },
+    } = config;
+
+    // @todo: use "event.deltaX" for horizontal scrolling if "nextZoom > minZoom"
+    const {offsetX, deltaY} = event;
+
+    event.preventDefault();
+
+    let nextZoom = this.zoom - deltaY * deltaFactor;
+
+    if (nextZoom > maxZoom) {
+      nextZoom = maxZoom;
+    } else if (nextZoom < minZoom) {
+      nextZoom = minZoom;
+    }
+
+    if (nextZoom === this.zoom) {
+      return;
+    }
+
+    // const {scrobbleList} = this.props;
+    const {plot} = this.children;
+    const [plotWidth] = plot.getDimensions();
+    const x = Math.min(
+      Math.max(offsetX - plotPadding, 0),
+      plotWidth - 2 * plotPadding,
+    );
+
+    console.log(x, nextZoom);
+    // @todo: "this.scrobbleList = scrobbleList.slice(..., ...)"
+    //        in a way that scrobbles under "x" remain where they are
+
+    this.zoom = nextZoom;
   }
 
   showIntroMessage() {
