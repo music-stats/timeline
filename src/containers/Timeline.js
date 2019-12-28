@@ -177,6 +177,7 @@ export default class Timeline {
   }
 
   getGenreColorByAlbumPlaycount(genre, playcount, toHighlight = false) {
+    const {timeline: {point: {colorValueFactors, highlightedColorValueFactors}}} = config;
     const genreColorScale = this.genreColorScales[genre];
     const color = d3Color.hsl(
       genreColorScale
@@ -184,21 +185,16 @@ export default class Timeline {
         : d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount)),
     );
 
-    if (!toHighlight) {
-      // @todo: tweak these consts and move them to config
-      color.s /= 2;
-      color.l /= 1.2;
-    } else {
-      color.s *= 1.2;
-      color.l *= 1.8;
-    }
+    color.s *= toHighlight
+      ? highlightedColorValueFactors.saturation
+      : colorValueFactors.saturation;
+
+    color.l *= toHighlight
+      ? highlightedColorValueFactors.lightness
+      : colorValueFactors.lightness;
 
     return color;
   }
-
-  // getHighlightColorByAlbumPlaycount(playcount) {
-  //   return d3ScaleChromatic.interpolateWarm(this.scales.albumPlaycountScale(playcount));
-  // }
 
   highlightArtistScrobbleList(scrobble) {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
