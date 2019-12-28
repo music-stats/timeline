@@ -5,7 +5,7 @@ export function dateTimeStringToTimestamp(dateTimeString) {
   return Date.parse(dateTimeString.replace(' ', 'T'));
 }
 
-export function dataTimeStringToDateString(dateTimeString) {
+export function dateTimeStringToDateString(dateTimeString) {
   // "YYYY-MM-DD"
   return dateTimeString.slice(0, 10);
 }

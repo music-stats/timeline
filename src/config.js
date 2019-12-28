@@ -27,7 +27,7 @@ export default {
     zoom: {
       min: 1,
       max: 10,
-      deltaFactor: 0.02,
+      deltaFactor: 0.005,
     },
 
     plot: {

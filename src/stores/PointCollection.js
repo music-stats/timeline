@@ -23,6 +23,30 @@ export default class PointCollection {
     return this.list[this.list.length - 1];
   }
 
+  getNext(timestamp) {
+    for (let i = 0; i < this.list.length; i += 1) {
+      const point = this.list[i];
+
+      if (point.timestamp >= timestamp) {
+        return point;
+      }
+    }
+
+    return null;
+  }
+
+  getPrevious(timestamp) {
+    for (let i = this.list.length - 1; i >= 0; i -= 1) {
+      const point = this.list[i];
+
+      if (point.timestamp <= timestamp) {
+        return point;
+      }
+    }
+
+    return null;
+  }
+
   getAdjacent(point, shift, filter = () => true) {
     let {index} = point;
     const stepCondition = shift > 0

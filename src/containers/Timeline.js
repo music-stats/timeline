@@ -4,7 +4,8 @@ import * as d3Color from 'd3-color';
 import html from '../lib/html';
 
 import config from '../config';
-import {dateTimeStringToTimestamp, dataTimeStringToDateString} from '../utils/date';
+import {dateTimeStringToDateString} from '../utils/date';
+import {clamp} from '../utils/number';
 
 import PointCollection from '../stores/PointCollection';
 import PointBuffer from '../stores/PointBuffer';
@@ -25,14 +26,14 @@ export default class Timeline {
 
     this.props = props;
     this.children = {};
-    this.scrobbleList = scrobbleList;
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.selectedScrobble = null;
     this.toShowIntroMessage = true;
 
     this.scrobbleCollection = new PointCollection(scrobbleList);
-    this.highlightedScrobbleCollection = new PointCollection();
+    this.scrobbleCollectionZoomed = new PointCollection(scrobbleList);
+    this.scrobbleCollectionHighlighted = new PointCollection();
     this.scrobbleBuffer = new PointBuffer(this.scrobbleHalfSize);
     this.scrobbleRegistry = new PointRegistry(({artist: {name}}) => name);
     this.summaryRegistry = new SummaryRegistry(scrobbleList);
@@ -50,7 +51,7 @@ export default class Timeline {
   reset() {
     this.scrobbleBuffer.reset();
     this.scrobbleRegistry.reset();
-    this.highlightedScrobbleCollection.reset();
+    this.scrobbleCollectionHighlighted.reset();
     this.selectedScrobble = null;
   }
 
@@ -73,8 +74,8 @@ export default class Timeline {
 
     this.children.infoBox = new InfoBox({
       dates: {
-        firstScrobbleDate: dataTimeStringToDateString(this.scrobbleCollection.getFirst().date),
-        lastScrobbleDate: dataTimeStringToDateString(this.scrobbleCollection.getLast().date),
+        firstScrobbleDate: dateTimeStringToDateString(this.scrobbleCollection.getFirst().date),
+        lastScrobbleDate: dateTimeStringToDateString(this.scrobbleCollection.getLast().date),
       },
       counts: {
         ...this.summaryRegistry.getSummary(),
@@ -87,8 +88,8 @@ export default class Timeline {
 
   getPeriodCounts() {
     const {scrobbleList} = this.props;
-    const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getFirst().date);
-    const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getLast().date);
+    const firstScrobbleDateTimestamp = this.scrobbleCollection.getFirst().timestamp;
+    const lastScrobbleDateTimestamp = this.scrobbleCollection.getLast().timestamp;
     const msInDay = 24 * 60 * 60 * 1000;
     const dayCount = Math.ceil((lastScrobbleDateTimestamp - firstScrobbleDateTimestamp) / msInDay);
     const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
@@ -109,21 +110,15 @@ export default class Timeline {
       },
     } = config;
 
-    const {scrobbleList} = this.props;
     const {plot} = this.children;
     const [width, height] = plot.getDimensions();
 
-    const firstScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getFirst().date);
-    const lastScrobbleDateTimestamp = dateTimeStringToTimestamp(this.scrobbleCollection.getLast().date);
+    const firstScrobbleDateTimestamp = this.scrobbleCollectionZoomed.getFirst().timestamp;
+    const lastScrobbleDateTimestamp = this.scrobbleCollectionZoomed.getLast().timestamp;
     const [maxArtistPlaycount, maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
 
-    // plot width calculation avoids stretching the timeline in case of few points
     const plotLeft = plotPadding;
-    const plotWidth = Math.min(
-      width - 2 * plotPadding,
-      scrobbleList.length * scrobbleSize,
-    );
-    const plotRight = plotPadding + plotWidth;
+    const plotRight = width - plotPadding;
 
     // plot height calculation is ensuring equal vertical gaps between points
     const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
@@ -223,7 +218,7 @@ export default class Timeline {
         timeAxisLabel.renderText(xi, plot.getDimensions()[0], date);
       }
 
-      this.highlightedScrobbleCollection.push({
+      this.scrobbleCollectionHighlighted.push({
         x: xi,
         y: yi,
       });
@@ -237,10 +232,10 @@ export default class Timeline {
   removeScrobbleCollectionHighlight() {
     const {plot} = this.children;
 
-    this.highlightedScrobbleCollection.getAll().forEach(
+    this.scrobbleCollectionHighlighted.getAll().forEach(
       ({x, y}) => plot.drawPoint(x, y, this.scrobbleBuffer.getPoint(x, y).color),
     );
-    this.highlightedScrobbleCollection.reset();
+    this.scrobbleCollectionHighlighted.reset();
   }
 
   selectScrobble(scrobble) {
@@ -261,7 +256,7 @@ export default class Timeline {
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
     if (scrobble) {
-      const adjacentScrobble = this.scrobbleCollection.getAdjacent(scrobble, shift);
+      const adjacentScrobble = this.scrobbleCollectionZoomed.getAdjacent(scrobble, shift);
 
       if (adjacentScrobble) {
         this.selectScrobble(adjacentScrobble);
@@ -272,7 +267,7 @@ export default class Timeline {
   selectHorizontallyAdjacentScrobble(scrobble, shift) {
     if (scrobble) {
       const {artist: {playcount}} = scrobble;
-      const adjacentScrobble = this.scrobbleCollection.getAdjacent(
+      const adjacentScrobble = this.scrobbleCollectionZoomed.getAdjacent(
         scrobble,
         shift,
         ({artist: {playcount: p}}) => p === playcount,
@@ -331,7 +326,12 @@ export default class Timeline {
     }
   }
 
+  // @todo:
+  // * fix time range when "xTimestamp" changes
+  // * fix arrow navigation
   handlePlotWheel(event) {
+    event.preventDefault();
+
     const {
       timeline: {
         zoom: {min: minZoom, max: maxZoom, deltaFactor},
@@ -341,34 +341,35 @@ export default class Timeline {
 
     // @todo: use "event.deltaX" for horizontal scrolling if "nextZoom > minZoom"
     const {offsetX, deltaY} = event;
-
-    event.preventDefault();
-
-    let nextZoom = this.zoom - deltaY * deltaFactor;
-
-    if (nextZoom > maxZoom) {
-      nextZoom = maxZoom;
-    } else if (nextZoom < minZoom) {
-      nextZoom = minZoom;
-    }
+    const nextZoom = clamp(this.zoom - deltaY * deltaFactor, minZoom, maxZoom);
 
     if (nextZoom === this.zoom) {
       return;
     }
 
-    // const {scrobbleList} = this.props;
+    const {scrobbleList} = this.props;
     const {plot} = this.children;
     const [plotWidth] = plot.getDimensions();
-    const x = Math.min(
-      Math.max(offsetX - plotPadding, 0),
-      plotWidth - 2 * plotPadding,
-    );
+    const plotWidthPadded = plotWidth - 2 * plotPadding;
 
-    console.log(x, nextZoom);
-    // @todo: "this.scrobbleList = scrobbleList.slice(..., ...)"
-    //        in a way that scrobbles under "x" remain where they are
+    const firstScrobble = this.scrobbleCollection.getFirst();
+    const lastScrobble = this.scrobbleCollection.getLast();
+    const firstScrobbleDateTimestamp = firstScrobble.timestamp;
+    const lastScrobbleDateTimestamp = lastScrobble.timestamp;
+    const timeScale = d3Scale.scaleLinear()
+      .domain([0, plotWidthPadded])
+      .rangeRound([firstScrobbleDateTimestamp, lastScrobbleDateTimestamp]);
+    const xTimestamp = timeScale(clamp(offsetX - plotPadding, 0, plotWidthPadded));
 
+    const leftTimeRange = (xTimestamp - firstScrobbleDateTimestamp) / nextZoom;
+    const rightTimeRange = (lastScrobbleDateTimestamp - xTimestamp) / nextZoom;
+    const leftScrobble = this.scrobbleCollection.getNext(xTimestamp - leftTimeRange) || firstScrobble;
+    const rightScrobble = this.scrobbleCollection.getPrevious(xTimestamp + rightTimeRange) || lastScrobble;
+
+    this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(leftScrobble.index, rightScrobble.index));
     this.zoom = nextZoom;
+    this.reset();
+    this.draw();
   }
 
   showIntroMessage() {
@@ -387,7 +388,6 @@ export default class Timeline {
   }
 
   draw() {
-    const {scrobbleList} = this.props;
     const {plot} = this.children;
 
     // subsequent calls depend on plot dimensions
@@ -395,16 +395,15 @@ export default class Timeline {
     this.initializeScales();
     plot.drawBackground();
 
-    scrobbleList.forEach((scrobble, index) => {
-      const {date, artist, album} = scrobble;
-      const x = this.scales.timeRangeScale(dateTimeStringToTimestamp(date));
+    this.scrobbleCollectionZoomed.getAll().forEach((scrobble) => {
+      const {timestamp, artist, album} = scrobble;
+      const x = this.scales.timeRangeScale(timestamp);
       const y = this.scales.artistPlaycountScale(artist.playcount);
       const color = this.getGenreColorByAlbumPlaycount(artist.genre, album.playcount);
       const point = {
         ...scrobble,
         x,
         y,
-        index,
         color,
       };
 

@@ -1,5 +1,5 @@
 import config from './config';
-import {enrichArtistsWithGenres} from './utils/dataset';
+import {enrichScrobbleList} from './utils/dataset';
 import Timeline from './containers/Timeline';
 
 import './app.css';
@@ -10,7 +10,7 @@ Promise.all([
   config.dataUrls.artistsByGenres,
 ].map((url) => fetch(url).then((response) => response.json())))
   .then(([scrobbleList, artistsByGenres]) => {
-    enrichArtistsWithGenres(scrobbleList, artistsByGenres);
+    enrichScrobbleList(scrobbleList, artistsByGenres);
 
     const timeline = new Timeline({
       scrobbleList,
