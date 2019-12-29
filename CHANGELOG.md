@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Brighter color for all scrobbles of a given artist.
   * Date of the first scrobble of a given artist.
 * Keyboard navigation (traversing the timeline with arrow keys).
+* Zooming (horizontal stretching) on mouse wheel.
 
 ## [0.0.0] - 2019-08-23
 ### Added

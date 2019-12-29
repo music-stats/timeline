@@ -161,7 +161,7 @@ export default class InfoBox {
         <p
           class="InfoBox__field InfoBox__field--intro-message"
         >
-          (hover over a scrobble and use arrow keys for navigation)
+          (use arrow keys for navigation and scroll for zooming)
         </p>
 
         <p

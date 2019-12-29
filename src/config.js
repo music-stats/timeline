@@ -24,11 +24,8 @@ export default {
   },
 
   timeline: {
-    zoom: {
-      min: 1,
-      max: 10,
-      deltaFactor: 0.005,
-    },
+    zoomDeltaFactor: 0.01,
+    minTimeRange: 24 * 60 * 60 * 1000, // 1 day
 
     plot: {
       padding: 20,
