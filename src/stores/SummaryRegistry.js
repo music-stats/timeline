@@ -18,7 +18,12 @@ export default class SummaryRegistry {
       }
 
       this.registry[artist.name].playcount = artist.playcount;
-      this.registry[artist.name].albums[album.name] = album.playcount;
+
+      // album name could be empty
+      if (album.name) {
+        this.registry[artist.name].albums[album.name] = album.playcount;
+      }
+
       this.registry[artist.name].tracks[track.name] = track.playcount;
     });
 

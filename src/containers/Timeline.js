@@ -357,11 +357,14 @@ export default class Timeline {
       return;
     }
 
+    const {timeAxisLabel} = this.children;
+
     const leftScrobble = this.scrobbleCollection.getPrevious(xScrobbleTimestamp - leftTimeRange) || firstScrobble;
     const rightScrobble = this.scrobbleCollection.getNext(xScrobbleTimestamp + rightTimeRange) || lastScrobble;
 
     this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(leftScrobble.index, rightScrobble.index + 1));
     this.reset();
+    timeAxisLabel.clear();
     this.draw();
   }
 
