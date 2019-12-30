@@ -62,6 +62,10 @@ export default {
   },
 
   genreColors: {
+    // grey - classical
+    "Classical":               ['#bdbdbd', '#f0f0f0'],
+    "Tango":                   ['#bdbdbd', '#f0f0f0'],
+
     // brown - electronic
     "Electronic":              ['#cc4c02', '#fec44f'],
     "Ambient":                 ['#cc4c02', '#fec44f'],
@@ -70,12 +74,10 @@ export default {
     "Trip Hop":                ['#cc4c02', '#fec44f'],
     "Dream Pop":               ['#cc4c02', '#fec44f'],
 
-    // red - classical
-    "Classical":               ['#cb181d', '#fc9272'],
-
     // yellow - jazzy
     "Cabaret":                 ['#fec44f', '#fff7bc'],
     "Jazz":                    ['#fec44f', '#fff7bc'],
+    "Blues":                   ['#fec44f', '#fff7bc'],
     "Funk":                    ['#fec44f', '#fff7bc'],
     "Hip-hop":                 ['#fec44f', '#fff7bc'],
 
@@ -85,6 +87,7 @@ export default {
     "Folk Rock":               ['#238b45', '#a1d99b'],
     "Folk Metal":              ['#238b45', '#a1d99b'],
     "Dark Folk":               ['#238b45', '#a1d99b'],
+    "Freak Folk":              ['#238b45', '#a1d99b'],
 
     // green-blue - pop
     "Singer-songwriter":       ['#02818a', '#a6bddb'],
@@ -107,6 +110,7 @@ export default {
     "Post-black":              ['#88419d', '#9ebcda'],
     "Heavy Metal":             ['#88419d', '#9ebcda'],
     "Power Metal":             ['#88419d', '#9ebcda'],
+    "Speed Metal":             ['#88419d', '#9ebcda'],
     "Symphonic Metal":         ['#88419d', '#9ebcda'],
     "Progressive Metal":       ['#88419d', '#9ebcda'],
     "Gothic Metal":            ['#88419d', '#9ebcda'],
@@ -125,7 +129,6 @@ export default {
     "Sludge Metal":            ['#88419d', '#9ebcda'],
 
     // pink - punk
-    "Punk":                    ['#ce1256', '#c994c7'],
     "Punk Rock":               ['#ce1256', '#c994c7'],
     "Ska Punk":                ['#ce1256', '#c994c7'],
     "Post-punk":               ['#ce1256', '#c994c7'],
