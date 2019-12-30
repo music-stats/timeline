@@ -17,6 +17,7 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 
 // @todo:
+// * support zooming on mobile devices via touch events
 // * add unit tests (use "tape")
 
 export default class Timeline {
