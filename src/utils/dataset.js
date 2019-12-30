@@ -7,14 +7,20 @@ export function enrichScrobbleList(scrobbleList, artistsByGenres) {
     artistsByGenres[genre].forEach((artistName) => genresByArtists[artistName] = genre);
   }
 
-  scrobbleList.forEach((scrobble, index) => {
+  return scrobbleList.map((scrobble, index) => {
     const genre = genresByArtists[scrobble.artist.name];
+    const timestamp = dateTimeStringToTimestamp(scrobble.date);
 
-    if (genre) {
-      scrobble.artist.genre = genre;
-    }
-
-    scrobble.index = index;
-    scrobble.timestamp = dateTimeStringToTimestamp(scrobble.date);
+    return {
+      ...scrobble,
+      ...(genre && {
+        artist: {
+          ...scrobble.artist,
+          genre,
+        },
+      }),
+      index,
+      timestamp,
+    };
   });
 }

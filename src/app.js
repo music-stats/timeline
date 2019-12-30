@@ -9,9 +9,8 @@ Promise.all([
   config.dataUrls.scrobbles,
   config.dataUrls.artistsByGenres,
 ].map((url) => fetch(url).then((response) => response.json())))
-  .then(([scrobbleList, artistsByGenres]) => {
-    enrichScrobbleList(scrobbleList, artistsByGenres);
-
+  .then(([scrobbleListOriginal, artistsByGenres]) => {
+    const scrobbleList = enrichScrobbleList(scrobbleListOriginal, artistsByGenres);
     const timeline = new Timeline({
       scrobbleList,
       artistsByGenres,

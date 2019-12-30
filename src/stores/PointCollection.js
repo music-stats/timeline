@@ -49,19 +49,18 @@ export default class PointCollection {
 
   getAdjacent(point, shift, filter = () => true) {
     let {index} = point;
+    const {index: firstIndex} = this.getFirst();
+    const {index: lastIndex} = this.getLast();
     const stepCondition = shift > 0
-      ? () => index < this.list.length - 1
-      : () => index > 0;
+      ? () => index < lastIndex
+      : () => index > firstIndex;
 
     while (stepCondition()) {
       index += shift;
-      const adjacentPoint = this.list[index];
+      const adjacentPoint = this.list.find(({index: i}) => i === index);
 
-      if (filter(adjacentPoint)) {
-        return {
-          ...adjacentPoint,
-          index,
-        };
+      if (adjacentPoint && filter(adjacentPoint)) {
+        return adjacentPoint;
       }
     }
 

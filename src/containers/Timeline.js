@@ -325,14 +325,11 @@ export default class Timeline {
     }
   }
 
-  // @todo:
-  // * fix arrow navigation
+  // @todo: use "event.deltaX" for horizontal panning, but don't zoom and pan simultaneously
   handlePlotWheel(event) {
     event.preventDefault();
 
     const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
-
-    // @todo: use "event.deltaX" for horizontal panning
     const {offsetX, deltaY} = event;
     const zoomFactor = 1 - deltaY * zoomDeltaFactor;
 
