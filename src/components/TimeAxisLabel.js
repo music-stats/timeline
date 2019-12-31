@@ -12,11 +12,18 @@ export default class TimeAxisLabel {
   }
 
   initializeElement() {
-    const {timeline: {plot: {padding: plotPadding}, timeAxis: {width: timeAxisWidth}}} = config;
+    const {
+      timeline: {
+        plot: {padding: plotPadding},
+        timeAxis: {width: timeAxisWidth},
+        legend: {height: legendHeight},
+      },
+    } = config;
+
     const height = plotPadding - timeAxisWidth / 2;
 
     this.element = document.getElementById('time-axis-label');
-    this.element.style.top = `calc(100% - ${height}px)`;
+    this.element.style.top = `calc(100% - ${(height + legendHeight + plotPadding)}px)`;
     this.element.style.lineHeight = `${height}px`;
   }
 

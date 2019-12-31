@@ -15,8 +15,10 @@ import SummaryRegistry from '../stores/SummaryRegistry';
 import Plot from '../components/Plot';
 import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
+import Legend from '../components/Legend';
 
 // @todo:
+// * add a scale to the time axis - it should show months/weeks/days depending on zoomed time range
 // * support zooming on mobile devices via touch events
 // * add unit tests (use "tape")
 
@@ -40,7 +42,7 @@ export default class Timeline {
     this.summaryRegistry = new SummaryRegistry(scrobbleList);
 
     this.scales = {};
-    this.genreColorScales = this.getGenreColorScales();
+    this.genreGroupColorScales = this.getGenreGroupColorScales();
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
@@ -83,6 +85,10 @@ export default class Timeline {
         dayCount,
         perDayCount,
       },
+    });
+
+    this.children.legend = new Legend({
+      scrobbleList,
     });
   }
 
@@ -153,30 +159,26 @@ export default class Timeline {
       .range(albumPlaycountScaleRange);
   }
 
-  getGenreColorScales() {
-    const {genreColors} = config;
+  getGenreGroupColorScales() {
+    const {genreGroups} = config;
     const scales = {};
     const [maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
 
-    for (const genre in genreColors) {
-      if (!genreColors[genre].length) {
-        continue;
-      }
-
-      scales[genre] = d3Scale.scaleSequential()
+    for (const genreGroup in genreGroups) {
+      scales[genreGroup] = d3Scale.scaleSequential()
         .domain([1, maxAlbumPlaycount])
-        .range(genreColors[genre]);
+        .range(genreGroups[genreGroup].colorRange);
     }
 
     return scales;
   }
 
-  getGenreColorByAlbumPlaycount(genre, playcount, toHighlight = false) {
+  getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, toHighlight = false) {
     const {timeline: {point: {colorValueFactors, highlightedColorValueFactors}}} = config;
-    const genreColorScale = this.genreColorScales[genre];
+    const genreGroupColorScale = this.genreGroupColorScales[genreGroup];
     const color = d3Color.hsl(
-      genreColorScale
-        ? genreColorScale(playcount)
+      genreGroupColorScale
+        ? genreGroupColorScale(playcount)
         : d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount)),
     );
 
@@ -199,7 +201,7 @@ export default class Timeline {
     this.scrobbleRegistry.getPointList(artist.name).forEach((
       {
         date,
-        artist: {genre},
+        artist: {genreGroup},
         album: {playcount},
         track: {name},
         index: artistScrobbleGlobalIndex,
@@ -210,7 +212,7 @@ export default class Timeline {
     ) => {
       const color = name === track.name
         ? selectedTrackColor
-        : this.getGenreColorByAlbumPlaycount(genre, playcount, true);
+        : this.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true);
 
       plot.drawPoint(xi, yi, color);
 
@@ -395,7 +397,7 @@ export default class Timeline {
       const {timestamp, artist, album} = scrobble;
       const x = this.scales.timeRangeScale(timestamp);
       const y = this.scales.artistPlaycountScale(artist.playcount);
-      const color = this.getGenreColorByAlbumPlaycount(artist.genre, album.playcount);
+      const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, album.playcount);
       const point = {
         ...scrobble,
         x,
@@ -428,13 +430,14 @@ export default class Timeline {
   }
 
   render() {
-    const {plot, timeAxisLabel, infoBox} = this.children;
+    const {plot, timeAxisLabel, infoBox, legend} = this.children;
 
     return html`
       <main>
         ${plot.render()}
         ${timeAxisLabel.render()}
         ${infoBox.render()}
+        ${legend.render()}
       </main>
     `;
   }

@@ -1,0 +1,27 @@
+.Legend {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 20px 20px 20px;
+}
+
+.Legend__genre {
+  position: relative;
+  flex-grow: 1;
+  border: none;
+  margin-right: 1px;
+  white-space: nowrap;
+}
+
+.Legend__genre:last-child {
+  margin-right: 0;
+}
+
+.Legend__genre-caption {
+  position: absolute;
+  top: 4px;
+  left: calc(50% + 5px);
+  transform: rotate(90deg);
+  transform-origin: top left;
+  font-size: 8px;
+  cursor: default;
+}

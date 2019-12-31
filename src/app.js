@@ -10,10 +10,8 @@ Promise.all([
   config.dataUrls.artistsByGenres,
 ].map((url) => fetch(url).then((response) => response.json())))
   .then(([scrobbleListOriginal, artistsByGenres]) => {
-    const scrobbleList = enrichScrobbleList(scrobbleListOriginal, artistsByGenres);
     const timeline = new Timeline({
-      scrobbleList,
-      artistsByGenres,
+      scrobbleList: enrichScrobbleList(scrobbleListOriginal, artistsByGenres),
     });
 
     timeline.beforeRender();

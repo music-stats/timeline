@@ -28,11 +28,11 @@ export default class Plot {
   }
 
   scale() {
-    const dpr = window.devicePixelRatio;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const {timeline: {plot: {padding}, legend: {height: legendHeight}}} = config;
 
-    this.dimensions = [width, height];
+    const dpr = window.devicePixelRatio;
+    this.dimensions = [window.innerWidth, window.innerHeight - (legendHeight + padding)];
+    const [width, height] = this.dimensions;
 
     this.element.width = width * dpr;
     this.element.height = height * dpr;
