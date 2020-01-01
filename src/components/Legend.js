@@ -9,12 +9,18 @@ import './Legend.css';
 export default class Legend {
   constructor(props) {
     this.props = props;
+    this.element = null;
     this.genreList = this.getGenreSortedList();
     this.heightScale = this.getHeightScale();
+
+    this.setGenreElementsHeight = this.setGenreElementsHeight.bind(this);
+  }
+
+  initializeElements() {
+    this.element = document.getElementById('legend');
   }
 
   // @todo: add interactivity
-  initializeElements() {}
   subscribe() {}
 
   getGenreSortedList() {
@@ -80,15 +86,25 @@ export default class Legend {
   afterRender() {
     this.initializeElements();
     this.subscribe();
+    requestAnimationFrame(this.setGenreElementsHeight);
+  }
+
+  setGenreElementsHeight() {
+    const genreElementCollection = this.element.getElementsByClassName('Legend__genre');
+
+    for (let i = 0; i < genreElementCollection.length; i += 1) {
+      const {playcount} = this.genreList[i];
+      const height = Math.max(this.heightScale(playcount), 1);
+
+      genreElementCollection[i].style.height = `${height}px`;
+    }
   }
 
   renderGenre({name, artistCount, playcount, color}) {
-    const heigth = Math.max(this.heightScale(playcount), 1);
-
     return html`
       <section
         class="Legend__genre"
-        style="height: ${heigth}px; background-color: ${color}"
+        style="background-color: ${color}"
         title="${artistCount} artist${artistCount > 1 ? 's' : ''}, ${playcount} scrobble${playcount > 1 ? 's' : ''}"
       >
         <span
@@ -103,6 +119,7 @@ export default class Legend {
   render() {
     return html`
       <nav
+        id="legend"
         class="Legend"
       >
         ${this.genreList.map(this.renderGenre, this)}

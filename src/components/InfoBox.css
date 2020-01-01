@@ -3,8 +3,8 @@
   top: 0;
   left: 0;
   display: grid;
-  grid-row-gap: 7px;
-  margin: 14px;
+  grid-row-gap: 5px;
+  margin: 10px 14px;
   font-size: 0.8rem;
   /* allows the canvas to receive mouse events under the info box */
   pointer-events: none;

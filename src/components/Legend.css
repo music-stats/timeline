@@ -1,22 +1,19 @@
 .Legend {
   display: flex;
-  flex-wrap: wrap;
   margin: 0 14px 14px 14px;
   font-size: 0.5rem;
-}
-
-@media all and (min-width: 800px) {
-  .Legend {
-    font-size: 0.625rem;
-  }
 }
 
 .Legend__genre {
   position: relative;
   flex-grow: 1;
+  height: 4px;
   border: none;
   margin-right: 1px;
   white-space: nowrap;
+  transition-property: height;
+  transition-duration: 400ms;
+  transition-delay: 200ms;
 }
 
 .Legend__genre:last-child {
@@ -25,9 +22,23 @@
 
 .Legend__genre-caption {
   position: absolute;
-  top: 0;
+  top: 4px;
   left: 50%;
-  transform: rotate(90deg) translate(4px, -50%);
+  transform: rotate(90deg) translateY(-50%);
   transform-origin: top left;
   cursor: default;
+}
+
+.Legend__genre:hover .Legend__genre-caption {
+  color: var(--color-light-grey-3);
+}
+
+@media all and (min-width: 800px) {
+  .Legend {
+    font-size: 0.625rem;
+  }
+
+  .Legend__genre-caption {
+    top: 8px;
+  }
 }

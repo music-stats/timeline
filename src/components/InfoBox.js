@@ -80,7 +80,9 @@ export default class InfoBox {
     const albumUrl = url`https://www.last.fm/music/${artist.name}/${album.name}`;
     const trackUrl = url`https://www.last.fm/music/${artist.name}/_/${track.name}`;
 
-    this.dateElement.innerText = date;
+    this.dateElement.innerHTML = html`
+      <small>${date}</small>
+    `;
 
     this.artistNameElement.innerHTML = html`
       <span>
