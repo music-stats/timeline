@@ -3,8 +3,16 @@
   top: 0;
   left: 0;
   display: grid;
-  grid-row-gap: 10px;
-  margin: 20px;
+  grid-row-gap: 7px;
+  margin: 14px;
+  font-size: 0.8rem;
+  /* allows the canvas to receive mouse events under the info box */
+  pointer-events: none;
+}
+
+.InfoBox > * {
+  /* allows text to be selected and links to be clicked */
+  pointer-events: auto;
 }
 
 .InfoBox__field {

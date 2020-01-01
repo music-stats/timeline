@@ -1,7 +1,14 @@
 .Legend {
   display: flex;
   flex-wrap: wrap;
-  margin: 0 20px 20px 20px;
+  margin: 0 14px 14px 14px;
+  font-size: 0.5rem;
+}
+
+@media all and (min-width: 800px) {
+  .Legend {
+    font-size: 0.625rem;
+  }
 }
 
 .Legend__genre {
@@ -18,10 +25,9 @@
 
 .Legend__genre-caption {
   position: absolute;
-  top: 4px;
-  left: calc(50% + 5px);
-  transform: rotate(90deg);
+  top: 0;
+  left: 50%;
+  transform: rotate(90deg) translate(4px, -50%);
   transform-origin: top left;
-  font-size: 8px;
   cursor: default;
 }
