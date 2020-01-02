@@ -12,19 +12,42 @@ export default class Legend {
     this.element = null;
     this.genreList = this.getGenreSortedList();
     this.heightScale = this.getHeightScale();
+    this.highlightedGenreIndex = null;
 
     this.setGenreElementsHeight = this.setGenreElementsHeight.bind(this);
   }
 
   initializeElements() {
     this.element = document.getElementById('legend');
+    this.genreElementCollection = this.element.getElementsByClassName('Legend__genre');
   }
 
   // @todo: add interactivity
   subscribe() {}
 
+  highlightGenre(genre) {
+    const genreIndex = this.genreList.findIndex(({name}) => name === genre);
+    const genreElement = this.genreElementCollection[genreIndex];
+    const {highlightedColor} = this.genreList[genreIndex];
+
+    genreElement.classList.add('Legend__genre--highlight');
+    genreElement.style.backgroundColor = highlightedColor;
+    this.highlightedGenreIndex = genreIndex;
+  }
+
+  removeGenreHighlight() {
+    if (this.highlightedGenreIndex !== null) {
+      const genreElement = this.genreElementCollection[this.highlightedGenreIndex];
+      const {color} = this.genreList[this.highlightedGenreIndex];
+
+      genreElement.classList.remove('Legend__genre--highlight');
+      genreElement.style.backgroundColor = color;
+      this.highlightedGenreIndex = null;
+    }
+  }
+
   getGenreSortedList() {
-    const {timeline: {point: {colorValueFactors}}, genreGroups} = config;
+    const {timeline: {point: {colorValueFactors, highlightedColorValueFactors}}, genreGroups} = config;
     const {scrobbleList} = this.props;
 
     const genres = {};
@@ -58,16 +81,22 @@ export default class Legend {
 
     for (const genre in genres) {
       const {artistCount, playcount, genreGroup} = genres[genre];
-      const color = d3Color.hsl(genreGroups[genreGroup].colorRange[0]);
+      const baseColor = genreGroups[genreGroup].colorRange[0];
+      const color = d3Color.hsl(baseColor);
+      const highlightedColor = d3Color.hsl(baseColor);
 
       color.s *= colorValueFactors.saturation;
       color.l *= colorValueFactors.lightness;
+
+      highlightedColor.s *= highlightedColorValueFactors.saturation;
+      highlightedColor.l *= highlightedColorValueFactors.lightness;
 
       genreList.push({
         name: genre,
         artistCount,
         playcount,
         color,
+        highlightedColor,
       });
     }
 
@@ -90,13 +119,12 @@ export default class Legend {
   }
 
   setGenreElementsHeight() {
-    const genreElementCollection = this.element.getElementsByClassName('Legend__genre');
-
-    for (let i = 0; i < genreElementCollection.length; i += 1) {
+    for (let i = 0; i < this.genreElementCollection.length; i += 1) {
       const {playcount} = this.genreList[i];
       const height = Math.max(this.heightScale(playcount), 1);
+      const genreElement = this.genreElementCollection[i];
 
-      genreElementCollection[i].style.height = `${height}px`;
+      genreElement.style.height = `${height}px`;
     }
   }
 

@@ -16,6 +16,10 @@
   transition-delay: 200ms;
 }
 
+.Legend__genre--highlight {
+  color: var(--color-white);
+}
+
 .Legend__genre:last-child {
   margin-right: 0;
 }

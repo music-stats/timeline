@@ -6,18 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-* Basic static canvas-based playcount chart:
+* Canvas-based playcount chart:
   * X axis: time.
   * Y axis: artist playcount.
   * Color: album playcount.
 * Summary: period, total numbers.
-* Colorized genres.
+* Colorized genres (both on the plot and on the legend).
 * Highlighting on selection:
   * An info box with date, artist, album and track.
   * Brighter color for all scrobbles of a given artist.
   * Date of the first scrobble of a given artist.
 * Keyboard navigation (traversing the timeline with arrow keys).
-* Zooming (horizontal stretching) on mouse wheel.
+* Zooming on mouse wheel (horizontal stretching of the plot).
 
 ## [0.0.0] - 2019-08-23
 ### Added

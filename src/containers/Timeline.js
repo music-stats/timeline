@@ -89,6 +89,9 @@ export default class Timeline {
 
     this.children.legend = new Legend({
       scrobbleList,
+      // onGenreMouseOver: () => null,
+      // onGenreMouseLeave: () => null,
+      // onGenreClick: () => null,
     });
   }
 
@@ -240,8 +243,15 @@ export default class Timeline {
     this.scrobbleCollectionHighlighted.reset();
   }
 
+  removeLegendGenreHighlight() {
+    const {legend} = this.children;
+
+    legend.removeGenreHighlight();
+  }
+
   selectScrobble(scrobble) {
-    const {infoBox} = this.children;
+    const {infoBox, legend} = this.children;
+    const {artist: {genre}} = scrobble;
 
     if (this.toShowIntroMessage) {
       this.hideIntroMessage();
@@ -254,6 +264,12 @@ export default class Timeline {
       scrobble,
       totals: this.summaryRegistry.getTotals(scrobble),
     });
+
+    legend.removeGenreHighlight();
+
+    if (genre) {
+      legend.highlightGenre(genre);
+    }
   }
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
@@ -285,6 +301,7 @@ export default class Timeline {
     this.reset();
     this.draw();
     this.showIntroMessage();
+    this.removeLegendGenreHighlight();
   }
 
   handleDocumentKeydown(event) {
@@ -301,6 +318,7 @@ export default class Timeline {
     this.selectedScrobble = null;
     this.removeScrobbleCollectionHighlight();
     this.showIntroMessage();
+    this.removeLegendGenreHighlight();
   }
 
   handleArrowDownKeydown() {
