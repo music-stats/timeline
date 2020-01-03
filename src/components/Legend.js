@@ -81,7 +81,14 @@ export default class Legend {
 
     for (const genre in genres) {
       const {artistCount, playcount, genreGroup} = genres[genre];
-      const baseColor = genreGroups[genreGroup].colorRange[0];
+      const genreGroupConfig = genreGroups[genreGroup];
+
+      if (!genreGroupConfig) {
+        console.warn(`genre not found in the config: ${genre}`);
+        continue;
+      }
+
+      const {colorRange: [baseColor]} = genreGroupConfig;
       const color = d3Color.hsl(baseColor);
       const highlightedColor = d3Color.hsl(baseColor);
 
@@ -129,11 +136,17 @@ export default class Legend {
   }
 
   renderGenre({name, artistCount, playcount, color}) {
+    const {scrobbleList} = this.props;
+    const title = [
+      `${artistCount} artist${artistCount > 1 ? 's' : ''}`,
+      `${playcount} scrobble${playcount > 1 ? 's' : ''} (${(100 * playcount / scrobbleList.length).toFixed(1)}%)`,
+    ].join(', ');
+
     return html`
       <section
         class="Legend__genre"
         style="background-color: ${color}"
-        title="${artistCount} artist${artistCount > 1 ? 's' : ''}, ${playcount} scrobble${playcount > 1 ? 's' : ''}"
+        title=${title}
       >
         <span
           class="Legend__genre-caption"

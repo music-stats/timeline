@@ -8,7 +8,6 @@
   position: relative;
   flex-grow: 1;
   height: 4px;
-  border: none;
   margin-right: 1px;
   white-space: nowrap;
   transition-property: height;

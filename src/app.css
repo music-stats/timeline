@@ -11,6 +11,10 @@ body {
   background-color: var(--color-dark-grey-blue);
 }
 
+::selection {
+  background-color: var(--color-light-blue);
+}
+
 a {
   text-decoration: none;
   color: var(--color-light-blue);
@@ -18,4 +22,8 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+a::selection {
+  color: var(--color-dark-grey-blue);
 }

@@ -34,7 +34,7 @@ export default {
 
     point: {
       size: 4,
-      maxMargin: 2,
+      maxMargin: 1,
       selectedColor: cssColors.white,
       colorValueFactors: {
         saturation: 0.5,
@@ -42,7 +42,7 @@ export default {
       },
       highlightedColorValueFactors: {
         saturation: 1.2,
-        lightness: 1.8,
+        lightness: 1.4,
       },
     },
 
@@ -98,6 +98,7 @@ export default {
         'Jazz',
         'Blues',
         'Rockabilly',
+        'Rock And Roll',
         'Funk',
         'Hip-hop',
       ],
