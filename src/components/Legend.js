@@ -22,8 +22,16 @@ export default class Legend {
     this.genreElementCollection = this.element.getElementsByClassName('Legend__genre');
   }
 
-  // @todo: add interactivity
-  subscribe() {}
+  subscribe() {
+    const {onGenreClick} = this.props;
+
+    for (let i = 0; i < this.genreElementCollection.length; i += 1) {
+      const genreElement = this.genreElementCollection[i];
+      const {name} = this.genreList[i];
+
+      genreElement.addEventListener('click', () => onGenreClick(name));
+    }
+  }
 
   highlightGenre(genre) {
     const genreIndex = this.genreList.findIndex(({name}) => name === genre);
@@ -47,7 +55,7 @@ export default class Legend {
   }
 
   getGenreSortedList() {
-    const {timeline: {point: {colorValueFactors, highlightedColorValueFactors}}, genreGroups} = config;
+    const {timeline: {point: {colorValueFactors}}, genreGroups} = config;
     const {scrobbleList} = this.props;
 
     const genres = {};
@@ -92,11 +100,11 @@ export default class Legend {
       const color = d3Color.hsl(baseColor);
       const highlightedColor = d3Color.hsl(baseColor);
 
-      color.s *= colorValueFactors.saturation;
-      color.l *= colorValueFactors.lightness;
+      color.s *= colorValueFactors.other.saturation;
+      color.l *= colorValueFactors.other.lightness;
 
-      highlightedColor.s *= highlightedColorValueFactors.saturation;
-      highlightedColor.l *= highlightedColorValueFactors.lightness;
+      highlightedColor.s *= colorValueFactors.genre.saturation;
+      highlightedColor.l *= colorValueFactors.genre.lightness;
 
       genreList.push({
         name: genre,

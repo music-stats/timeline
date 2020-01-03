@@ -38,7 +38,8 @@ export default class Timeline {
     this.scrobbleCollectionZoomed = new PointCollection(scrobbleList);
     this.scrobbleCollectionHighlighted = new PointCollection();
     this.scrobbleBuffer = new PointBuffer(this.scrobbleHalfSize);
-    this.scrobbleRegistry = new PointRegistry(({artist: {name}}) => name);
+    this.scrobbleGenreRegistry = new PointRegistry(({artist: {genre}}) => genre);
+    this.scrobbleArtistRegistry = new PointRegistry(({artist: {name}}) => name);
     this.summaryRegistry = new SummaryRegistry(scrobbleList);
 
     this.scales = {};
@@ -48,11 +49,13 @@ export default class Timeline {
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
     this.handlePlotWheel = this.handlePlotWheel.bind(this);
+    this.handleLegendGenreClick = this.handleLegendGenreClick.bind(this);
   }
 
   reset() {
     this.scrobbleBuffer.reset();
-    this.scrobbleRegistry.reset();
+    this.scrobbleGenreRegistry.reset();
+    this.scrobbleArtistRegistry.reset();
     this.scrobbleCollectionHighlighted.reset();
     this.selectedScrobble = null;
   }
@@ -89,9 +92,9 @@ export default class Timeline {
 
     this.children.legend = new Legend({
       scrobbleList,
+      onGenreClick: this.handleLegendGenreClick,
       // onGenreMouseOver: () => null,
       // onGenreMouseLeave: () => null,
-      // onGenreClick: () => null,
     });
   }
 
@@ -176,8 +179,8 @@ export default class Timeline {
     return scales;
   }
 
-  getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, toHighlight = false) {
-    const {timeline: {point: {colorValueFactors, highlightedColorValueFactors}}} = config;
+  getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, toHighlightGenre = false, toHighlightArtist = false) {
+    const {timeline: {point: {colorValueFactors}}} = config;
     const genreGroupColorScale = this.genreGroupColorScales[genreGroup];
     const color = d3Color.hsl(
       genreGroupColorScale
@@ -185,14 +188,20 @@ export default class Timeline {
         : d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount)),
     );
 
-    color.s *= toHighlight
-      ? highlightedColorValueFactors.saturation
-      : colorValueFactors.saturation;
+    if (toHighlightGenre) {
+      color.s *= colorValueFactors.genre.saturation;
+      color.l *= colorValueFactors.genre.lightness;
+      return color;
+    }
 
-    color.l *= toHighlight
-      ? highlightedColorValueFactors.lightness
-      : colorValueFactors.lightness;
+    if (toHighlightArtist) {
+      color.s *= colorValueFactors.artist.saturation;
+      color.l *= colorValueFactors.artist.lightness;
+      return color;
+    }
 
+    color.s *= colorValueFactors.other.saturation;
+    color.l *= colorValueFactors.other.lightness;
     return color;
   }
 
@@ -201,10 +210,32 @@ export default class Timeline {
     const {plot, timeAxisLabel} = this.children;
     const {index: highlightedScrobbleGlobalIndex, artist, track} = scrobble;
 
-    this.scrobbleRegistry.getPointList(artist.name).forEach((
+    if (artist.genre) {
+      this.scrobbleGenreRegistry.getPointList(artist.genre).forEach(({
+        artist: {name: artistName},
+        album: {playcount},
+        x: xi,
+        y: yi,
+      }) => {
+        // all scrobbles of current artists are highlighted later with a different color
+        if (artistName === artist.name) {
+          return;
+        }
+
+        const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, true, false);
+
+        plot.drawPoint(xi, yi, color);
+
+        this.scrobbleCollectionHighlighted.push({
+          x: xi,
+          y: yi,
+        });
+      });
+    }
+
+    this.scrobbleArtistRegistry.getPointList(artist.name).forEach((
       {
         date,
-        artist: {genreGroup},
         album: {playcount},
         track: {name},
         index: artistScrobbleGlobalIndex,
@@ -215,7 +246,7 @@ export default class Timeline {
     ) => {
       const color = name === track.name
         ? selectedTrackColor
-        : this.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true);
+        : this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, false, true);
 
       plot.drawPoint(xi, yi, color);
 
@@ -385,7 +416,17 @@ export default class Timeline {
     this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(leftScrobble.index, rightScrobble.index + 1));
     this.reset();
     timeAxisLabel.clear();
+    this.removeLegendGenreHighlight();
     this.draw();
+  }
+
+  // @todo:
+  // * show intro message
+  // * clear time axis label
+  // * highlight a genre on the legend
+  // * highlight all scrobbles with that genre on the plot (derive common logic from "this.highlightArtistScrobbleList()")
+  handleLegendGenreClick(genre) {
+    console.log(genre);
   }
 
   showIntroMessage() {
@@ -425,7 +466,8 @@ export default class Timeline {
 
       plot.drawPoint(x, y, color);
       this.scrobbleBuffer.putPoint(point);
-      this.scrobbleRegistry.putPoint(point);
+      this.scrobbleGenreRegistry.putPoint(point);
+      this.scrobbleArtistRegistry.putPoint(point);
     });
 
     plot.drawTimeAxis(...this.scales.timeRangeScale.range());

@@ -11,6 +11,10 @@ export default class PointRegistry {
   putPoint(point) {
     const key = this.getKey(point);
 
+    if (!key) {
+      return;
+    }
+
     if (!this.registry[key]) {
       this.registry[key] = [];
     }

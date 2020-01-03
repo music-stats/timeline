@@ -37,12 +37,18 @@ export default {
       maxMargin: 1,
       selectedColor: cssColors.white,
       colorValueFactors: {
-        saturation: 0.5,
-        lightness: 0.8,
-      },
-      highlightedColorValueFactors: {
-        saturation: 1.2,
-        lightness: 1.4,
+        other: {
+          saturation: 0.6,
+          lightness: 0.6,
+        },
+        genre: {
+          saturation: 0.9,
+          lightness: 1,
+        },
+        artist: {
+          saturation: 1.5,
+          lightness: 1.7,
+        },
       },
     },
 
