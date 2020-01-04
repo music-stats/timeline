@@ -45,6 +45,10 @@ export default {
           saturation: 1.1,
           lightness: 1,
         },
+        artistLabel: {
+          saturation: 1.4,
+          lightness: 1.6,
+        },
         artist: {
           saturation: 1.4,
           lightness: 1.8,

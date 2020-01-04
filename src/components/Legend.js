@@ -10,6 +10,7 @@ export default class Legend {
   constructor(props) {
     this.props = props;
     this.element = null;
+    this.genreElementCollection = [];
     this.genreList = this.getGenreSortedList();
     this.heightScale = this.getHeightScale();
     this.highlightedGenreIndex = null;

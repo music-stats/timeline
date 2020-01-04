@@ -1,0 +1,14 @@
+.ArtistLabelCollection {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.ArtistLabelCollection__label {
+  position: absolute;
+  transform: translateY(calc(-100% - 4px));
+  white-space: nowrap;
+  font-size: 0.625rem;
+}

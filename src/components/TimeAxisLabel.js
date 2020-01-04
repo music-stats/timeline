@@ -7,10 +7,7 @@ import './TimeAxisLabel.css';
 
 export default class TimeAxisLabel {
   constructor() {
-    const {timeline: {point: {size}}} = config;
-
     this.element = null;
-    this.padding = size;
   }
 
   initializeElement() {
@@ -34,19 +31,22 @@ export default class TimeAxisLabel {
   }
 
   renderText(x, canvasWidth, value) {
-    // text must be rendered before the "offsetWidth" is measured
+    const {timeline: {point: {size: padding}}} = config;
+
     this.element.innerText = value;
 
+    // text must be rendered before the "offsetWidth" is measured
     const halfWidth = Math.ceil(this.element.offsetWidth / 2);
+
     const [left, right] = (() => {
       // stick to left
-      if (x - halfWidth < this.padding) {
-        return [`${this.padding}px`, 'auto'];
+      if (x - halfWidth < padding) {
+        return [`${padding}px`, 'auto'];
       }
 
       // stick to right
-      if (x + halfWidth > canvasWidth - this.padding) {
-        return ['auto', `${this.padding}px`];
+      if (x + halfWidth > canvasWidth - padding) {
+        return ['auto', `${padding}px`];
       }
 
       // center under "x"
