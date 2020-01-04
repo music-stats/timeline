@@ -32,7 +32,6 @@ export default class Timeline {
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
     this.selectedScrobble = null;
-    this.toShowIntroMessage = true;
 
     this.scrobbleCollection = new PointCollection(scrobbleList);
     this.scrobbleCollectionZoomed = new PointCollection(scrobbleList);
@@ -75,8 +74,6 @@ export default class Timeline {
       onWheel: this.handlePlotWheel,
     });
 
-    this.children.timeAxisLabel = new TimeAxisLabel();
-
     this.children.infoBox = new InfoBox({
       dates: {
         firstScrobbleDate: dateTimeStringToDateString(this.scrobbleCollection.getFirst().date),
@@ -89,6 +86,8 @@ export default class Timeline {
         perDayCount,
       },
     });
+
+    this.children.timeAxisLabel = new TimeAxisLabel();
 
     this.children.legend = new Legend({
       scrobbleList,
@@ -205,53 +204,17 @@ export default class Timeline {
     return color;
   }
 
-  highlightArtistScrobbleList(scrobble) {
-    const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
-    const {plot, timeAxisLabel} = this.children;
-    const {index: highlightedScrobbleGlobalIndex, artist, track} = scrobble;
+  highlightGenreScrobbleList(genre, genreGroup, artistNameToSkip = null) {
+    const {plot} = this.children;
 
-    if (artist.genre) {
-      this.scrobbleGenreRegistry.getPointList(artist.genre).forEach(({
-        artist: {name: artistName},
-        album: {playcount},
-        x: xi,
-        y: yi,
-      }) => {
-        // all scrobbles of current artists are highlighted later with a different color
-        if (artistName === artist.name) {
-          return;
-        }
-
-        const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, true, false);
-
-        plot.drawPoint(xi, yi, color);
-
-        this.scrobbleCollectionHighlighted.push({
-          x: xi,
-          y: yi,
-        });
-      });
-    }
-
-    this.scrobbleArtistRegistry.getPointList(artist.name).forEach((
-      {
-        date,
-        album: {playcount},
-        track: {name},
-        index: artistScrobbleGlobalIndex,
-        x: xi,
-        y: yi,
-      },
-      artistScrobbleLocalIndex,
-    ) => {
-      const color = name === track.name
-        ? selectedTrackColor
-        : this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, false, true);
-
-      plot.drawPoint(xi, yi, color);
-
-      if (artistScrobbleLocalIndex === 0) {
-        timeAxisLabel.renderText(xi, plot.getDimensions()[0], date);
+    this.scrobbleGenreRegistry.getPointList(genre).forEach(({
+      artist: {name: artistName},
+      album: {playcount},
+      x: xi,
+      y: yi,
+    }) => {
+      if (artistName === artistNameToSkip) {
+        return;
       }
 
       this.scrobbleCollectionHighlighted.push({
@@ -259,8 +222,41 @@ export default class Timeline {
         y: yi,
       });
 
-      if (artistScrobbleGlobalIndex === highlightedScrobbleGlobalIndex) {
-        this.selectedScrobble = scrobble;
+      plot.drawPoint(
+        xi,
+        yi,
+        this.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true, false),
+      );
+    });
+  }
+
+  highlightArtistScrobbleList({index, artist, track}) {
+    const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
+    const {plot, timeAxisLabel} = this.children;
+
+    this.scrobbleArtistRegistry.getPointList(artist.name).forEach(({
+      index: scrobbleGlobalIndex,
+      date,
+      album: {playcount},
+      track: {name},
+      x: xi,
+      y: yi,
+    }) => {
+      this.scrobbleCollectionHighlighted.push({
+        x: xi,
+        y: yi,
+      });
+
+      plot.drawPoint(
+        xi,
+        yi,
+        name === track.name
+          ? selectedTrackColor
+          : this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, false, true),
+      );
+
+      if (scrobbleGlobalIndex === index) {
+        timeAxisLabel.renderText(xi, plot.getDimensions()[0], date);
       }
     });
   }
@@ -274,33 +270,37 @@ export default class Timeline {
     this.scrobbleCollectionHighlighted.reset();
   }
 
-  removeLegendGenreHighlight() {
-    const {legend} = this.children;
+  selectGenre(genre, genreGroup) {
+    const {infoBox, timeAxisLabel, legend} = this.children;
 
+    this.selectedScrobble = null;
+    this.removeScrobbleCollectionHighlight();
+    this.highlightGenreScrobbleList(genre, genreGroup);
+    infoBox.showIntroMessage();
+    timeAxisLabel.clear();
     legend.removeGenreHighlight();
+    legend.highlightGenre(genre);
   }
 
   selectScrobble(scrobble) {
     const {infoBox, legend} = this.children;
-    const {artist: {genre}} = scrobble;
+    const {artist} = scrobble;
 
-    if (this.toShowIntroMessage) {
-      this.hideIntroMessage();
+    this.selectedScrobble = scrobble;
+    this.removeScrobbleCollectionHighlight();
+    legend.removeGenreHighlight();
+
+    if (artist.genre) {
+      this.highlightGenreScrobbleList(artist.genre, artist.genreGroup, artist.name);
+      legend.highlightGenre(artist.genre);
     }
 
-    this.removeScrobbleCollectionHighlight();
     this.highlightArtistScrobbleList(scrobble);
-
+    infoBox.hideIntroMessage();
     infoBox.renderScrobbleInfo({
       scrobble,
       totals: this.summaryRegistry.getTotals(scrobble),
     });
-
-    legend.removeGenreHighlight();
-
-    if (genre) {
-      legend.highlightGenre(genre);
-    }
   }
 
   selectVerticallyAdjacentScrobble(scrobble, shift) {
@@ -329,10 +329,13 @@ export default class Timeline {
   }
 
   handleWindowResize() {
+    const {infoBox, timeAxisLabel, legend} = this.children;
+
     this.reset();
     this.draw();
-    this.showIntroMessage();
-    this.removeLegendGenreHighlight();
+    infoBox.showIntroMessage();
+    timeAxisLabel.clear();
+    legend.removeGenreHighlight();
   }
 
   handleDocumentKeydown(event) {
@@ -346,10 +349,13 @@ export default class Timeline {
   }
 
   handleEscKeydown() {
+    const {infoBox, timeAxisLabel, legend} = this.children;
+
     this.selectedScrobble = null;
     this.removeScrobbleCollectionHighlight();
-    this.showIntroMessage();
-    this.removeLegendGenreHighlight();
+    infoBox.showIntroMessage();
+    timeAxisLabel.clear();
+    legend.removeGenreHighlight();
   }
 
   handleArrowDownKeydown() {
@@ -382,11 +388,11 @@ export default class Timeline {
     event.preventDefault();
 
     const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
-    const {offsetX, deltaY} = event;
-    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
-
     const {scrobbleList} = this.props;
-    const {plot} = this.children;
+    const {plot, timeAxisLabel, legend} = this.children;
+    const {offsetX, deltaY} = event;
+
+    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
     const [plotWidth] = plot.getDimensions();
     const plotWidthPadded = plotWidth - 2 * plotPadding;
 
@@ -408,40 +414,18 @@ export default class Timeline {
       return;
     }
 
-    const {timeAxisLabel} = this.children;
-
     const leftScrobble = this.scrobbleCollection.getPrevious(xScrobbleTimestamp - leftTimeRange) || firstScrobble;
     const rightScrobble = this.scrobbleCollection.getNext(xScrobbleTimestamp + rightTimeRange) || lastScrobble;
 
     this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(leftScrobble.index, rightScrobble.index + 1));
     this.reset();
-    timeAxisLabel.clear();
-    this.removeLegendGenreHighlight();
     this.draw();
-  }
-
-  // @todo:
-  // * show intro message
-  // * clear time axis label
-  // * highlight a genre on the legend
-  // * highlight all scrobbles with that genre on the plot (derive common logic from "this.highlightArtistScrobbleList()")
-  handleLegendGenreClick(genre) {
-    console.log(genre);
-  }
-
-  showIntroMessage() {
-    const {timeAxisLabel, infoBox} = this.children;
-
-    this.toShowIntroMessage = true;
     timeAxisLabel.clear();
-    infoBox.showIntroMessage();
+    legend.removeGenreHighlight();
   }
 
-  hideIntroMessage() {
-    const {infoBox} = this.children;
-
-    this.toShowIntroMessage = false;
-    infoBox.hideIntroMessage();
+  handleLegendGenreClick(genre, genreGroup) {
+    this.selectGenre(genre, genreGroup);
   }
 
   draw() {
@@ -490,13 +474,13 @@ export default class Timeline {
   }
 
   render() {
-    const {plot, timeAxisLabel, infoBox, legend} = this.children;
+    const {plot, infoBox, timeAxisLabel, legend} = this.children;
 
     return html`
       <main>
         ${plot.render()}
-        ${timeAxisLabel.render()}
         ${infoBox.render()}
+        ${timeAxisLabel.render()}
         ${legend.render()}
       </main>
     `;

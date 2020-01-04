@@ -13,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Summary: period, total numbers.
 * Colorized genres (both on the plot and on the legend).
 * Highlighting on selection:
-  * An info box with date, artist, album and track.
+  * An info box with artist, album and track.
+  * Scrobble datetime on the time axis.
   * Brighter color for all scrobbles of a given artist.
-  * Date of the first scrobble of a given artist.
 * Keyboard navigation (traversing the timeline with arrow keys).
 * Zooming on mouse wheel (horizontal stretching of the plot).
 

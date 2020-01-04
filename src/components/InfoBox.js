@@ -5,12 +5,14 @@ import {url} from '../utils/string';
 
 import './InfoBox.css';
 
+// @todo: move GitHub and Twitter links to the bottom right corner,
+//        similar to how it's done on the "music-stats/map"
+
 export default class InfoBox {
   constructor(props) {
     this.props = props;
 
     this.introMessageElementList = null;
-    this.dateElement = null;
     this.artistNameElement = null;
     this.albumNameElement = null;
     this.trackNameElement = null;
@@ -18,7 +20,6 @@ export default class InfoBox {
 
   initializeElements() {
     this.introMessageElementList = document.querySelectorAll('.InfoBox__field--intro-message');
-    this.dateElement = document.getElementById('info-box-field-date');
     this.artistNameElement = document.getElementById('info-box-field-artist-name');
     this.albumNameElement = document.getElementById('info-box-field-album-name');
     this.trackNameElement = document.getElementById('info-box-field-track-name');
@@ -28,7 +29,6 @@ export default class InfoBox {
     this.introMessageElementList.forEach((element) => element.style.display = 'block');
 
     [
-      this.dateElement,
       this.artistNameElement,
       this.albumNameElement,
       this.trackNameElement,
@@ -73,16 +73,12 @@ export default class InfoBox {
   }
 
   renderScrobbleInfo({scrobble, totals}) {
-    const {date, artist, album, track} = scrobble;
+    const {artist, album, track} = scrobble;
     const [artistTotalPlaycount, albumTotalPlaycount, trackTotalPlaycount] = totals;
 
     const artistUrl = url`https://www.last.fm/music/${artist.name}`;
     const albumUrl = url`https://www.last.fm/music/${artist.name}/${album.name}`;
     const trackUrl = url`https://www.last.fm/music/${artist.name}/_/${track.name}`;
-
-    this.dateElement.innerHTML = html`
-      <small>${date}</small>
-    `;
 
     this.artistNameElement.innerHTML = html`
       <span>
@@ -165,11 +161,6 @@ export default class InfoBox {
         >
           (use arrow keys for navigation and scroll for zooming)
         </p>
-
-        <p
-          id="info-box-field-date"
-          class="InfoBox__field"
-        />
 
         <p
           id="info-box-field-artist-name"

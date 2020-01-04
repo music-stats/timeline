@@ -38,16 +38,16 @@ export default {
       selectedColor: cssColors.white,
       colorValueFactors: {
         other: {
-          saturation: 0.6,
+          saturation: 0.5,
           lightness: 0.6,
         },
         genre: {
-          saturation: 0.9,
+          saturation: 1.1,
           lightness: 1,
         },
         artist: {
-          saturation: 1.5,
-          lightness: 1.7,
+          saturation: 1.4,
+          lightness: 1.8,
         },
       },
     },

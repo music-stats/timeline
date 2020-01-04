@@ -27,9 +27,9 @@ export default class Legend {
 
     for (let i = 0; i < this.genreElementCollection.length; i += 1) {
       const genreElement = this.genreElementCollection[i];
-      const {name} = this.genreList[i];
+      const {name, group} = this.genreList[i];
 
-      genreElement.addEventListener('click', () => onGenreClick(name));
+      genreElement.addEventListener('click', () => onGenreClick(name, group));
     }
   }
 
@@ -108,6 +108,7 @@ export default class Legend {
 
       genreList.push({
         name: genre,
+        group: genreGroup,
         artistCount,
         playcount,
         color,

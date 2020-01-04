@@ -16,6 +16,10 @@
 }
 
 .Legend__genre--highlight {
+  transform: rotate(-4deg) scaleX(1.2);
+  transform-origin: top center;
+  z-index: 1;
+  font-weight: bold;
   color: var(--color-white);
 }
 
