@@ -3,8 +3,6 @@ import config from '../config';
 
 import './TimeAxisLabel.css';
 
-// @todo: show dates (YYYY-MM-DD) of the first and the last scrobble from current zoomed range
-
 export default class TimeAxisLabel {
   constructor() {
     this.element = null;

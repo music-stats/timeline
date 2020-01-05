@@ -1,11 +1,9 @@
 .InfoBox {
   position: absolute;
+  /* "z-index" should be greater than the one for ".ArtistLabelCollection" */
+  z-index: 1;
   top: 0;
   left: 0;
-  display: grid;
-  grid-row-gap: 5px;
-  margin: 10px 14px;
-  font-size: 0.8rem;
   /* allows the canvas to receive mouse events under the info box */
   pointer-events: none;
 }
@@ -15,6 +13,12 @@
   pointer-events: auto;
 }
 
-.InfoBox__field {
-  margin: 0;
+.InfoBox__field--scrobble-info {
+  display: none;
+}
+
+@media all and (max-width: 400px) {
+  .InfoBox {
+    font-size: var(--font-size-normal);
+  }
 }

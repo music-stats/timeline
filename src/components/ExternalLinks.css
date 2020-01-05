@@ -1,0 +1,33 @@
+.ExternalLinks {
+  position: absolute;
+  /* "z-index" should be greater than the one for ".Legend__genre--highlight" */
+  z-index: 2;
+  bottom: 0;
+  right: 0;
+  transition-property: transform, opacity;
+  transition-duration: 400ms;
+  /* "+4px" because margin is greater than padding by "4px" for ".list-box" */
+  transform: translateX(calc(100% + 4px));
+  opacity: 0.6;
+}
+
+.ExternalLinks:hover {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* to avoid jumping if a cursor goes to the right of the element */
+.ExternalLinks::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 14px;
+  content: '';
+}
+
+@media all and (max-width: 400px) {
+  .ExternalLinks {
+    font-size: var(--font-size-normal);
+  }
+}

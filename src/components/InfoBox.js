@@ -5,14 +5,13 @@ import {url} from '../utils/string';
 
 import './InfoBox.css';
 
-// @todo: move GitHub and Twitter links to the bottom right corner,
-//        similar to how it's done on the "music-stats/map"
-
 export default class InfoBox {
   constructor(props) {
     this.props = props;
 
     this.introMessageElementList = null;
+    this.scrobbleInfoElementList = null;
+
     this.artistNameElement = null;
     this.albumNameElement = null;
     this.trackNameElement = null;
@@ -20,6 +19,8 @@ export default class InfoBox {
 
   initializeElements() {
     this.introMessageElementList = document.querySelectorAll('.InfoBox__field--intro-message');
+    this.scrobbleInfoElementList = document.querySelectorAll('.InfoBox__field--scrobble-info');
+
     this.artistNameElement = document.getElementById('info-box-field-artist-name');
     this.albumNameElement = document.getElementById('info-box-field-album-name');
     this.trackNameElement = document.getElementById('info-box-field-track-name');
@@ -27,12 +28,7 @@ export default class InfoBox {
 
   showIntroMessage() {
     this.introMessageElementList.forEach((element) => element.style.display = 'block');
-
-    [
-      this.artistNameElement,
-      this.albumNameElement,
-      this.trackNameElement,
-    ].forEach((element) => element.innerText = '');
+    this.scrobbleInfoElementList.forEach((element) => element.style.display = 'none');
   }
 
   hideIntroMessage() {
@@ -80,6 +76,7 @@ export default class InfoBox {
     const albumUrl = url`https://www.last.fm/music/${artist.name}/${album.name}`;
     const trackUrl = url`https://www.last.fm/music/${artist.name}/_/${track.name}`;
 
+    this.artistNameElement.style.display = 'block';
     this.artistNameElement.innerHTML = html`
       <span>
         <a href=${artistUrl}>${artist.name}</a> <small>(${artist.playcount}/${artistTotalPlaycount})</small>
@@ -89,7 +86,6 @@ export default class InfoBox {
     this.albumNameElement.style.display = album.name
       ? 'block'
       : 'none';
-
     this.albumNameElement.innerHTML = album.name
       ? html`
         <span>
@@ -98,6 +94,7 @@ export default class InfoBox {
       `
       : '';
 
+    this.trackNameElement.style.display = 'block';
     this.trackNameElement.innerHTML = html`
       <span>
         <a href=${trackUrl}>${track.name}</a> <small>(${track.playcount}/${trackTotalPlaycount})</small>
@@ -110,7 +107,6 @@ export default class InfoBox {
   }
 
   render() {
-    const {links} = config;
     const {
       dates: {
         firstScrobbleDate,
@@ -121,6 +117,7 @@ export default class InfoBox {
         perDayCount,
       },
     } = this.props;
+
     const {
       scrobbleListLink,
       artistListLink,
@@ -130,51 +127,39 @@ export default class InfoBox {
 
     return html`
       <aside
-        class="InfoBox"
+        class="InfoBox list-box"
       >
         <p
-          class="InfoBox__field InfoBox__field--intro-message"
-        >
-          <a href=${links.github.url}>${links.github.text}</a> <a href=${links.twitter.url}>${links.twitter.text}</a>
-        </p>
-
-        <p
-          class="InfoBox__field InfoBox__field--intro-message"
+          class="InfoBox__field--intro-message list-box__field"
         >
           ${dayCount} days: ${firstScrobbleDate} - ${lastScrobbleDate}
         </p>
 
         <p
-          class="InfoBox__field InfoBox__field--intro-message"
+          class="InfoBox__field--intro-message list-box__field"
         >
           ${scrobbleListLink} scrobbles (${perDayCount} per day)
         </p>
 
         <p
-          class="InfoBox__field InfoBox__field--intro-message"
+          class="InfoBox__field--intro-message list-box__field"
         >
           ${artistListLink} artists, ${albumListLink} albums, ${trackListLink} tracks
         </p>
 
         <p
-          class="InfoBox__field InfoBox__field--intro-message"
-        >
-          (use arrow keys for navigation and scroll for zooming)
-        </p>
-
-        <p
           id="info-box-field-artist-name"
-          class="InfoBox__field"
+          class="InfoBox__field--scrobble-info list-box__field"
         />
 
         <p
           id="info-box-field-album-name"
-          class="InfoBox__field"
+          class="InfoBox__field--scrobble-info list-box__field"
         />
 
         <p
           id="info-box-field-track-name"
-          class="InfoBox__field"
+          class="InfoBox__field--scrobble-info list-box__field"
         />
       </aside>
     `;

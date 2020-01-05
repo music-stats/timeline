@@ -1,6 +1,12 @@
 .TimeAxisLabel {
-  font-size: 0.625rem;
+  font-size: var(--font-size-normal);
   position: absolute;
   white-space: nowrap;
   color: var(--color-grey-2);
+}
+
+@media all and (max-width: 400px) {
+  .TimeAxisLabel {
+    font-size: var(--font-size-small);
+  }
 }

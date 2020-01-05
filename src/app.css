@@ -5,7 +5,9 @@ html {
 
 body {
   font-family: monospace;
+  font-size: var(--font-size-root);
   height: 100%;
+  overflow: hidden;
   margin: 0;
   color: var(--color-light-grey-1);
   background-color: var(--color-dark-grey-blue);
@@ -26,4 +28,16 @@ a:hover {
 
 a::selection {
   color: var(--color-dark-grey-blue);
+}
+
+.list-box {
+  display: grid;
+  grid-row-gap: 5px;
+  margin: 14px;
+  padding: 10px;
+  background-color: var(--color-dark-grey-1-semitransparent);
+}
+
+.list-box__field {
+  margin: 0;
 }

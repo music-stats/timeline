@@ -1,7 +1,7 @@
 .Legend {
   display: flex;
   margin: 0 14px 14px 14px;
-  font-size: 0.5rem;
+  font-size: var(--font-size-small);
 }
 
 .Legend__genre {
@@ -36,16 +36,26 @@
   cursor: default;
 }
 
-.Legend__genre:hover .Legend__genre-caption {
+.Legend__genre:hover:not(.Legend__genre--highlight) .Legend__genre-caption {
   color: var(--color-light-grey-3);
 }
 
 @media all and (min-width: 800px) {
   .Legend {
-    font-size: 0.625rem;
+    font-size: var(--font-size-normal);
   }
 
   .Legend__genre-caption {
     top: 8px;
+  }
+}
+
+@media all and (max-width: 400px) {
+  .Legend {
+    font-size: var(--font-size-extra-small);
+  }
+
+  .Legend__genre-caption {
+    top: 2px;
   }
 }

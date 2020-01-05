@@ -15,12 +15,17 @@ import SummaryRegistry from '../stores/SummaryRegistry';
 import Plot from '../components/Plot';
 import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
+import ExternalLinks from '../components/ExternalLinks';
 import Legend from '../components/Legend';
 import ArtistLabelCollection from '../components/ArtistLabelCollection';
 
 // @todo:
-// * add a scale to the time axis - it should show months/weeks/days depending on zoomed time range
+// * for each zoomed range:
+//   * show dates of the first and the last scrobbles (YYYY-MM-DD) as time axis labels
+//   * update summary numbers/links
+//   * add a scale to the time axis - it should show months/weeks/days
 // * support zooming on mobile devices via touch events
+// * use "event.deltaX" for horizontal panning, but don't zoom and pan simultaneously
 // * add unit tests (use "tape")
 
 export default class Timeline {
@@ -96,6 +101,8 @@ export default class Timeline {
         perDayCount,
       },
     });
+
+    this.children.externalLinks = new ExternalLinks();
 
     this.children.timeAxisLabel = new TimeAxisLabel();
 
@@ -222,32 +229,20 @@ export default class Timeline {
     this.scrobbleGenreRegistry.getPointList(genre).forEach(({
       artist: {name: artistName},
       album: {playcount},
-      x: xi,
-      y: yi,
+      x,
+      y,
     }) => {
-      if (artistName === artistNameToSkip) {
-        return;
+      if (artistName !== artistNameToSkip) {
+        const color = this.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true, false);
+
+        this.scrobbleCollectionHighlighted.push({x, y});
+        artistLastPoints[artistName] = {x, y, color};
+        plot.drawPoint(x, y, color);
       }
-
-      const color = this.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true, false);
-
-      this.scrobbleCollectionHighlighted.push({
-        x: xi,
-        y: yi,
-      });
-
-      artistLastPoints[artistName] = {
-        x: xi,
-        y: yi,
-        color,
-      };
-
-      plot.drawPoint(xi, yi, color);
     });
 
     for (const artistName in artistLastPoints) {
       const {x, y, color} = artistLastPoints[artistName];
-
       artistLabelCollection.renderLabel(x, y, plotWidth, artistName, color, false);
     }
   }
@@ -256,6 +251,7 @@ export default class Timeline {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
     const {plot, timeAxisLabel, artistLabelCollection} = this.children;
     const [plotWidth] = plot.getDimensions();
+    const sameTrackPointList = [];
     let lastPoint = null;
 
     this.scrobbleArtistRegistry.getPointList(artist.name).forEach(({
@@ -263,37 +259,28 @@ export default class Timeline {
       date,
       album: {playcount},
       track: {name},
-      x: xi,
-      y: yi,
+      x,
+      y,
     }) => {
       const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, false, true);
 
-      this.scrobbleCollectionHighlighted.push({
-        x: xi,
-        y: yi,
-      });
+      this.scrobbleCollectionHighlighted.push({x, y});
+      lastPoint = {x, y, color};
 
-      lastPoint = {
-        x: xi,
-        y: yi,
-        color,
-      };
-
-      plot.drawPoint(
-        xi,
-        yi,
-        name === track.name
-          ? selectedTrackColor
-          : color,
-      );
+      // skipping same track scrobbles, those will be rendered after the main loop (to appear on top)
+      if (name === track.name) {
+        sameTrackPointList.push({x, y});
+      } else {
+        plot.drawPoint(x, y, color);
+      }
 
       if (scrobbleGlobalIndex === index) {
-        timeAxisLabel.renderText(xi, plotWidth, date);
+        timeAxisLabel.renderText(x, plotWidth, date);
       }
     });
 
-    const {x, y, color} = lastPoint;
-    artistLabelCollection.renderLabel(x, y, plotWidth, artist.name, color, true);
+    sameTrackPointList.forEach(({x, y}) => plot.drawPoint(x, y, selectedTrackColor));
+    artistLabelCollection.renderLabel(lastPoint.x, lastPoint.y, plotWidth, artist.name, lastPoint.color, true);
   }
 
   removeScrobbleCollectionHighlight() {
@@ -368,9 +355,18 @@ export default class Timeline {
   }
 
   handleWindowResize() {
-    this.resetState();
-    this.draw();
-    this.resetUi();
+    // A timeout handle is used for throttling and dealing with mobile device rotation.
+    // On some mobile browsers, the "resize" event is triggered before window dimensions are changed.
+    clearTimeout(this.windowResizeTimeoutHandle);
+
+    this.windowResizeTimeoutHandle = setTimeout(
+      () => {
+        this.resetState();
+        this.draw();
+        this.resetUi();
+      },
+      60,
+    );
   }
 
   handleDocumentKeydown(event) {
@@ -414,7 +410,6 @@ export default class Timeline {
     }
   }
 
-  // @todo: use "event.deltaX" for horizontal panning, but don't zoom and pan simultaneously
   handlePlotWheel(event) {
     event.preventDefault();
 
@@ -504,12 +499,13 @@ export default class Timeline {
   }
 
   render() {
-    const {plot, infoBox, timeAxisLabel, legend, artistLabelCollection} = this.children;
+    const {plot, infoBox, externalLinks, timeAxisLabel, legend, artistLabelCollection} = this.children;
 
     return html`
       <main>
         ${plot.render()}
         ${infoBox.render()}
+        ${externalLinks.render()}
         ${timeAxisLabel.render()}
         ${legend.render()}
         ${artistLabelCollection.render()}

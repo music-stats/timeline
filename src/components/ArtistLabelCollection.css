@@ -10,5 +10,11 @@
   position: absolute;
   transform: translateY(calc(-100% - 4px));
   white-space: nowrap;
-  font-size: 0.625rem;
+  font-size: var(--font-size-normal);
+}
+
+@media all and (max-width: 400px) {
+  .ArtistLabelCollection__label {
+    font-size: var(--font-size-small);
+  }
 }
