@@ -58,7 +58,7 @@ export default {
 
     timeAxis: {
       width: 2,
-      color: cssColors.grey1,
+      color: cssColors.darkGrey2,
     },
 
     legend: {

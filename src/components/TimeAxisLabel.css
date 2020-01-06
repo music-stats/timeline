@@ -2,6 +2,12 @@
   font-size: var(--font-size-normal);
   position: absolute;
   white-space: nowrap;
+  color: var(--color-grey-1);
+}
+
+.TimeAxisLabel--most-top {
+  z-index: 1;
+  background-color: var(--color-dark-grey-blue);
   color: var(--color-grey-2);
 }
 

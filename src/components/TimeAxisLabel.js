@@ -4,7 +4,8 @@ import config from '../config';
 import './TimeAxisLabel.css';
 
 export default class TimeAxisLabel {
-  constructor() {
+  constructor(props) {
+    this.props = props;
     this.element = null;
   }
 
@@ -16,12 +17,16 @@ export default class TimeAxisLabel {
         legend: {height: legendHeight},
       },
     } = config;
-
+    const {id, isMostTop} = this.props;
     const height = plotPadding - timeAxisWidth / 2;
 
-    this.element = document.getElementById('time-axis-label');
+    this.element = document.getElementById(id);
     this.element.style.top = `calc(100% - ${(height + legendHeight + plotPadding)}px)`;
     this.element.style.lineHeight = `${height}px`;
+
+    if (isMostTop) {
+      this.element.classList.add('TimeAxisLabel--most-top');
+    }
   }
 
   clear() {
@@ -60,12 +65,13 @@ export default class TimeAxisLabel {
   }
 
   render() {
+    const {id} = this.props;
+
     return html`
       <aside
-        id="time-axis-label"
+        id=${id}
         class="TimeAxisLabel"
-      >
-      </aside>
+      />
     `;
   }
 }

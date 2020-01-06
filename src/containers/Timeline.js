@@ -21,9 +21,8 @@ import ArtistLabelCollection from '../components/ArtistLabelCollection';
 
 // @todo:
 // * for each zoomed range:
-//   * show dates of the first and the last scrobbles (YYYY-MM-DD) as time axis labels
 //   * update summary numbers/links
-//   * add a scale to the time axis - it should show months/weeks/days
+//   * add a scale to the time axis (showing months/weeks/days)
 // * support zooming on mobile devices via touch events
 // * use "event.deltaX" for horizontal panning, but don't zoom and pan simultaneously
 // * add unit tests (use "tape")
@@ -66,10 +65,10 @@ export default class Timeline {
   }
 
   resetUi() {
-    const {infoBox, timeAxisLabel, legend, artistLabelCollection} = this.children;
+    const {infoBox, selectedScrobbleTimeLabel, legend, artistLabelCollection} = this.children;
 
     infoBox.showIntroMessage();
-    timeAxisLabel.clear();
+    selectedScrobbleTimeLabel.clear();
     legend.removeGenreHighlight();
     artistLabelCollection.removeAllLabels();
   }
@@ -81,7 +80,6 @@ export default class Timeline {
 
   initializeChildrenComponents() {
     const {scrobbleList} = this.props;
-    const [dayCount, perDayCount] = this.getPeriodCounts();
 
     this.children.plot = new Plot({
       pointHalfSize: this.scrobbleHalfSize,
@@ -97,14 +95,22 @@ export default class Timeline {
       counts: {
         ...this.summaryRegistry.getSummary(),
         scrobbleCount: scrobbleList.length,
-        dayCount,
-        perDayCount,
+        perDayCount: this.getPerDayCount(),
       },
     });
 
     this.children.externalLinks = new ExternalLinks();
 
-    this.children.timeAxisLabel = new TimeAxisLabel();
+    this.children.firstScrobbleTimeLabel = new TimeAxisLabel({
+      id: 'first-scrobble-time-label',
+    });
+    this.children.lastScrobbleTimeLabel = new TimeAxisLabel({
+      id: 'last-scrobble-time-label',
+    });
+    this.children.selectedScrobbleTimeLabel = new TimeAxisLabel({
+      id: 'selected-scrobble-time-label',
+      isMostTop: true,
+    });
 
     this.children.legend = new Legend({
       scrobbleList,
@@ -114,7 +120,7 @@ export default class Timeline {
     this.children.artistLabelCollection = new ArtistLabelCollection();
   }
 
-  getPeriodCounts() {
+  getPerDayCount() {
     const {scrobbleList} = this.props;
     const firstScrobbleTimestamp = this.scrobbleCollection.getFirst().timestamp;
     const lastScrobbleTimestamp = this.scrobbleCollection.getLast().timestamp;
@@ -122,10 +128,7 @@ export default class Timeline {
     const dayCount = Math.ceil((lastScrobbleTimestamp - firstScrobbleTimestamp) / msInDay);
     const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
 
-    return [
-      dayCount,
-      perDayCount,
-    ];
+    return perDayCount;
   }
 
   initializeScales() {
@@ -249,7 +252,7 @@ export default class Timeline {
 
   highlightArtistScrobbleList({index, artist, track}) {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
-    const {plot, timeAxisLabel, artistLabelCollection} = this.children;
+    const {plot, selectedScrobbleTimeLabel, artistLabelCollection} = this.children;
     const [plotWidth] = plot.getDimensions();
     const sameTrackPointList = [];
     let lastPoint = null;
@@ -275,7 +278,7 @@ export default class Timeline {
       }
 
       if (scrobbleGlobalIndex === index) {
-        timeAxisLabel.renderText(x, plotWidth, date);
+        selectedScrobbleTimeLabel.renderText(x, plotWidth, date);
       }
     });
 
@@ -454,7 +457,7 @@ export default class Timeline {
   }
 
   draw() {
-    const {plot} = this.children;
+    const {plot, firstScrobbleTimeLabel, lastScrobbleTimeLabel} = this.children;
 
     // subsequent calls depend on plot dimensions
     plot.scale();
@@ -480,6 +483,12 @@ export default class Timeline {
     });
 
     plot.drawTimeAxis(...this.scales.timeRangeScale.range());
+
+    const [plotWidth] = plot.getDimensions();
+    const firstScrobble = this.scrobbleCollectionZoomed.getFirst();
+    const lastScrobble = this.scrobbleCollectionZoomed.getLast();
+    firstScrobbleTimeLabel.renderText(this.scales.timeRangeScale(firstScrobble.timestamp), plotWidth, firstScrobble.date);
+    lastScrobbleTimeLabel.renderText(this.scales.timeRangeScale(lastScrobble.timestamp), plotWidth, lastScrobble.date);
   }
 
   // things needed for the first render
@@ -499,16 +508,9 @@ export default class Timeline {
   }
 
   render() {
-    const {plot, infoBox, externalLinks, timeAxisLabel, legend, artistLabelCollection} = this.children;
-
     return html`
       <main>
-        ${plot.render()}
-        ${infoBox.render()}
-        ${externalLinks.render()}
-        ${timeAxisLabel.render()}
-        ${legend.render()}
-        ${artistLabelCollection.render()}
+        ${Object.values(this.children).map((child) => child.render())}
       </main>
     `;
   }

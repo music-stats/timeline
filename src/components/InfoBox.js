@@ -107,17 +107,7 @@ export default class InfoBox {
   }
 
   render() {
-    const {
-      dates: {
-        firstScrobbleDate,
-        lastScrobbleDate,
-      },
-      counts: {
-        dayCount,
-        perDayCount,
-      },
-    } = this.props;
-
+    const {counts: {perDayCount}} = this.props;
     const {
       scrobbleListLink,
       artistListLink,
@@ -129,12 +119,6 @@ export default class InfoBox {
       <aside
         class="InfoBox list-box"
       >
-        <p
-          class="InfoBox__field--intro-message list-box__field"
-        >
-          ${dayCount} days: ${firstScrobbleDate} - ${lastScrobbleDate}
-        </p>
-
         <p
           class="InfoBox__field--intro-message list-box__field"
         >
