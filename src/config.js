@@ -28,7 +28,7 @@ export default {
     minTimeRange: 24 * 60 * 60 * 1000, // 1 day
 
     plot: {
-      padding: 14,
+      padding: 12,
       backgroundColor: cssColors.darkGreyBlue,
     },
 

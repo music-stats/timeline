@@ -1,6 +1,7 @@
 import html from '../lib/html';
 
 import config from '../config';
+import {dateTimeStringToDateString} from '../utils/date';
 import {url} from '../utils/string';
 
 import './InfoBox.css';
@@ -50,7 +51,9 @@ export default class InfoBox {
       },
     } = this.props;
     const baseUrl = `${links.lastfm.url}library`;
-    const queryString = `from=${firstScrobbleDate}&to=${lastScrobbleDate}`;
+    const fromDateString = dateTimeStringToDateString(firstScrobbleDate);
+    const toDateString = dateTimeStringToDateString(lastScrobbleDate);
+    const queryString = `from=${fromDateString}&to=${toDateString}`;
 
     return {
       scrobbleListLink: html`
@@ -117,7 +120,7 @@ export default class InfoBox {
 
     return html`
       <aside
-        class="InfoBox list-box"
+        class="InfoBox list-box list-box--with-bg"
       >
         <p
           class="InfoBox__field--intro-message list-box__field"

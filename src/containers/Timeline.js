@@ -4,7 +4,6 @@ import * as d3Color from 'd3-color';
 import html from '../lib/html';
 
 import config from '../config';
-import {dateTimeStringToDateString} from '../utils/date';
 import {clamp} from '../utils/number';
 
 import PointCollection from '../stores/PointCollection';
@@ -23,8 +22,8 @@ import ArtistLabelCollection from '../components/ArtistLabelCollection';
 // * for each zoomed range:
 //   * update summary numbers/links
 //   * add a scale to the time axis (showing months/weeks/days)
-// * support zooming on mobile devices via touch events
 // * use "event.deltaX" for horizontal panning, but don't zoom and pan simultaneously
+// * support zooming and panning on mobile devices via touch events
 // * add unit tests (use "tape")
 
 export default class Timeline {
@@ -89,8 +88,8 @@ export default class Timeline {
 
     this.children.infoBox = new InfoBox({
       dates: {
-        firstScrobbleDate: dateTimeStringToDateString(this.scrobbleCollection.getFirst().date),
-        lastScrobbleDate: dateTimeStringToDateString(this.scrobbleCollection.getLast().date),
+        firstScrobbleDate: this.scrobbleCollection.getFirst().date,
+        lastScrobbleDate: this.scrobbleCollection.getLast().date,
       },
       counts: {
         ...this.summaryRegistry.getSummary(),
@@ -325,7 +324,9 @@ export default class Timeline {
       legend.highlightGenre(artist.genre);
     }
 
+    // artist scrobbles are rendered on top of genre scrobbles and artist labels
     this.highlightArtistScrobbleList(scrobble);
+
     infoBox.renderScrobbleInfo({
       scrobble,
       totals: this.summaryRegistry.getTotals(scrobble),
@@ -368,7 +369,7 @@ export default class Timeline {
         this.draw();
         this.resetUi();
       },
-      60,
+      100,
     );
   }
 

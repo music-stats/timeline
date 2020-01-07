@@ -12,15 +12,25 @@ export default class ExternalLinks {
         class="ExternalLinks list-box"
       >
         <p
-          class="list-box__field"
+          class="ExternalLinks__field list-box__field"
         >
-          GitHub: <a href=${github.url}>${github.text}</a>
+          <a
+            class="ExternalLinks__link"
+            href=${github.url}
+          >
+            ${github.text}
+          </a>
         </p>
 
         <p
-          class="list-box__field"
+          class="ExternalLinks__field list-box__field"
         >
-          Twitter: <a href=${twitter.url}>${twitter.text}</a>
+          <a
+            class="ExternalLinks__link"
+            href=${twitter.url}
+          >
+            ${twitter.text}
+          </a>
         </p>
       </aside>
     `;

@@ -32,9 +32,12 @@ a::selection {
 
 .list-box {
   display: grid;
-  grid-row-gap: 5px;
-  margin: 14px;
-  padding: 10px;
+  grid-row-gap: 4px;
+  margin: 12px;
+}
+
+.list-box--with-bg {
+  padding: 8px 10px;
   background-color: var(--color-dark-grey-1-semitransparent);
 }
 
