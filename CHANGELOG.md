@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.0.1] - 2020-01-08
 ### Added
 * Canvas-based playcount chart:
   * X axis: time.
@@ -18,6 +20,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Brighter color for all scrobbles of a given artist.
 * Keyboard navigation (traversing the timeline with arrow keys).
 * Zooming on mouse wheel (horizontal stretching of the plot).
+
+Screenshot:
+
+<p align="center">
+  <a href="https://user-images.githubusercontent.com/2470363/72014656-9b2eb480-3260-11ea-9ad0-bd9377b0788d.png">
+    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/72014656-9b2eb480-3260-11ea-9ad0-bd9377b0788d.png" />
+  </a>
+</p>
+
+First working prototype screenshot:
+
+<p align="center">
+  <a href="https://user-images.githubusercontent.com/2470363/70378960-5e9d2f80-1927-11ea-8367-de163c2d7862.png">
+    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/70378960-5e9d2f80-1927-11ea-8367-de163c2d7862.png" />
+  </a>
+</p>
 
 ## [0.0.0] - 2019-08-23
 ### Added

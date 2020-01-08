@@ -1,6 +1,6 @@
 {
   "name": "music-stats-timeline",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "visualization of listening habits",
   "main": "src/app.js",
   "scripts": {
@@ -42,9 +42,9 @@
     "@babel/register": "7.7.7",
     "eslint": "6.8.0",
     "eslint-config-developit": "1.1.1",
-    "gh-pages": "2.1.1",
+    "gh-pages": "2.2.0",
     "npm-check": "5.9.0",
-    "rollup": "1.27.14",
+    "rollup": "1.29.0",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-eslint": "7.0.0",

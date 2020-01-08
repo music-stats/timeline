@@ -48,6 +48,15 @@ export default class Timeline {
     this.scales = {};
     this.genreGroupColorScales = this.getGenreGroupColorScales();
 
+    this.timeRange = [
+      this.scrobbleCollection.getFirst().timestamp,
+      this.scrobbleCollection.getLast().timestamp,
+    ];
+    this.timeRangeZoomed = [
+      this.scrobbleCollectionZoomed.getFirst().timestamp,
+      this.scrobbleCollectionZoomed.getLast().timestamp,
+    ];
+
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
@@ -142,13 +151,7 @@ export default class Timeline {
 
     const {plot} = this.children;
     const [width, height] = plot.getDimensions();
-
-    const firstScrobbleTimestamp = this.scrobbleCollectionZoomed.getFirst().timestamp;
-    const lastScrobbleTimestamp = this.scrobbleCollectionZoomed.getLast().timestamp;
     const [maxArtistPlaycount, maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
-
-    const plotLeft = plotPadding;
-    const plotRight = width - plotPadding;
 
     // plot height calculation is ensuring equal vertical gaps between points
     const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
@@ -169,8 +172,8 @@ export default class Timeline {
 
     // X axis
     this.scales.timeRangeScale = d3Scale.scaleLinear()
-      .domain([firstScrobbleTimestamp, lastScrobbleTimestamp])
-      .rangeRound([plotLeft, plotRight]);
+      .domain(this.timeRangeZoomed)
+      .rangeRound([plotPadding, width - plotPadding]);
 
     // Y axis
     this.scales.artistPlaycountScale = d3Scale.scaleLinear()
@@ -186,7 +189,7 @@ export default class Timeline {
   getGenreGroupColorScales() {
     const {genreGroups} = config;
     const scales = {};
-    const [maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
+    const maxAlbumPlaycount = this.summaryRegistry.getMaxPlaycounts()[1];
 
     for (const genreGroup in genreGroups) {
       scales[genreGroup] = d3Scale.scaleSequential()
@@ -224,11 +227,19 @@ export default class Timeline {
   }
 
   highlightGenreScrobbleList(genre, genreGroup, artistNameToSkip = null) {
+    const genreScrobbleList = this.scrobbleGenreRegistry.getPointList(genre);
+
+    // there could be no scrobbles for a given genre,
+    // since registry is repopulated for when zoomed time range changes
+    if (!genreScrobbleList) {
+      return;
+    }
+
     const {plot, artistLabelCollection} = this.children;
     const [plotWidth] = plot.getDimensions();
     const artistLastPoints = {};
 
-    this.scrobbleGenreRegistry.getPointList(genre).forEach(({
+    genreScrobbleList.forEach(({
       artist: {name: artistName},
       album: {playcount},
       x,
@@ -422,32 +433,32 @@ export default class Timeline {
     const {plot} = this.children;
     const {offsetX, deltaY} = event;
 
-    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
     const [plotWidth] = plot.getDimensions();
     const plotWidthPadded = plotWidth - 2 * plotPadding;
 
-    const firstScrobble = this.scrobbleCollection.getFirst();
-    const lastScrobble = this.scrobbleCollection.getLast();
-    const firstScrobbleZoomed = this.scrobbleCollectionZoomed.getFirst();
-    const lastScrobbleZoomed = this.scrobbleCollectionZoomed.getLast();
-
     const timeScale = d3Scale.scaleLinear()
       .domain([0, plotWidthPadded])
-      .rangeRound([firstScrobbleZoomed.timestamp, lastScrobbleZoomed.timestamp]);
-    const xTimestamp = timeScale(clamp(offsetX - plotPadding, 0, plotWidthPadded));
-    const xScrobbleTimestamp = (this.scrobbleCollectionZoomed.getPrevious(xTimestamp) || firstScrobbleZoomed).timestamp;
+      .rangeRound(this.timeRangeZoomed);
 
-    const leftTimeRange = (xScrobbleTimestamp - firstScrobbleZoomed.timestamp) / zoomFactor;
-    const rightTimeRange = (lastScrobbleZoomed.timestamp - xScrobbleTimestamp) / zoomFactor;
+    const xTimestamp = timeScale(clamp(offsetX - plotPadding, ...timeScale.domain()));
+    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
+    const leftTimeRange = (xTimestamp - this.timeRangeZoomed[0]) / zoomFactor;
+    const rightTimeRange = (this.timeRangeZoomed[1] - xTimestamp) / zoomFactor;
 
     if (leftTimeRange + rightTimeRange < minTimeRange) {
       return;
     }
 
-    const leftScrobble = this.scrobbleCollection.getPrevious(xScrobbleTimestamp - leftTimeRange) || firstScrobble;
-    const rightScrobble = this.scrobbleCollection.getNext(xScrobbleTimestamp + rightTimeRange) || lastScrobble;
+    this.timeRangeZoomed = [
+      Math.max(xTimestamp - leftTimeRange, this.timeRange[0]),
+      Math.min(xTimestamp + rightTimeRange, this.timeRange[1]),
+    ];
 
-    this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(leftScrobble.index, rightScrobble.index + 1));
+    this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(
+      this.scrobbleCollection.getPrevious(this.timeRangeZoomed[0]).index,
+      this.scrobbleCollection.getNext(this.timeRangeZoomed[1]).index + 1,
+    ));
+
     this.resetState();
     this.draw();
     this.resetUi();
