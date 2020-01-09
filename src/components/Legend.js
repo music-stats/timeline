@@ -13,7 +13,6 @@ export default class Legend {
     this.genreElementCollection = [];
     this.genreList = this.getGenreSortedList();
     this.heightScale = this.getHeightScale();
-    this.highlightedGenreIndex = null;
 
     this.setGenreElementsHeight = this.setGenreElementsHeight.bind(this);
   }
@@ -21,38 +20,6 @@ export default class Legend {
   initializeElements() {
     this.element = document.getElementById('legend');
     this.genreElementCollection = this.element.getElementsByClassName('Legend__genre');
-  }
-
-  subscribe() {
-    const {onGenreClick} = this.props;
-
-    for (let i = 0; i < this.genreElementCollection.length; i += 1) {
-      const genreElement = this.genreElementCollection[i];
-      const {name, group} = this.genreList[i];
-
-      genreElement.addEventListener('click', () => onGenreClick(name, group));
-    }
-  }
-
-  highlightGenre(genre) {
-    const genreIndex = this.genreList.findIndex(({name}) => name === genre);
-    const genreElement = this.genreElementCollection[genreIndex];
-    const {highlightedColor} = this.genreList[genreIndex];
-
-    genreElement.classList.add('Legend__genre--highlight');
-    genreElement.style.backgroundColor = highlightedColor;
-    this.highlightedGenreIndex = genreIndex;
-  }
-
-  removeGenreHighlight() {
-    if (this.highlightedGenreIndex !== null) {
-      const genreElement = this.genreElementCollection[this.highlightedGenreIndex];
-      const {color} = this.genreList[this.highlightedGenreIndex];
-
-      genreElement.classList.remove('Legend__genre--highlight');
-      genreElement.style.backgroundColor = color;
-      this.highlightedGenreIndex = null;
-    }
   }
 
   getGenreSortedList() {
@@ -131,7 +98,6 @@ export default class Legend {
 
   afterRender() {
     this.initializeElements();
-    this.subscribe();
     requestAnimationFrame(this.setGenreElementsHeight);
   }
 

@@ -16,6 +16,7 @@ import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 import ExternalLinks from '../components/ExternalLinks';
 import Legend from '../components/Legend';
+import LegendInteractive from '../components/LegendInteractive';
 import ArtistLabelCollection from '../components/ArtistLabelCollection';
 
 export default class Timeline {
@@ -112,10 +113,14 @@ export default class Timeline {
       isMostTop: true,
     });
 
-    this.children.legend = new Legend({
-      scrobbleList,
-      onGenreClick: this.handleLegendGenreClick,
-    });
+    this.children.legend = new LegendInteractive(
+      {
+        onGenreClick: this.handleLegendGenreClick,
+      },
+      new Legend({
+        scrobbleList,
+      }),
+    );
 
     this.children.artistLabelCollection = new ArtistLabelCollection();
   }
