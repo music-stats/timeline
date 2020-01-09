@@ -18,14 +18,6 @@ import ExternalLinks from '../components/ExternalLinks';
 import Legend from '../components/Legend';
 import ArtistLabelCollection from '../components/ArtistLabelCollection';
 
-// @todo:
-// * for each zoomed range:
-//   * update summary numbers/links
-//   * add a scale to the time axis (showing months/weeks/days)
-// * use "event.deltaX" for horizontal panning, but don't zoom and pan simultaneously
-// * support zooming and panning on mobile devices via touch events
-// * add unit tests (use "tape")
-
 export default class Timeline {
   constructor(props) {
     const {timeline: {point: {size: scrobbleSize}}} = config;
