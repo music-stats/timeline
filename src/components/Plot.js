@@ -6,21 +6,13 @@ import './Plot.css';
 export default class Plot {
   constructor(props) {
     this.props = props;
-
     this.dimensions = null;
     this.element = null;
     this.ctx = null;
   }
 
   initializeElement() {
-    this.element = document.getElementById('plot-canvas');
-  }
-
-  subscribe() {
-    const {onMouseMove, onWheel} = this.props;
-
-    this.element.addEventListener('mousemove', onMouseMove);
-    this.element.addEventListener('wheel', onWheel);
+    this.element = document.getElementById('plot');
   }
 
   getDimensions() {
@@ -29,15 +21,28 @@ export default class Plot {
 
   scale() {
     const {timeline: {plot: {padding}, legend: {height: legendHeight}}} = config;
-
     const dpr = window.devicePixelRatio;
-    this.dimensions = [window.innerWidth, window.innerHeight - (legendHeight + padding)];
-    const [width, height] = this.dimensions;
+    const width = window.innerWidth;
+    const height = window.innerHeight - (legendHeight + padding);
 
-    this.element.width = width * dpr;
-    this.element.height = height * dpr;
-    this.element.style.width = `${width}px`;
-    this.element.style.height = `${height}px`;
+    this.dimensions = [width, height];
+
+    // batch assignment is used to minimize reflows
+    Object.assign(
+      this.element,
+      {
+        width: width * dpr,
+        height: height * dpr,
+      },
+    );
+
+    Object.assign(
+      this.element.style,
+      {
+        width: `${width}px`,
+        height: `${height}px`,
+      },
+    );
 
     this.ctx = this.element.getContext('2d', {alpha: false});
     this.ctx.scale(dpr, dpr);
@@ -79,13 +84,12 @@ export default class Plot {
 
   afterRender() {
     this.initializeElement();
-    this.subscribe();
   }
 
   render() {
     return html`
       <canvas
-        id="plot-canvas"
+        id="plot"
         class="Plot"
       />
     `;

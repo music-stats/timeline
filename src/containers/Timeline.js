@@ -4,7 +4,6 @@ import * as d3Color from 'd3-color';
 import html from '../lib/html';
 
 import config from '../config';
-import {clamp} from '../utils/number';
 
 import PointCollection from '../stores/PointCollection';
 import PointBuffer from '../stores/PointBuffer';
@@ -12,6 +11,7 @@ import PointRegistry from '../stores/PointRegistry';
 import SummaryRegistry from '../stores/SummaryRegistry';
 
 import Plot from '../components/Plot';
+import PlotInteractive from '../components/PlotInteractive';
 import TimeAxisLabel from '../components/TimeAxisLabel';
 import InfoBox from '../components/InfoBox';
 import ExternalLinks from '../components/ExternalLinks';
@@ -49,12 +49,6 @@ export default class Timeline {
       this.scrobbleCollectionZoomed.getFirst().timestamp,
       this.scrobbleCollectionZoomed.getLast().timestamp,
     ];
-
-    this.handleWindowResize = this.handleWindowResize.bind(this);
-    this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
-    this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
-    this.handlePlotWheel = this.handlePlotWheel.bind(this);
-    this.handleLegendGenreClick = this.handleLegendGenreClick.bind(this);
   }
 
   resetState() {
@@ -74,19 +68,18 @@ export default class Timeline {
     artistLabelCollection.removeAllLabels();
   }
 
-  subscribe() {
-    window.addEventListener('resize', this.handleWindowResize);
-    document.addEventListener('keydown', this.handleDocumentKeydown);
-  }
-
   initializeChildrenComponents() {
-    const {scrobbleList} = this.props;
+    const {scrobbleList, onPlotMouseMove, onPlotWheel, onLegendGenreClick} = this.props;
 
-    this.children.plot = new Plot({
-      pointHalfSize: this.scrobbleHalfSize,
-      onMouseMove: this.handlePlotMouseMove,
-      onWheel: this.handlePlotWheel,
-    });
+    this.children.plot = new PlotInteractive(
+      {
+        onMouseMove: onPlotMouseMove,
+        onWheel: onPlotWheel,
+      },
+      new Plot({
+        pointHalfSize: this.scrobbleHalfSize,
+      }),
+    );
 
     this.children.infoBox = new InfoBox({
       dates: {
@@ -115,7 +108,7 @@ export default class Timeline {
 
     this.children.legend = new LegendInteractive(
       {
-        onGenreClick: this.handleLegendGenreClick,
+        onGenreClick: onLegendGenreClick,
       },
       new Legend({
         scrobbleList,
@@ -223,11 +216,11 @@ export default class Timeline {
     return color;
   }
 
-  highlightGenreScrobbleList(genre, genreGroup, artistNameToSkip = null) {
+  highlightGenreScrobbleList(genre, genreGroup, artistNameToSkip = null, toRenderArtistLabelCollection = true) {
     const genreScrobbleList = this.scrobbleGenreRegistry.getPointList(genre);
 
     // there could be no scrobbles for a given genre,
-    // since registry is repopulated for when zoomed time range changes
+    // since registry is repopulated when zoomed time range changes
     if (!genreScrobbleList) {
       return;
     }
@@ -251,13 +244,15 @@ export default class Timeline {
       }
     });
 
-    for (const artistName in artistLastPoints) {
-      const {x, y, color} = artistLastPoints[artistName];
-      artistLabelCollection.renderLabel(x, y, plotWidth, artistName, color, false);
+    if (toRenderArtistLabelCollection) {
+      for (const artistName in artistLastPoints) {
+        const {x, y, color} = artistLastPoints[artistName];
+        artistLabelCollection.renderLabel(x, y, plotWidth, artistName, color, false);
+      }
     }
   }
 
-  highlightArtistScrobbleList({index, artist, track}) {
+  highlightArtistScrobbleList({index, artist, track}, toRenderArtistLabelCollection = true) {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
     const {plot, selectedScrobbleTimeLabel, artistLabelCollection} = this.children;
     const [plotWidth] = plot.getDimensions();
@@ -290,7 +285,10 @@ export default class Timeline {
     });
 
     sameTrackPointList.forEach(({x, y}) => plot.drawPoint(x, y, selectedTrackColor));
-    artistLabelCollection.renderLabel(lastPoint.x, lastPoint.y, plotWidth, artist.name, lastPoint.color, true);
+
+    if (toRenderArtistLabelCollection) {
+      artistLabelCollection.renderLabel(lastPoint.x, lastPoint.y, plotWidth, artist.name, lastPoint.color, true);
+    }
   }
 
   removeScrobbleCollectionHighlight() {
@@ -318,22 +316,30 @@ export default class Timeline {
   selectScrobble(scrobble) {
     const {infoBox, legend, artistLabelCollection} = this.children;
     const {artist} = scrobble;
+    const isNewArtist = !(this.selectedScrobble && this.selectedScrobble.artist.name === artist.name);
 
     // clean old
     this.selectedScrobble = scrobble;
     this.removeScrobbleCollectionHighlight();
     infoBox.hideIntroMessage();
-    legend.removeGenreHighlight();
-    artistLabelCollection.removeAllLabels();
+
+    // there's no need to re-render genre-related labels if selected artist didn't change
+    if (isNewArtist) {
+      legend.removeGenreHighlight();
+      artistLabelCollection.removeAllLabels();
+    }
 
     // show new
     if (artist.genre) {
-      this.highlightGenreScrobbleList(artist.genre, artist.genreGroup, artist.name);
-      legend.highlightGenre(artist.genre);
+      this.highlightGenreScrobbleList(artist.genre, artist.genreGroup, artist.name, isNewArtist);
+
+      if (isNewArtist) {
+        legend.highlightGenre(artist.genre);
+      }
     }
 
     // artist scrobbles are rendered on top of genre scrobbles and artist labels
-    this.highlightArtistScrobbleList(scrobble);
+    this.highlightArtistScrobbleList(scrobble, isNewArtist);
 
     infoBox.renderScrobbleInfo({
       scrobble,
@@ -366,110 +372,14 @@ export default class Timeline {
     }
   }
 
-  handleWindowResize() {
-    // A timeout handle is used for throttling and dealing with mobile device rotation.
-    // On some mobile browsers, the "resize" event is triggered before window dimensions are changed.
-    clearTimeout(this.windowResizeTimeoutHandle);
-
-    this.windowResizeTimeoutHandle = setTimeout(
-      () => {
-        this.resetState();
-        this.draw();
-        this.resetUi();
-      },
-      100,
-    );
-  }
-
-  handleDocumentKeydown(event) {
-    switch (event.key) {
-      case 'Escape': return this.handleEscKeydown();
-      case 'ArrowDown': return this.handleArrowDownKeydown();
-      case 'ArrowUp': return this.handleArrowUpKeydown();
-      case 'ArrowLeft': return this.handleArrowLeftKeydown();
-      case 'ArrowRight': return this.handleArrowRightKeydown();
-    }
-  }
-
-  handleEscKeydown() {
-    this.selectedScrobble = null;
-    this.removeScrobbleCollectionHighlight();
-    this.resetUi();
-  }
-
-  handleArrowDownKeydown() {
-    this.selectVerticallyAdjacentScrobble(this.selectedScrobble, -1);
-  }
-
-  handleArrowUpKeydown() {
-    this.selectVerticallyAdjacentScrobble(this.selectedScrobble, 1);
-  }
-
-  handleArrowLeftKeydown() {
-    this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, -1);
-  }
-
-  handleArrowRightKeydown() {
-    this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, 1);
-  }
-
-  handlePlotMouseMove(event) {
-    const {offsetX: x, offsetY: y} = event;
-    const scrobble = this.scrobbleBuffer.getPoint(x, y);
-
-    if (scrobble) {
-      this.selectScrobble(scrobble);
-    }
-  }
-
-  handlePlotWheel(event) {
-    event.preventDefault();
-
-    const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
-    const {scrobbleList} = this.props;
-    const {plot} = this.children;
-    const {offsetX, deltaY} = event;
-
-    const [plotWidth] = plot.getDimensions();
-    const plotWidthPadded = plotWidth - 2 * plotPadding;
-
-    const timeScale = d3Scale.scaleLinear()
-      .domain([0, plotWidthPadded])
-      .rangeRound(this.timeRangeZoomed);
-
-    const xTimestamp = timeScale(clamp(offsetX - plotPadding, ...timeScale.domain()));
-    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
-    const leftTimeRange = (xTimestamp - this.timeRangeZoomed[0]) / zoomFactor;
-    const rightTimeRange = (this.timeRangeZoomed[1] - xTimestamp) / zoomFactor;
-
-    if (leftTimeRange + rightTimeRange < minTimeRange) {
-      return;
-    }
-
-    this.timeRangeZoomed = [
-      Math.max(xTimestamp - leftTimeRange, this.timeRange[0]),
-      Math.min(xTimestamp + rightTimeRange, this.timeRange[1]),
-    ];
-
-    this.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(
-      this.scrobbleCollection.getPrevious(this.timeRangeZoomed[0]).index,
-      this.scrobbleCollection.getNext(this.timeRangeZoomed[1]).index + 1,
-    ));
-
-    this.resetState();
-    this.draw();
-    this.resetUi();
-  }
-
-  handleLegendGenreClick(genre, genreGroup) {
-    this.selectGenre(genre, genreGroup);
-  }
-
-  draw() {
+  draw(toRescalePlot = true) {
     const {plot, firstScrobbleTimeLabel, lastScrobbleTimeLabel} = this.children;
 
     // subsequent calls depend on plot dimensions
-    plot.scale();
+    if (toRescalePlot) {
+      plot.scale();
+    }
+
     this.initializeScales();
     plot.drawBackground();
 
@@ -512,8 +422,6 @@ export default class Timeline {
         child.afterRender();
       }
     });
-
-    this.subscribe();
   }
 
   render() {

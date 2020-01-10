@@ -19,13 +19,13 @@ export default class LegendInteractive {
 
   highlightGenre(genre) {
     const {genreElementCollection, genreList} = this.legend;
-
     const genreIndex = genreList.findIndex(({name}) => name === genre);
     const genreElement = genreElementCollection[genreIndex];
     const {highlightedColor} = genreList[genreIndex];
 
     genreElement.classList.add('Legend__genre--highlight');
     genreElement.style.backgroundColor = highlightedColor;
+
     this.highlightedGenreIndex = genreIndex;
   }
 
@@ -37,6 +37,7 @@ export default class LegendInteractive {
 
       genreElement.classList.remove('Legend__genre--highlight');
       genreElement.style.backgroundColor = color;
+
       this.highlightedGenreIndex = null;
     }
   }

@@ -1,6 +1,8 @@
 import config from './config';
 import {enrichScrobbleList} from './utils/dataset';
+
 import Timeline from './containers/Timeline';
+import TimelineInteractive from './containers/TimelineInteractive';
 
 import './app.css';
 import './app-theme.css';
@@ -10,9 +12,15 @@ Promise.all([
   config.dataUrls.artistsByGenres,
 ].map((url) => fetch(url).then((response) => response.json())))
   .then(([scrobbleListOriginal, artistsByGenres]) => {
-    const timeline = new Timeline({
-      scrobbleList: enrichScrobbleList(scrobbleListOriginal, artistsByGenres),
-    });
+    const scrobbleList = enrichScrobbleList(scrobbleListOriginal, artistsByGenres);
+    const timeline = new TimelineInteractive(
+      {
+        scrobbleList,
+      },
+      new Timeline({
+        scrobbleList,
+      }),
+    );
 
     timeline.beforeRender();
     document.body.innerHTML = timeline.render();

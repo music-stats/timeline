@@ -30,9 +30,15 @@ export default class ArtistLabelCollection {
     color.l *= colorValueFactors.artistLabel.lightness;
 
     labelElement.classList.add('ArtistLabelCollection__label');
-    labelElement.style.top = `${y}px`;
-    labelElement.style.color = color;
     labelElement.innerText = value;
+
+    Object.assign(
+      labelElement.style,
+      {
+        top: `${y}px`,
+        color: color,
+      },
+    );
 
     if (isHighlighted) {
       if (this.highlightedLabelElement) {
@@ -46,7 +52,7 @@ export default class ArtistLabelCollection {
     this.labelElementList.push(labelElement);
     this.element.appendChild(labelElement);
 
-    // text must be rendered before the "offsetWidth" is measured
+    // text must be rendered (added to DOM) before "offsetWidth" is measured
     const halfWidth = Math.ceil(labelElement.offsetWidth / 2);
 
     const [left, right] = (() => {
@@ -64,8 +70,13 @@ export default class ArtistLabelCollection {
       return [`${x - halfWidth}px`, 'auto'];
     })();
 
-    labelElement.style.left = left;
-    labelElement.style.right = right;
+    Object.assign(
+      labelElement.style,
+      {
+        left,
+        right,
+      },
+    );
   }
 
   afterRender() {

@@ -21,8 +21,14 @@ export default class TimeAxisLabel {
     const height = plotPadding - timeAxisWidth / 2;
 
     this.element = document.getElementById(id);
-    this.element.style.top = `calc(100% - ${(height + legendHeight + plotPadding)}px)`;
-    this.element.style.lineHeight = `${height}px`;
+
+    Object.assign(
+      this.element.style,
+      {
+        top: `calc(100% - ${(height + legendHeight + plotPadding)}px)`,
+        lineHeight: `${height}px`,
+      },
+    );
 
     if (isMostTop) {
       this.element.classList.add('TimeAxisLabel--most-top');
@@ -56,8 +62,13 @@ export default class TimeAxisLabel {
       return [`${x - halfWidth}px`, 'auto'];
     })();
 
-    this.element.style.left = left;
-    this.element.style.right = right;
+    Object.assign(
+      this.element.style,
+      {
+        left,
+        right,
+      },
+    );
   }
 
   afterRender() {
