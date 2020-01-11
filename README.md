@@ -36,6 +36,9 @@ src/
 └── config.js   # hardcoded values go there (including plot-specific styling)
 ```
 
+Among containers and components there are `<...Interactive />` classes that act as decorators.
+Such classes add various handlers and control static classes they decorate (e.g. highlighting on mouse move).
+
 ## What makes it possible?
 ### data source
 See [scripts supporting the scrobble timeline](https://github.com/music-stats/scripts#scrobble-timeline).
