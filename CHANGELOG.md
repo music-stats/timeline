@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2020-01-12
+### Added
+* Panning (horizontal shifting of the plot) - desktop only (no touch events).
+
+### Changed
+* Performance optimizations - avoiding unneeded re-rendering.
+
 ## [0.0.1] - 2020-01-08
 ### Added
 * Canvas-based playcount chart:
@@ -19,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Scrobble datetime on the time axis.
   * Brighter color for all scrobbles of a given artist.
 * Keyboard navigation (traversing the timeline with arrow keys).
-* Zooming on mouse wheel (horizontal stretching of the plot).
+* Zooming (horizontal stretching of the plot) - desktop only (no touch events).
 
 Screenshot:
 

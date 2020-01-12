@@ -5,9 +5,12 @@ export default class PlotInteractive {
   }
 
   subscribe() {
-    const {onMouseMove, onWheel} = this.props;
+    const {onMouseDown, onMouseUp, onMouseOut, onMouseMove, onWheel} = this.props;
     const {element} = this.plot;
 
+    element.addEventListener('mousedown', onMouseDown);
+    element.addEventListener('mouseup', onMouseUp);
+    element.addEventListener('mouseout', onMouseOut);
     element.addEventListener('mousemove', onMouseMove);
     element.addEventListener('wheel', onWheel);
   }

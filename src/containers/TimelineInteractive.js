@@ -11,9 +11,13 @@ export default class TimelineInteractive {
 
     this.selectedScrobble = null;
     this.scrobbleCollectionHighlighted = new PointCollection();
+    this.isPlotMouseDown = false;
+    this.plotMouseX = null;
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
+    this.handlePlotMouseDown = this.handlePlotMouseDown.bind(this);
+    this.handlePlotMouseUpOrOut = this.handlePlotMouseUpOrOut.bind(this);
     this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
     this.handlePlotWheel = this.handlePlotWheel.bind(this);
     this.handleLegendGenreClick = this.handleLegendGenreClick.bind(this);
@@ -21,6 +25,9 @@ export default class TimelineInteractive {
     Object.assign(
       this.timeline.props,
       {
+        onPlotMouseDown: this.handlePlotMouseDown,
+        onPlotMouseUp: this.handlePlotMouseUpOrOut,
+        onPlotMouseOut: this.handlePlotMouseUpOrOut,
         onPlotMouseMove: this.handlePlotMouseMove,
         onPlotWheel: this.handlePlotWheel,
         onLegendGenreClick: this.handleLegendGenreClick,
@@ -220,6 +227,100 @@ export default class TimelineInteractive {
     }
   }
 
+  selectScrobbleUnderMouse(event) {
+    const {scrobbleBuffer} = this.timeline;
+    const {offsetX: x, offsetY: y} = event;
+    const scrobble = scrobbleBuffer.getPoint(x, y);
+
+    if (scrobble) {
+      this.selectScrobble(scrobble);
+    }
+  }
+
+  panPlot(event) {
+    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {offsetX: x} = event;
+    const minTimestamp = scrobbleCollection.getFirst().timestamp;
+    const maxTimestamp = scrobbleCollection.getLast().timestamp;
+
+    const [leftTimestamp, rightTimestamp] = timeRangeScale.domain();
+
+    if (rightTimestamp - leftTimestamp >= maxTimestamp - minTimestamp) {
+      return;
+    }
+
+    let timestampDiff = timeRangeScale.invert(this.plotMouseX) - timeRangeScale.invert(x);
+
+    if (!timestampDiff) {
+      return;
+    }
+
+    if (rightTimestamp + timestampDiff > maxTimestamp) {
+      timestampDiff = maxTimestamp - rightTimestamp;
+    } else if (leftTimestamp + timestampDiff < minTimestamp) {
+      timestampDiff = minTimestamp - leftTimestamp;
+    }
+
+    if (timestampDiff) {
+      this.updatePlotTimeRange(
+        leftTimestamp + timestampDiff,
+        rightTimestamp + timestampDiff,
+      );
+    }
+  }
+
+  zoomPlot(event) {
+    const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
+    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {plot} = this.timeline.children;
+    const {offsetX, deltaY} = event;
+    const timeRangeZoomed = timeRangeScale.domain();
+
+    const [plotWidth] = plot.getDimensions();
+    const plotWidthPadded = plotWidth - 2 * plotPadding;
+
+    const timeScale = d3Scale.scaleLinear()
+      .domain([0, plotWidthPadded])
+      .rangeRound(timeRangeZoomed);
+
+    const xTimestamp = timeScale(clamp(offsetX - plotPadding, ...timeScale.domain()));
+    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
+    const leftTimeDiff = (xTimestamp - timeRangeZoomed[0]) / zoomFactor;
+    const rightTimeDiff = (timeRangeZoomed[1] - xTimestamp) / zoomFactor;
+
+    if (leftTimeDiff + rightTimeDiff >= minTimeRange) {
+      this.updatePlotTimeRange(
+        Math.max(
+          xTimestamp - leftTimeDiff,
+          scrobbleCollection.getFirst().timestamp,
+        ),
+        Math.min(
+          xTimestamp + rightTimeDiff,
+          scrobbleCollection.getLast().timestamp,
+        ),
+      );
+    }
+  }
+
+  updatePlotTimeRange(leftTimestamp, rightTimestamp) {
+    const {scrobbleList} = this.props;
+    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+
+    timeRangeScale.domain([
+      leftTimestamp,
+      rightTimestamp,
+    ]);
+
+    this.timeline.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(
+      scrobbleCollection.getPrevious(leftTimestamp).index,
+      scrobbleCollection.getNext(rightTimestamp).index + 1,
+    ));
+
+    this.resetState();
+    this.draw();
+    this.resetUi();
+  }
+
   handleWindowResize() {
     // A timeout handle is used for throttling and dealing with mobile device rotation.
     // On some mobile browsers, the "resize" event is triggered before window dimensions are changed.
@@ -268,64 +369,29 @@ export default class TimelineInteractive {
     this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, 1);
   }
 
-  handlePlotMouseMove(event) {
-    const {scrobbleBuffer} = this.timeline;
-    const {offsetX: x, offsetY: y} = event;
-    const scrobble = scrobbleBuffer.getPoint(x, y);
+  handlePlotMouseDown() {
+    this.isPlotMouseDown = true;
+  }
 
-    if (scrobble) {
-      this.selectScrobble(scrobble);
+  handlePlotMouseUpOrOut() {
+    this.isPlotMouseDown = false;
+  }
+
+  handlePlotMouseMove(event) {
+    const {offsetX} = event;
+
+    if (this.isPlotMouseDown) {
+      this.panPlot(event);
+    } else {
+      this.selectScrobbleUnderMouse(event);
     }
+
+    this.plotMouseX = offsetX;
   }
 
   handlePlotWheel(event) {
     event.preventDefault();
-
-    const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
-    const {scrobbleList} = this.props;
-    const {scrobbleCollection} = this.timeline;
-    const {plot} = this.timeline.children;
-    const {offsetX, deltaY} = event;
-    const timeRangeZoomed = this.timeline.plotScales.x.domain();
-
-    const [plotWidth] = plot.getDimensions();
-    const plotWidthPadded = plotWidth - 2 * plotPadding;
-
-    const timeScale = d3Scale.scaleLinear()
-      .domain([0, plotWidthPadded])
-      .rangeRound(timeRangeZoomed);
-
-    const xTimestamp = timeScale(clamp(offsetX - plotPadding, ...timeScale.domain()));
-    const zoomFactor = 1 - deltaY * zoomDeltaFactor;
-    const leftTimeRange = (xTimestamp - timeRangeZoomed[0]) / zoomFactor;
-    const rightTimeRange = (timeRangeZoomed[1] - xTimestamp) / zoomFactor;
-
-    if (leftTimeRange + rightTimeRange < minTimeRange) {
-      return;
-    }
-
-    const leftTimestamp = Math.max(
-      xTimestamp - leftTimeRange,
-      scrobbleCollection.getFirst().timestamp,
-    );
-    const rightTimestamp = Math.min(
-      xTimestamp + rightTimeRange,
-      scrobbleCollection.getLast().timestamp,
-    );
-
-    this.timeline.plotScales.x.domain([
-      leftTimestamp,
-      rightTimestamp,
-    ]);
-
-    this.timeline.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(
-      scrobbleCollection.getPrevious(leftTimestamp).index,
-      scrobbleCollection.getNext(rightTimestamp).index + 1,
-    ));
-
-    this.resetState();
-    this.draw();
-    this.resetUi();
+    this.zoomPlot(event);
   }
 
   handleLegendGenreClick(genre, genreGroup) {

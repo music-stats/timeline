@@ -41,10 +41,21 @@ export default class Timeline {
   }
 
   initializeChildrenComponents() {
-    const {scrobbleList, onPlotMouseMove, onPlotWheel, onLegendGenreClick} = this.props;
+    const {
+      scrobbleList,
+      onPlotMouseDown,
+      onPlotMouseUp,
+      onPlotMouseOut,
+      onPlotMouseMove,
+      onPlotWheel,
+      onLegendGenreClick,
+    } = this.props;
 
     this.children.plot = new PlotInteractive(
       {
+        onMouseDown: onPlotMouseDown,
+        onMouseUp: onPlotMouseUp,
+        onMouseOut: onPlotMouseOut,
         onMouseMove: onPlotMouseMove,
         onWheel: onPlotWheel,
       },

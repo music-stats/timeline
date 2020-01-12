@@ -1,6 +1,6 @@
 {
   "name": "music-stats-timeline",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "visualization of listening habits",
   "main": "src/app.js",
   "scripts": {
