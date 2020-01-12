@@ -12,11 +12,6 @@ export default class TimelineInteractive {
     this.selectedScrobble = null;
     this.scrobbleCollectionHighlighted = new PointCollection();
 
-    this.timeRange = [
-      this.timeline.scrobbleCollection.getFirst().timestamp,
-      this.timeline.scrobbleCollection.getLast().timestamp,
-    ];
-
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
@@ -36,6 +31,13 @@ export default class TimelineInteractive {
   subscribe() {
     window.addEventListener('resize', this.handleWindowResize);
     document.addEventListener('keydown', this.handleDocumentKeydown);
+  }
+
+  resetScales() {
+    const {plot} = this.timeline.children;
+
+    plot.scale();
+    this.timeline.plotScales = this.timeline.getPlotScales();
   }
 
   resetState() {
@@ -225,6 +227,7 @@ export default class TimelineInteractive {
 
     this.windowResizeTimeoutHandle = setTimeout(
       () => {
+        this.resetScales();
         this.resetState();
         this.draw();
         this.resetUi();
@@ -280,9 +283,10 @@ export default class TimelineInteractive {
 
     const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
     const {scrobbleList} = this.props;
-    const {scrobbleCollection, timeRangeZoomed} = this.timeline;
+    const {scrobbleCollection} = this.timeline;
     const {plot} = this.timeline.children;
     const {offsetX, deltaY} = event;
+    const timeRangeZoomed = this.timeline.plotScales.x.domain();
 
     const [plotWidth] = plot.getDimensions();
     const plotWidthPadded = plotWidth - 2 * plotPadding;
@@ -300,18 +304,27 @@ export default class TimelineInteractive {
       return;
     }
 
-    this.timeline.timeRangeZoomed = [
-      Math.max(xTimestamp - leftTimeRange, this.timeRange[0]),
-      Math.min(xTimestamp + rightTimeRange, this.timeRange[1]),
-    ];
+    const leftTimestamp = Math.max(
+      xTimestamp - leftTimeRange,
+      scrobbleCollection.getFirst().timestamp,
+    );
+    const rightTimestamp = Math.min(
+      xTimestamp + rightTimeRange,
+      scrobbleCollection.getLast().timestamp,
+    );
+
+    this.timeline.plotScales.x.domain([
+      leftTimestamp,
+      rightTimestamp,
+    ]);
 
     this.timeline.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(
-      scrobbleCollection.getPrevious(this.timeline.timeRangeZoomed[0]).index,
-      scrobbleCollection.getNext(this.timeline.timeRangeZoomed[1]).index + 1,
+      scrobbleCollection.getPrevious(leftTimestamp).index,
+      scrobbleCollection.getNext(rightTimestamp).index + 1,
     ));
 
     this.resetState();
-    this.draw(false);
+    this.draw();
     this.resetUi();
   }
 
@@ -319,8 +332,8 @@ export default class TimelineInteractive {
     this.selectGenre(genre, genreGroup);
   }
 
-  draw(toRescalePlot = true) {
-    this.timeline.draw(toRescalePlot);
+  draw() {
+    this.timeline.draw();
   }
 
   beforeRender() {

@@ -1,12 +1,20 @@
 export default class SummaryRegistry {
   constructor(scrobbleList) {
     this.registry = {};
+
     this.summary = {
       artistCount: 0,
       albumCount: 0,
       trackCount: 0,
     };
 
+    this.maxArtistPlaycount = 0;
+    this.maxAlbumPlaycount = 0;
+
+    this.initialize(scrobbleList);
+  }
+
+  initialize(scrobbleList) {
     scrobbleList.forEach(({artist, album, track}) => {
       if (!this.registry[artist.name]) {
         // The same track can appear on different albums, so track playcount values are not nested into albums.
@@ -30,15 +38,35 @@ export default class SummaryRegistry {
     this.summary.artistCount = Object.keys(this.registry).length;
 
     for (const artistName in this.registry) {
-      const {albums, tracks} = this.registry[artistName];
+      const {playcount, albums, tracks} = this.registry[artistName];
 
       this.summary.albumCount += Object.keys(albums).length;
       this.summary.trackCount += Object.keys(tracks).length;
+
+      if (playcount > this.maxArtistPlaycount) {
+        this.maxArtistPlaycount = playcount;
+      }
+
+      for (const albumName in albums) {
+        const albumPlaycount = albums[albumName];
+
+        if (albumPlaycount > this.maxAlbumPlaycount) {
+          this.maxAlbumPlaycount = albumPlaycount;
+        }
+      }
     }
   }
 
   getSummary() {
     return this.summary;
+  }
+
+  getMaxArtistPlaycount() {
+    return this.maxArtistPlaycount;
+  }
+
+  getMaxAlbumPlaycount() {
+    return this.maxAlbumPlaycount;
   }
 
   getTotals({artist, album, track}) {
@@ -48,32 +76,6 @@ export default class SummaryRegistry {
       playcount,
       albums[album.name],
       tracks[track.name],
-    ];
-  }
-
-  getMaxPlaycounts() {
-    let maxArtistPlaycount = 0;
-    let maxAlbumPlaycount = 0;
-
-    for (const artistName in this.registry) {
-      const {playcount, albums} = this.registry[artistName];
-
-      if (playcount > maxArtistPlaycount) {
-        maxArtistPlaycount = playcount;
-      }
-
-      for (const albumName in albums) {
-        const albumPlaycount = albums[albumName];
-
-        if (albumPlaycount > maxAlbumPlaycount) {
-          maxAlbumPlaycount = albumPlaycount;
-        }
-      }
-    }
-
-    return [
-      maxArtistPlaycount,
-      maxAlbumPlaycount,
     ];
   }
 }

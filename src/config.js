@@ -65,19 +65,13 @@ export default {
       height: 140,
     },
 
-    scales: {
-      albumPlaycount: {
-        range: [
-          0.8,
-          0.4,
-        ],
-      },
-    },
+    // grey
+    unknownGenreColorRange: ['#525252', '#bdbdbd'],
   },
 
   genreGroups: {
     'Classical': {
-      // grey
+      // light grey
       colorRange: ['#bdbdbd', '#f0f0f0'],
 
       genres: [

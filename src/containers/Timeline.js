@@ -1,5 +1,4 @@
 import * as d3Scale from 'd3-scale';
-import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import * as d3Color from 'd3-color';
 import html from '../lib/html';
 
@@ -36,13 +35,9 @@ export default class Timeline {
     this.scrobbleArtistRegistry = new PointRegistry(({artist: {name}}) => name);
     this.summaryRegistry = new SummaryRegistry(scrobbleList);
 
-    this.scales = {};
+    this.plotScales = {}; // to be initialized after render, since it relies on plot dimensions
+    this.unknownGenreColorScale = this.getUnknownGenreColorScale();
     this.genreGroupColorScales = this.getGenreGroupColorScales();
-
-    this.timeRangeZoomed = [
-      this.scrobbleCollectionZoomed.getFirst().timestamp,
-      this.scrobbleCollectionZoomed.getLast().timestamp,
-    ];
   }
 
   initializeChildrenComponents() {
@@ -95,19 +90,29 @@ export default class Timeline {
     this.children.artistLabelCollection = new ArtistLabelCollection();
   }
 
-  initializeScales() {
+  getPerDayCount() {
+    const {scrobbleList} = this.props;
+    const firstScrobbleTimestamp = this.scrobbleCollection.getFirst().timestamp;
+    const lastScrobbleTimestamp = this.scrobbleCollection.getLast().timestamp;
+    const msInDay = 24 * 60 * 60 * 1000;
+    const dayCount = Math.ceil((lastScrobbleTimestamp - firstScrobbleTimestamp) / msInDay);
+    const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
+
+    return perDayCount;
+  }
+
+  getPlotScales() {
     const {
       timeline: {
         plot: {padding: plotPadding},
         point: {size: scrobbleSize, maxMargin: scrobbleMaxMargin},
         timeAxis: {width: timeAxisWidth},
-        scales: {albumPlaycount: {range: albumPlaycountScaleRange}},
       },
     } = config;
 
     const {plot} = this.children;
     const [width, height] = plot.getDimensions();
-    const [maxArtistPlaycount, maxAlbumPlaycount] = this.summaryRegistry.getMaxPlaycounts();
+    const maxArtistPlaycount = this.summaryRegistry.getMaxArtistPlaycount();
 
     // plot height calculation is ensuring equal vertical gaps between points
     const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
@@ -126,41 +131,38 @@ export default class Timeline {
     }
     const plotTop = plotBottom - plotHeight;
 
-    // X axis
-    this.scales.timeRangeScale = d3Scale.scaleLinear()
-      .domain(this.timeRangeZoomed)
+    const timeRangeScale = d3Scale.scaleLinear()
+      .domain([
+        this.scrobbleCollectionZoomed.getFirst().timestamp,
+        this.scrobbleCollectionZoomed.getLast().timestamp,
+      ])
       .rangeRound([plotPadding, width - plotPadding]);
 
-    // Y axis
-    this.scales.artistPlaycountScale = d3Scale.scaleLinear()
+    const artistPlaycountScale = d3Scale.scaleLinear()
       .domain([1, maxArtistPlaycount])
       .rangeRound([plotBottom, plotTop]);
 
-    // scrobble point color
-    this.scales.albumPlaycountScale = d3Scale.scaleLinear()
-      .domain([1, maxAlbumPlaycount])
-      .range(albumPlaycountScaleRange);
+    return {
+      x: timeRangeScale,
+      y: artistPlaycountScale,
+    };
   }
 
-  getPerDayCount() {
-    const {scrobbleList} = this.props;
-    const firstScrobbleTimestamp = this.scrobbleCollection.getFirst().timestamp;
-    const lastScrobbleTimestamp = this.scrobbleCollection.getLast().timestamp;
-    const msInDay = 24 * 60 * 60 * 1000;
-    const dayCount = Math.ceil((lastScrobbleTimestamp - firstScrobbleTimestamp) / msInDay);
-    const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
+  getUnknownGenreColorScale() {
+    const {timeline: {unknownGenreColorRange}} = config;
 
-    return perDayCount;
+    return d3Scale.scaleSequential()
+      .domain([1, this.summaryRegistry.getMaxAlbumPlaycount()])
+      .range(unknownGenreColorRange);
   }
 
   getGenreGroupColorScales() {
     const {genreGroups} = config;
     const scales = {};
-    const maxAlbumPlaycount = this.summaryRegistry.getMaxPlaycounts()[1];
 
     for (const genreGroup in genreGroups) {
       scales[genreGroup] = d3Scale.scaleSequential()
-        .domain([1, maxAlbumPlaycount])
+        .domain([1, this.summaryRegistry.getMaxAlbumPlaycount()])
         .range(genreGroups[genreGroup].colorRange);
     }
 
@@ -169,12 +171,8 @@ export default class Timeline {
 
   getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, toHighlightGenre = false, toHighlightArtist = false) {
     const {timeline: {point: {colorValueFactors}}} = config;
-    const genreGroupColorScale = this.genreGroupColorScales[genreGroup];
-    const color = d3Color.hsl(
-      genreGroupColorScale
-        ? genreGroupColorScale(playcount)
-        : d3ScaleChromatic.interpolateGreys(this.scales.albumPlaycountScale(playcount)),
-    );
+    const colorScale = this.genreGroupColorScales[genreGroup] || this.unknownGenreColorScale;
+    const color = d3Color.hsl(colorScale(playcount));
 
     if (toHighlightGenre) {
       color.s *= colorValueFactors.genre.saturation;
@@ -193,21 +191,18 @@ export default class Timeline {
     return color;
   }
 
-  draw(toRescalePlot = true) {
+  draw() {
     const {plot, firstScrobbleTimeLabel, lastScrobbleTimeLabel} = this.children;
+    const [plotWidth] = plot.getDimensions();
+    const firstScrobble = this.scrobbleCollectionZoomed.getFirst();
+    const lastScrobble = this.scrobbleCollectionZoomed.getLast();
 
-    // subsequent calls depend on plot dimensions
-    if (toRescalePlot) {
-      plot.scale();
-    }
-
-    this.initializeScales();
     plot.drawBackground();
 
     this.scrobbleCollectionZoomed.getAll().forEach((scrobble) => {
       const {timestamp, artist, album} = scrobble;
-      const x = this.scales.timeRangeScale(timestamp);
-      const y = this.scales.artistPlaycountScale(artist.playcount);
+      const x = this.plotScales.x(timestamp);
+      const y = this.plotScales.y(artist.playcount);
       const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, album.playcount);
       const point = {
         ...scrobble,
@@ -222,13 +217,10 @@ export default class Timeline {
       this.scrobbleArtistRegistry.putPoint(point);
     });
 
-    plot.drawTimeAxis(...this.scales.timeRangeScale.range());
+    plot.drawTimeAxis(...this.plotScales.x.range());
 
-    const [plotWidth] = plot.getDimensions();
-    const firstScrobble = this.scrobbleCollectionZoomed.getFirst();
-    const lastScrobble = this.scrobbleCollectionZoomed.getLast();
-    firstScrobbleTimeLabel.renderText(this.scales.timeRangeScale(firstScrobble.timestamp), plotWidth, firstScrobble.date);
-    lastScrobbleTimeLabel.renderText(this.scales.timeRangeScale(lastScrobble.timestamp), plotWidth, lastScrobble.date);
+    firstScrobbleTimeLabel.renderText(this.plotScales.x(firstScrobble.timestamp), plotWidth, firstScrobble.date);
+    lastScrobbleTimeLabel.renderText(this.plotScales.x(lastScrobble.timestamp), plotWidth, lastScrobble.date);
   }
 
   // things needed for the first render
@@ -238,11 +230,16 @@ export default class Timeline {
 
   // things to initialize after the first render
   afterRender() {
+    const {plot} = this.children;
+
     Object.values(this.children).forEach((child) => {
       if (typeof child.afterRender === 'function') {
         child.afterRender();
       }
     });
+
+    plot.scale();
+    this.plotScales = this.getPlotScales();
   }
 
   render() {
