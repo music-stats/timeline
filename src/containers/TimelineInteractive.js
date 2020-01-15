@@ -230,7 +230,7 @@ export default class TimelineInteractive {
   selectScrobbleUnderMouse(event) {
     const {scrobbleBuffer} = this.timeline;
     const {offsetX: x, offsetY: y} = event;
-    const scrobble = scrobbleBuffer.getPoint(x, y);
+    const scrobble = scrobbleBuffer.getPointWithTolerance(x, y);
 
     if (scrobble) {
       this.selectScrobble(scrobble);

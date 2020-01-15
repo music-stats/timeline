@@ -21,6 +21,14 @@ export default class PointBuffer {
   }
 
   getPoint(x, y) {
+    const yBuffer = this.buffer[y];
+
+    return yBuffer
+      ? yBuffer[x]
+      : undefined;
+  }
+
+  getPointWithTolerance(x, y) {
     const xFrom = x - this.tolerance;
     const xTo = x + this.tolerance;
     const yFrom = y - this.tolerance;
@@ -40,6 +48,6 @@ export default class PointBuffer {
       }
     }
 
-    return null;
+    return undefined;
   }
 }

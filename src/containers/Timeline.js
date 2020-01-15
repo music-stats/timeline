@@ -222,8 +222,16 @@ export default class Timeline {
         color,
       };
 
-      plot.drawPoint(x, y, color);
-      this.scrobbleBuffer.putPoint(point);
+      // checking for a point presence in the buffer
+      // in order not to re-render multiple points with same coords
+      if (!this.scrobbleBuffer.getPoint(x, y)) {
+        plot.drawPoint(x, y, color);
+        this.scrobbleBuffer.putPoint(point);
+      }
+
+      // genre and artist registries are populated with all points
+      // (event if some of them were not rendered)
+      // because these registries are used for highlighting
       this.scrobbleGenreRegistry.putPoint(point);
       this.scrobbleArtistRegistry.putPoint(point);
     });
