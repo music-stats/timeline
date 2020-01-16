@@ -46,7 +46,7 @@ See [scripts supporting the scrobble timeline](https://github.com/music-stats/sc
 ### dev deps
 * linter: [`eslint`](https://eslint.org/)
 * bundler: [`rollup`](https://github.com/rollup/rollup); [`babel`](https://babeljs.io/) + [`uglify-js`](https://github.com/mishoo/UglifyJS2) for prod builds
-* unit tests: TBD
+* unit tests: [`tape`](https://github.com/substack/tape) + [`tap-spec`](https://github.com/scottcorgan/tap-spec) + [`@babel/register`](https://babeljs.io/docs/en/babel-register) + [`ignore-styles`](https://github.com/bkonkle/ignore-styles)
 
 ### deps
 * templates: [`htm`](https://github.com/developit/htm) + [`vhtml`](https://github.com/developit/vhtml)
@@ -59,7 +59,7 @@ Color ranges for genres are picked from Cynthia A. Brewer’s [ColorBrewer](http
 ```bash
 $ npm i                  # install deps
 $ npm run lint           # lint scripts and styles
-# $ npm test               # run unit tests
+$ npm test               # run unit tests
 $ npm run build:dev      # produce a build artifact for local development
 $ npm run build:prod     # produce a minified build artifact for production
 $ npm run serve          # run a local dev server (port: 8000)

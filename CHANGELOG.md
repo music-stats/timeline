@@ -5,13 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.0.3] - 2020-01-16
 ### Changed
 * Bugfix: colors taken not from original but sometimes adjacent points (with tolerance) when highlighting is getting removed.
 * Performance: avoiding redrawing of points with same coords.
 
 ## [0.0.2] - 2020-01-12
 ### Added
-* Panning (horizontal shifting of the plot) - desktop only (no touch events).
+* Feature: panning (horizontal shifting of the plot) - desktop only (no touch events).
 
 ### Changed
 * Performance: avoiding re-rendering of DOM elements when their content doesn't change.
