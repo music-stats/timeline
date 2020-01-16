@@ -2,7 +2,9 @@ import * as d3Scale from 'd3-scale';
 
 import config from '../config';
 import {clamp} from '../utils/number';
-import PointCollection from '../stores/PointCollection';
+
+import Collection from '../stores/Collection';
+import Registry from '../stores/Registry';
 
 export default class TimelineInteractive {
   constructor(props, timeline) {
@@ -10,10 +12,13 @@ export default class TimelineInteractive {
     this.timeline = timeline;
 
     this.selectedScrobble = null;
-    this.scrobbleCollectionHighlighted = new PointCollection();
+    this.pointCollectionHighlighted = new Collection();
+    this.genrePointRegistry = new Registry(({scrobble: {artist: {genre}}}) => genre);
+    this.artistPointRegistry = new Registry(({scrobble: {artist: {name}}}) => name);
     this.isPlotMouseDown = false;
     this.plotMouseX = null;
 
+    this.handleScrobblePointCreate = this.handleScrobblePointCreate.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
     this.handlePlotMouseDown = this.handlePlotMouseDown.bind(this);
@@ -25,6 +30,7 @@ export default class TimelineInteractive {
     Object.assign(
       this.timeline.props,
       {
+        onScrobblePointCreate: this.handleScrobblePointCreate,
         onPlotMouseDown: this.handlePlotMouseDown,
         onPlotMouseUp: this.handlePlotMouseUpOrOut,
         onPlotMouseOut: this.handlePlotMouseUpOrOut,
@@ -48,13 +54,12 @@ export default class TimelineInteractive {
   }
 
   resetState() {
-    const {scrobbleBuffer, scrobbleGenreRegistry, scrobbleArtistRegistry} = this.timeline;
+    const {pointBuffer} = this.timeline;
 
-    scrobbleBuffer.reset();
-    scrobbleGenreRegistry.reset();
-    scrobbleArtistRegistry.reset();
-
-    this.scrobbleCollectionHighlighted.reset();
+    pointBuffer.reset();
+    this.genrePointRegistry.reset();
+    this.artistPointRegistry.reset();
+    this.pointCollectionHighlighted.reset();
     this.selectedScrobble = null;
   }
 
@@ -67,30 +72,23 @@ export default class TimelineInteractive {
     artistLabelCollection.removeAllLabels();
   }
 
-  highlightGenreScrobbleList(genre, genreGroup, artistNameToSkip = null, toRenderArtistLabelCollection = true) {
-    const {scrobbleGenreRegistry} = this.timeline;
+  highlightGenre(genre, genreGroup, artistNameToSkip = null, toRenderArtistLabelCollection = true) {
     const {plot, artistLabelCollection} = this.timeline.children;
-    const genreScrobbleList = scrobbleGenreRegistry.getPointList(genre);
-
-    // there could be no scrobbles for a given genre,
-    // since registry is repopulated when zoomed time range changes
-    if (!genreScrobbleList) {
-      return;
-    }
-
     const [plotWidth] = plot.getDimensions();
     const artistLastPoints = {};
 
-    genreScrobbleList.forEach(({
-      artist: {name: artistName},
-      album: {playcount},
+    this.genrePointRegistry.getItemList(genre).forEach(({
       x,
       y,
+      scrobble: {
+        artist: {name: artistName},
+        album: {playcount},
+      },
     }) => {
       if (artistName !== artistNameToSkip) {
         const color = this.timeline.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true, false);
 
-        this.scrobbleCollectionHighlighted.push({x, y});
+        this.pointCollectionHighlighted.push({x, y});
         artistLastPoints[artistName] = {x, y, color};
         plot.drawPoint(x, y, color);
       }
@@ -104,25 +102,26 @@ export default class TimelineInteractive {
     }
   }
 
-  highlightArtistScrobbleList({index, artist, track}, toRenderArtistLabelCollection = true) {
+  highlightArtist({index, artist, track}, toRenderArtistLabelCollection = true) {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
-    const {scrobbleArtistRegistry} = this.timeline;
     const {plot, selectedScrobbleTimeLabel, artistLabelCollection} = this.timeline.children;
     const [plotWidth] = plot.getDimensions();
     const sameTrackPointList = [];
     let lastPoint = null;
 
-    scrobbleArtistRegistry.getPointList(artist.name).forEach(({
-      index: scrobbleGlobalIndex,
-      date,
-      album: {playcount},
-      track: {name},
+    this.artistPointRegistry.getItemList(artist.name).forEach(({
       x,
       y,
+      scrobble: {
+        index: scrobbleGlobalIndex,
+        date,
+        album: {playcount},
+        track: {name},
+      },
     }) => {
       const color = this.timeline.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, false, true);
 
-      this.scrobbleCollectionHighlighted.push({x, y});
+      this.pointCollectionHighlighted.push({x, y});
       lastPoint = {x, y, color};
 
       // skipping same track scrobbles, those will be rendered after the main loop (to appear on top)
@@ -144,14 +143,14 @@ export default class TimelineInteractive {
     }
   }
 
-  removeScrobbleCollectionHighlight() {
-    const {scrobbleBuffer} = this.timeline;
+  removePointsHighlight() {
+    const {pointBuffer} = this.timeline;
     const {plot} = this.timeline.children;
 
-    this.scrobbleCollectionHighlighted.getAll().forEach(
-      ({x, y}) => plot.drawPoint(x, y, scrobbleBuffer.getPoint(x, y).color),
+    this.pointCollectionHighlighted.getAll().forEach(
+      ({x, y}) => plot.drawPoint(x, y, pointBuffer.getPoint(x, y).color),
     );
-    this.scrobbleCollectionHighlighted.reset();
+    this.pointCollectionHighlighted.reset();
   }
 
   selectGenre(genre, genreGroup) {
@@ -159,23 +158,24 @@ export default class TimelineInteractive {
 
     // clean old
     this.selectedScrobble = null;
-    this.removeScrobbleCollectionHighlight();
+    this.removePointsHighlight();
     this.resetUi();
 
     // show new
-    this.highlightGenreScrobbleList(genre, genreGroup);
+    this.highlightGenre(genre, genreGroup);
     legend.highlightGenre(genre);
   }
 
   selectScrobble(scrobble) {
-    const {summaryRegistry} = this.timeline;
+    const {scrobbleListSummary} = this.timeline;
     const {infoBox, legend, artistLabelCollection} = this.timeline.children;
     const {artist} = scrobble;
     const isNewArtist = !(this.selectedScrobble && this.selectedScrobble.artist.name === artist.name);
 
-    // clean old
     this.selectedScrobble = scrobble;
-    this.removeScrobbleCollectionHighlight();
+
+    // clean old
+    this.removePointsHighlight();
     infoBox.hideIntroMessage();
 
     // there's no need to re-render genre-related labels if selected artist didn't change
@@ -186,7 +186,7 @@ export default class TimelineInteractive {
 
     // show new
     if (artist.genre) {
-      this.highlightGenreScrobbleList(artist.genre, artist.genreGroup, artist.name, isNewArtist);
+      this.highlightGenre(artist.genre, artist.genreGroup, artist.name, isNewArtist);
 
       if (isNewArtist) {
         legend.highlightGenre(artist.genre);
@@ -194,11 +194,11 @@ export default class TimelineInteractive {
     }
 
     // artist scrobbles are rendered on top of genre scrobbles and artist labels
-    this.highlightArtistScrobbleList(scrobble, isNewArtist);
+    this.highlightArtist(scrobble, isNewArtist);
 
     infoBox.renderScrobbleInfo({
       scrobble,
-      totals: summaryRegistry.getTotals(scrobble),
+      totals: scrobbleListSummary.getTotals(scrobble),
     });
   }
 
@@ -228,20 +228,20 @@ export default class TimelineInteractive {
   }
 
   selectScrobbleUnderMouse(event) {
-    const {scrobbleBuffer} = this.timeline;
+    const {pointBuffer} = this.timeline;
     const {offsetX: x, offsetY: y} = event;
-    const scrobble = scrobbleBuffer.getPointWithTolerance(x, y);
+    const point = pointBuffer.getPointWithTolerance(x, y);
 
-    if (scrobble) {
-      this.selectScrobble(scrobble);
+    if (point) {
+      this.selectScrobble(point.scrobble);
     }
   }
 
   panPlot(event) {
-    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
     const {offsetX: x} = event;
-    const minTimestamp = scrobbleCollection.getFirst().timestamp;
-    const maxTimestamp = scrobbleCollection.getLast().timestamp;
+    const minTimestamp = scrobbleCollectionFull.getFirst().timestamp;
+    const maxTimestamp = scrobbleCollectionFull.getLast().timestamp;
 
     const [leftTimestamp, rightTimestamp] = timeRangeScale.domain();
 
@@ -271,7 +271,7 @@ export default class TimelineInteractive {
 
   zoomPlot(event) {
     const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
-    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
     const {plot} = this.timeline.children;
     const {offsetX, deltaY} = event;
     const timeRangeZoomed = timeRangeScale.domain();
@@ -292,11 +292,11 @@ export default class TimelineInteractive {
       this.updatePlotTimeRange(
         Math.max(
           xTimestamp - leftTimeDiff,
-          scrobbleCollection.getFirst().timestamp,
+          scrobbleCollectionFull.getFirst().timestamp,
         ),
         Math.min(
           xTimestamp + rightTimeDiff,
-          scrobbleCollection.getLast().timestamp,
+          scrobbleCollectionFull.getLast().timestamp,
         ),
       );
     }
@@ -304,21 +304,26 @@ export default class TimelineInteractive {
 
   updatePlotTimeRange(leftTimestamp, rightTimestamp) {
     const {scrobbleList} = this.props;
-    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
 
     timeRangeScale.domain([
       leftTimestamp,
       rightTimestamp,
     ]);
 
-    this.timeline.scrobbleCollectionZoomed = new PointCollection(scrobbleList.slice(
-      scrobbleCollection.getPrevious(leftTimestamp).index,
-      scrobbleCollection.getNext(rightTimestamp).index + 1,
+    this.timeline.scrobbleCollectionZoomed = new Collection(scrobbleList.slice(
+      scrobbleCollectionFull.getPrevious(({timestamp}) => timestamp <= leftTimestamp).index,
+      scrobbleCollectionFull.getNext(({timestamp}) => timestamp >= rightTimestamp).index + 1,
     ));
 
     this.resetState();
     this.draw();
     this.resetUi();
+  }
+
+  handleScrobblePointCreate(point) {
+    this.genrePointRegistry.putItem(point);
+    this.artistPointRegistry.putItem(point);
   }
 
   handleWindowResize() {
@@ -349,7 +354,7 @@ export default class TimelineInteractive {
 
   handleEscKeydown() {
     this.selectedScrobble = null;
-    this.removeScrobbleCollectionHighlight();
+    this.removePointsHighlight();
     this.resetUi();
   }
 

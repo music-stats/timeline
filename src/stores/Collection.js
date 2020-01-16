@@ -1,4 +1,4 @@
-export default class PointCollection {
+export default class Collection {
   constructor(list = []) {
     this.list = list;
   }
@@ -7,8 +7,8 @@ export default class PointCollection {
     this.list = [];
   }
 
-  push(point) {
-    this.list.push(point);
+  push(item) {
+    this.list.push(item);
   }
 
   getAll() {
@@ -23,32 +23,32 @@ export default class PointCollection {
     return this.list[this.list.length - 1];
   }
 
-  getNext(timestamp) {
+  getNext(filter) {
     for (let i = 0; i < this.list.length; i += 1) {
-      const point = this.list[i];
+      const item = this.list[i];
 
-      if (point.timestamp >= timestamp) {
-        return point;
+      if (filter(item)) {
+        return item;
       }
     }
 
     return null;
   }
 
-  getPrevious(timestamp) {
+  getPrevious(filter) {
     for (let i = this.list.length - 1; i >= 0; i -= 1) {
-      const point = this.list[i];
+      const item = this.list[i];
 
-      if (point.timestamp <= timestamp) {
-        return point;
+      if (filter(item)) {
+        return item;
       }
     }
 
     return null;
   }
 
-  getAdjacent(point, shift, filter = () => true) {
-    let {index} = point;
+  getAdjacent(item, shift, filter = () => true) {
+    let {index} = item;
     const {index: firstIndex} = this.getFirst();
     const {index: lastIndex} = this.getLast();
     const stepCondition = shift > 0
@@ -57,10 +57,10 @@ export default class PointCollection {
 
     while (stepCondition()) {
       index += shift;
-      const adjacentPoint = this.list.find(({index: i}) => i === index);
+      const adjacentItem = this.list.find(({index: i}) => i === index);
 
-      if (adjacentPoint && filter(adjacentPoint)) {
-        return adjacentPoint;
+      if (adjacentItem && filter(adjacentItem)) {
+        return adjacentItem;
       }
     }
 

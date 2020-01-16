@@ -1,8 +1,8 @@
-export default class SummaryRegistry {
+export default class ScrobbleListSummary {
   constructor(scrobbleList) {
     this.registry = {};
 
-    this.summary = {
+    this.counts = {
       artistCount: 0,
       albumCount: 0,
       trackCount: 0,
@@ -35,13 +35,13 @@ export default class SummaryRegistry {
       this.registry[artist.name].tracks[track.name] = track.playcount;
     });
 
-    this.summary.artistCount = Object.keys(this.registry).length;
+    this.counts.artistCount = Object.keys(this.registry).length;
 
     for (const artistName in this.registry) {
       const {playcount, albums, tracks} = this.registry[artistName];
 
-      this.summary.albumCount += Object.keys(albums).length;
-      this.summary.trackCount += Object.keys(tracks).length;
+      this.counts.albumCount += Object.keys(albums).length;
+      this.counts.trackCount += Object.keys(tracks).length;
 
       if (playcount > this.maxArtistPlaycount) {
         this.maxArtistPlaycount = playcount;
@@ -57,8 +57,8 @@ export default class SummaryRegistry {
     }
   }
 
-  getSummary() {
-    return this.summary;
+  getCounts() {
+    return this.counts;
   }
 
   getMaxArtistPlaycount() {

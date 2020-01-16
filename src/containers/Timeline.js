@@ -4,10 +4,9 @@ import html from '../lib/html';
 
 import config from '../config';
 
-import PointCollection from '../stores/PointCollection';
+import Collection from '../stores/Collection';
 import PointBuffer from '../stores/PointBuffer';
-import PointRegistry from '../stores/PointRegistry';
-import SummaryRegistry from '../stores/SummaryRegistry';
+import ScrobbleListSummary from '../stores/ScrobbleListSummary';
 
 import Plot from '../components/Plot';
 import PlotInteractive from '../components/PlotInteractive';
@@ -28,12 +27,10 @@ export default class Timeline {
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
 
-    this.scrobbleCollection = new PointCollection(scrobbleList);
-    this.scrobbleCollectionZoomed = new PointCollection(scrobbleList);
-    this.scrobbleBuffer = new PointBuffer(this.scrobbleHalfSize);
-    this.scrobbleGenreRegistry = new PointRegistry(({artist: {genre}}) => genre);
-    this.scrobbleArtistRegistry = new PointRegistry(({artist: {name}}) => name);
-    this.summaryRegistry = new SummaryRegistry(scrobbleList);
+    this.scrobbleCollectionFull = new Collection(scrobbleList);
+    this.scrobbleCollectionZoomed = new Collection(scrobbleList);
+    this.pointBuffer = new PointBuffer(this.scrobbleHalfSize);
+    this.scrobbleListSummary = new ScrobbleListSummary(scrobbleList);
 
     this.plotScales = {}; // to be initialized after render, since it relies on plot dimensions
     this.unknownGenreColorScale = this.getUnknownGenreColorScale();
@@ -66,11 +63,11 @@ export default class Timeline {
 
     this.children.infoBox = new InfoBox({
       dates: {
-        firstScrobbleDate: this.scrobbleCollection.getFirst().date,
-        lastScrobbleDate: this.scrobbleCollection.getLast().date,
+        firstScrobbleDate: this.scrobbleCollectionFull.getFirst().date,
+        lastScrobbleDate: this.scrobbleCollectionFull.getLast().date,
       },
       counts: {
-        ...this.summaryRegistry.getSummary(),
+        ...this.scrobbleListSummary.getCounts(),
         scrobbleCount: scrobbleList.length,
         perDayCount: this.getPerDayCount(),
       },
@@ -103,8 +100,8 @@ export default class Timeline {
 
   getPerDayCount() {
     const {scrobbleList} = this.props;
-    const firstScrobbleTimestamp = this.scrobbleCollection.getFirst().timestamp;
-    const lastScrobbleTimestamp = this.scrobbleCollection.getLast().timestamp;
+    const firstScrobbleTimestamp = this.scrobbleCollectionFull.getFirst().timestamp;
+    const lastScrobbleTimestamp = this.scrobbleCollectionFull.getLast().timestamp;
     const msInDay = 24 * 60 * 60 * 1000;
     const dayCount = Math.ceil((lastScrobbleTimestamp - firstScrobbleTimestamp) / msInDay);
     const perDayCount = Math.round(10 * scrobbleList.length / dayCount) / 10;
@@ -123,7 +120,7 @@ export default class Timeline {
 
     const {plot} = this.children;
     const [width, height] = plot.getDimensions();
-    const maxArtistPlaycount = this.summaryRegistry.getMaxArtistPlaycount();
+    const maxArtistPlaycount = this.scrobbleListSummary.getMaxArtistPlaycount();
 
     // plot height calculation is ensuring equal vertical gaps between points
     const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
@@ -163,7 +160,7 @@ export default class Timeline {
     const {timeline: {unknownGenreColorRange}} = config;
 
     return d3Scale.scaleSequential()
-      .domain([1, this.summaryRegistry.getMaxAlbumPlaycount()])
+      .domain([1, this.scrobbleListSummary.getMaxAlbumPlaycount()])
       .range(unknownGenreColorRange);
   }
 
@@ -173,7 +170,7 @@ export default class Timeline {
 
     for (const genreGroup in genreGroups) {
       scales[genreGroup] = d3Scale.scaleSequential()
-        .domain([1, this.summaryRegistry.getMaxAlbumPlaycount()])
+        .domain([1, this.scrobbleListSummary.getMaxAlbumPlaycount()])
         .range(genreGroups[genreGroup].colorRange);
     }
 
@@ -203,6 +200,7 @@ export default class Timeline {
   }
 
   draw() {
+    const {onScrobblePointCreate} = this.props;
     const {plot, firstScrobbleTimeLabel, lastScrobbleTimeLabel} = this.children;
     const [plotWidth] = plot.getDimensions();
     const firstScrobble = this.scrobbleCollectionZoomed.getFirst();
@@ -216,24 +214,20 @@ export default class Timeline {
       const y = this.plotScales.y(artist.playcount);
       const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, album.playcount);
       const point = {
-        ...scrobble,
         x,
         y,
         color,
+        scrobble,
       };
 
       // checking for a point presence in the buffer
       // in order not to re-render multiple points with same coords
-      if (!this.scrobbleBuffer.getPoint(x, y)) {
+      if (!this.pointBuffer.getPoint(x, y)) {
         plot.drawPoint(x, y, color);
-        this.scrobbleBuffer.putPoint(point);
+        this.pointBuffer.putPoint(point);
       }
 
-      // genre and artist registries are populated with all points
-      // (event if some of them were not rendered)
-      // because these registries are used for highlighting
-      this.scrobbleGenreRegistry.putPoint(point);
-      this.scrobbleArtistRegistry.putPoint(point);
+      onScrobblePointCreate(point);
     });
 
     plot.drawTimeAxis(...this.plotScales.x.range());

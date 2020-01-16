@@ -1,4 +1,4 @@
-export default class PointRegistry {
+export default class Registry {
   constructor(getKey) {
     this.getKey = getKey;
     this.registry = {};
@@ -8,8 +8,8 @@ export default class PointRegistry {
     this.registry = {};
   }
 
-  putPoint(point) {
-    const key = this.getKey(point);
+  putItem(item) {
+    const key = this.getKey(item);
 
     if (!key) {
       return;
@@ -19,10 +19,10 @@ export default class PointRegistry {
       this.registry[key] = [];
     }
 
-    this.registry[key].push(point);
+    this.registry[key].push(item);
   }
 
-  getPointList(key) {
-    return this.registry[key];
+  getItemList(key) {
+    return this.registry[key] || [];
   }
 }
