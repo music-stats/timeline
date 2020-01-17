@@ -7,7 +7,6 @@ import './ArtistLabelCollection.css';
 export default class ArtistLabelCollection {
   constructor() {
     this.element = null;
-    this.labelElementList = [];
     this.highlightedLabelElement = null;
   }
 
@@ -16,8 +15,7 @@ export default class ArtistLabelCollection {
   }
 
   removeAllLabels() {
-    this.labelElementList.forEach((labelElement) => labelElement.remove());
-    this.labelElementList = [];
+    this.element.innerHTML = '';
     this.highlightedLabelElement = null;
   }
 
@@ -49,7 +47,6 @@ export default class ArtistLabelCollection {
       this.highlightedLabelElement = labelElement;
     }
 
-    this.labelElementList.push(labelElement);
     this.element.appendChild(labelElement);
 
     // text must be rendered (added to DOM) before "offsetWidth" is measured

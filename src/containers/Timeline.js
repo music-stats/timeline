@@ -3,6 +3,7 @@ import * as d3Color from 'd3-color';
 import html from '../lib/html';
 
 import config from '../config';
+import {timestampToDateTimeString} from '../utils/date';
 
 import Collection from '../stores/Collection';
 import PointBuffer from '../stores/PointBuffer';
@@ -75,10 +76,10 @@ export default class Timeline {
 
     this.children.externalLinks = new ExternalLinks();
 
-    this.children.firstScrobbleTimeLabel = new TimeAxisLabel({
+    this.children.leftTimeLabel = new TimeAxisLabel({
       id: 'first-scrobble-time-label',
     });
-    this.children.lastScrobbleTimeLabel = new TimeAxisLabel({
+    this.children.rightTimeLabel = new TimeAxisLabel({
       id: 'last-scrobble-time-label',
     });
     this.children.selectedScrobbleTimeLabel = new TimeAxisLabel({
@@ -201,10 +202,10 @@ export default class Timeline {
 
   draw() {
     const {onScrobblePointCreate} = this.props;
-    const {plot, firstScrobbleTimeLabel, lastScrobbleTimeLabel} = this.children;
+    const {plot, leftTimeLabel, rightTimeLabel} = this.children;
     const [plotWidth] = plot.getDimensions();
-    const firstScrobble = this.scrobbleCollectionZoomed.getFirst();
-    const lastScrobble = this.scrobbleCollectionZoomed.getLast();
+    const [leftTimestamp, rightTimestamp] = this.plotScales.x.domain();
+    const [leftX, rightX] = this.plotScales.x.range();
 
     plot.drawBackground();
 
@@ -230,10 +231,10 @@ export default class Timeline {
       onScrobblePointCreate(point);
     });
 
-    plot.drawTimeAxis(...this.plotScales.x.range());
+    plot.drawTimeAxis(leftX, rightX);
 
-    firstScrobbleTimeLabel.renderText(this.plotScales.x(firstScrobble.timestamp), plotWidth, firstScrobble.date);
-    lastScrobbleTimeLabel.renderText(this.plotScales.x(lastScrobble.timestamp), plotWidth, lastScrobble.date);
+    leftTimeLabel.renderText(leftX, plotWidth, timestampToDateTimeString(leftTimestamp));
+    rightTimeLabel.renderText(rightX, plotWidth, timestampToDateTimeString(rightTimestamp));
   }
 
   // things needed for the first render

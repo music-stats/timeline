@@ -2,6 +2,7 @@ import * as d3Scale from 'd3-scale';
 
 import config from '../config';
 import {clamp} from '../utils/number';
+import {timestampToDateTimeString} from '../utils/date';
 
 import Collection from '../stores/Collection';
 import Registry from '../stores/Registry';
@@ -114,7 +115,7 @@ export default class TimelineInteractive {
       y,
       scrobble: {
         index: scrobbleGlobalIndex,
-        date,
+        timestamp,
         album: {playcount},
         track: {name},
       },
@@ -132,7 +133,7 @@ export default class TimelineInteractive {
       }
 
       if (scrobbleGlobalIndex === index) {
-        selectedScrobbleTimeLabel.renderText(x, plotWidth, date);
+        selectedScrobbleTimeLabel.renderText(x, plotWidth, timestampToDateTimeString(timestamp));
       }
     });
 
@@ -202,11 +203,11 @@ export default class TimelineInteractive {
     });
   }
 
-  selectVerticallyAdjacentScrobble(scrobble, shift) {
+  selectVerticallyAdjacentScrobble(shift) {
     const {scrobbleCollectionZoomed} = this.timeline;
 
-    if (scrobble) {
-      const adjacentScrobble = scrobbleCollectionZoomed.getAdjacent(scrobble, shift);
+    if (this.selectedScrobble) {
+      const adjacentScrobble = scrobbleCollectionZoomed.getAdjacent(this.selectedScrobble, shift);
 
       if (adjacentScrobble) {
         this.selectScrobble(adjacentScrobble);
@@ -214,12 +215,12 @@ export default class TimelineInteractive {
     }
   }
 
-  selectHorizontallyAdjacentScrobble(scrobble, shift) {
+  selectHorizontallyAdjacentScrobble(shift) {
     const {scrobbleCollectionZoomed} = this.timeline;
 
-    if (scrobble) {
-      const filter = ({artist: {playcount}}) => playcount === scrobble.artist.playcount;
-      const adjacentScrobble = scrobbleCollectionZoomed.getAdjacent(scrobble, shift, filter);
+    if (this.selectedScrobble) {
+      const filter = ({artist: {playcount}}) => playcount === this.selectedScrobble.artist.playcount;
+      const adjacentScrobble = scrobbleCollectionZoomed.getAdjacent(this.selectedScrobble, shift, filter);
 
       if (adjacentScrobble) {
         this.selectScrobble(adjacentScrobble);
@@ -232,7 +233,7 @@ export default class TimelineInteractive {
     const {offsetX: x, offsetY: y} = event;
     const point = pointBuffer.getPointWithTolerance(x, y);
 
-    if (point) {
+    if (point && point.scrobble !== this.selectedScrobble) {
       this.selectScrobble(point.scrobble);
     }
   }
@@ -305,6 +306,8 @@ export default class TimelineInteractive {
   updatePlotTimeRange(leftTimestamp, rightTimestamp) {
     const {scrobbleList} = this.props;
     const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
+    const leftScrobble = scrobbleCollectionFull.getNext(({timestamp}) => timestamp >= leftTimestamp);
+    const rightScrobble = scrobbleCollectionFull.getPrevious(({timestamp}) => timestamp <= rightTimestamp);
 
     timeRangeScale.domain([
       leftTimestamp,
@@ -312,8 +315,8 @@ export default class TimelineInteractive {
     ]);
 
     this.timeline.scrobbleCollectionZoomed = new Collection(scrobbleList.slice(
-      scrobbleCollectionFull.getPrevious(({timestamp}) => timestamp <= leftTimestamp).index,
-      scrobbleCollectionFull.getNext(({timestamp}) => timestamp >= rightTimestamp).index + 1,
+      leftScrobble.index,
+      rightScrobble.index + 1,
     ));
 
     this.resetState();
@@ -345,10 +348,10 @@ export default class TimelineInteractive {
   handleDocumentKeydown(event) {
     switch (event.key) {
       case 'Escape': return this.handleEscKeydown();
-      case 'ArrowDown': return this.handleArrowDownKeydown();
-      case 'ArrowUp': return this.handleArrowUpKeydown();
-      case 'ArrowLeft': return this.handleArrowLeftKeydown();
-      case 'ArrowRight': return this.handleArrowRightKeydown();
+      case 'ArrowDown': return this.selectVerticallyAdjacentScrobble(-1);
+      case 'ArrowUp': return this.selectVerticallyAdjacentScrobble(1);
+      case 'ArrowLeft': return this.selectHorizontallyAdjacentScrobble(-1);
+      case 'ArrowRight': return this.selectHorizontallyAdjacentScrobble(1);
     }
   }
 
@@ -356,22 +359,6 @@ export default class TimelineInteractive {
     this.selectedScrobble = null;
     this.removePointsHighlight();
     this.resetUi();
-  }
-
-  handleArrowDownKeydown() {
-    this.selectVerticallyAdjacentScrobble(this.selectedScrobble, -1);
-  }
-
-  handleArrowUpKeydown() {
-    this.selectVerticallyAdjacentScrobble(this.selectedScrobble, 1);
-  }
-
-  handleArrowLeftKeydown() {
-    this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, -1);
-  }
-
-  handleArrowRightKeydown() {
-    this.selectHorizontallyAdjacentScrobble(this.selectedScrobble, 1);
   }
 
   handlePlotMouseDown() {

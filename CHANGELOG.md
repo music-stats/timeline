@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2020-01-17
+### Changed
+* Bugfix: zoomed scrobbles collection contains extra scrobbles outside of zoomed time range.
+* Bugfix: time axis labels show time of those extra scrobbles, not actual time range.
+* Performance: avoiding reselecting of the same scrobble on mouse move.
+* Performance: cleanup artist labels all at once.
+
 ## [0.0.3] - 2020-01-16
 ### Changed
 * Bugfix: colors taken not from original but sometimes adjacent points (with tolerance) when highlighting is getting removed.
