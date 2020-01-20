@@ -200,6 +200,17 @@ export default class Timeline {
     return color;
   }
 
+  createScrobblePoint(scrobble) {
+    const {timestamp, artist, album} = scrobble;
+
+    return {
+      x: this.plotScales.x(timestamp),
+      y: this.plotScales.y(artist.playcount),
+      color: this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, album.playcount),
+      scrobble,
+    };
+  }
+
   draw() {
     const {onScrobblePointCreate} = this.props;
     const {plot, leftTimeLabel, rightTimeLabel} = this.children;
@@ -210,26 +221,20 @@ export default class Timeline {
     plot.drawBackground();
 
     this.scrobbleCollectionZoomed.getAll().forEach((scrobble) => {
-      const {timestamp, artist, album} = scrobble;
-      const x = this.plotScales.x(timestamp);
-      const y = this.plotScales.y(artist.playcount);
-      const color = this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, album.playcount);
-      const point = {
-        x,
-        y,
-        color,
-        scrobble,
-      };
+      const point = this.createScrobblePoint(scrobble);
 
-      // checking for a point presence in the buffer
-      // in order not to re-render multiple points with same coords
-      if (!this.pointBuffer.getPoint(x, y)) {
-        plot.drawPoint(x, y, color);
-        this.pointBuffer.putPoint(point);
-      }
+      // Points with same coords are getting overridden in the buffer and drawn outside of this loop.
+      // This allows to avoid flickering during zooming, because newer points always win.
+      this.pointBuffer.putPoint(point);
 
+      // However, the "onScrobblePointCreate()" callback is called on every point,
+      // regardless if it remains in the buffer.
+      // This allows to store them elsewhere for accessing on user interaction
+      // (e.g. highlighting all points with a given artist).
       onScrobblePointCreate(point);
     });
+
+    this.pointBuffer.forEachPoint((x, y, {color}) => plot.drawPoint(x, y, color));
 
     plot.drawTimeAxis(leftX, rightX);
 

@@ -8,6 +8,16 @@ export default class PointBuffer {
     this.buffer = {};
   }
 
+  forEachPoint(callback) {
+    for (const yi in this.buffer) {
+      const yiBuffer = this.buffer[yi];
+
+      for (const xj in yiBuffer) {
+        callback(xj, yi, yiBuffer[xj]);
+      }
+    }
+  }
+
   putPoint({x, y, ...point}) {
     // y-coord is the first lookup index
     // because in ".getPoint()" it's faster to locate "buffer[y]" entries (rows)
@@ -35,11 +45,11 @@ export default class PointBuffer {
     const yTo = y + this.tolerance;
 
     for (let yi = yFrom; yi <= yTo; yi += 1) {
-      const yBuffer = this.buffer[yi];
+      const yiBuffer = this.buffer[yi];
 
-      if (yBuffer) {
+      if (yiBuffer) {
         for (let xj = xFrom; xj <= xTo; xj += 1) {
-          const point = yBuffer[xj];
+          const point = yiBuffer[xj];
 
           if (point) {
             return point;
