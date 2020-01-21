@@ -306,8 +306,8 @@ export default class TimelineInteractive {
   updatePlotTimeRange(leftTimestamp, rightTimestamp) {
     const {scrobbleList} = this.props;
     const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
-    const leftScrobble = scrobbleCollectionFull.getNext(({timestamp}) => timestamp >= leftTimestamp);
-    const rightScrobble = scrobbleCollectionFull.getPrevious(({timestamp}) => timestamp <= rightTimestamp);
+    const leftScrobble = scrobbleCollectionFull.findFirst(({timestamp}) => timestamp >= leftTimestamp);
+    const rightScrobble = scrobbleCollectionFull.findLast(({timestamp}) => timestamp <= rightTimestamp);
 
     timeRangeScale.domain([
       leftTimestamp,

@@ -38,9 +38,9 @@ export default class Legend {
 
   setGenreElementsHeight() {
     for (let i = 0; i < this.genreElementCollection.length; i += 1) {
+      const genreElement = this.genreElementCollection[i];
       const {playcount} = this.genreList[i];
       const height = Math.max(this.heightScale(playcount), 1);
-      const genreElement = this.genreElementCollection[i];
 
       genreElement.style.height = `${height}px`;
     }

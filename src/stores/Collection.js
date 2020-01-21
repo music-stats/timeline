@@ -23,19 +23,11 @@ export default class Collection {
     return this.list[this.list.length - 1];
   }
 
-  getNext(filter) {
-    for (let i = 0; i < this.list.length; i += 1) {
-      const item = this.list[i];
-
-      if (filter(item)) {
-        return item;
-      }
-    }
-
-    return null;
+  findFirst(filter) {
+    return this.list.find(filter);
   }
 
-  getPrevious(filter) {
+  findLast(filter) {
     for (let i = this.list.length - 1; i >= 0; i -= 1) {
       const item = this.list[i];
 
@@ -44,7 +36,7 @@ export default class Collection {
       }
     }
 
-    return null;
+    return undefined;
   }
 
   getAdjacent(item, shift, filter = () => true) {
@@ -64,6 +56,6 @@ export default class Collection {
       }
     }
 
-    return null;
+    return undefined;
   }
 }

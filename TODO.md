@@ -1,4 +1,9 @@
-* redistribute artist labels vertically so they don't collide
-* update summary numbers/links when zoomed range changes
-* add a scale to the time axis (showing months/weeks/days), update it when zoomed range changes
-* support zooming and panning on mobile devices via touch events, but don't zoom and pan simultaneously
+# TODO
+## Performance improvements
+* Use sliding indices instead of recreating the `scrobbleCollectionZoomed` on zooming/panning.
+
+## Features
+* Redistribute artist labels vertically so they don't collide.
+* Add a scale to the time axis (showing months/weeks/days), update it when zoomed range changes.
+* Update summary numbers/links when zoomed range changes.
+* Support zooming and panning on mobile devices via touch events, but don't zoom and pan simultaneously.
