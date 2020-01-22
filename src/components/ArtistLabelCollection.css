@@ -13,8 +13,20 @@
   font-size: var(--font-size-normal);
 }
 
+.ArtistLabelCollection__label--highlighted {
+  z-index: 1;
+  padding: 2px 4px 4px;
+  line-height: 1;
+  font-weight: bold;
+  background-color: var(--color-white-semitransparent);
+}
+
 @media all and (max-width: 400px) {
   .ArtistLabelCollection__label {
     font-size: var(--font-size-small);
+  }
+
+  .ArtistLabelCollection__label--highlighted {
+    padding: 1px 3px;
   }
 }

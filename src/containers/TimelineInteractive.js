@@ -19,32 +19,23 @@ export default class TimelineInteractive {
     this.isPlotMouseDown = false;
     this.plotMouseX = null;
 
-    this.handleScrobblePointCreate = this.handleScrobblePointCreate.bind(this);
-    this.handleWindowResize = this.handleWindowResize.bind(this);
-    this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
-    this.handlePlotMouseDown = this.handlePlotMouseDown.bind(this);
-    this.handlePlotMouseUpOrOut = this.handlePlotMouseUpOrOut.bind(this);
-    this.handlePlotMouseMove = this.handlePlotMouseMove.bind(this);
-    this.handlePlotWheel = this.handlePlotWheel.bind(this);
-    this.handleLegendGenreClick = this.handleLegendGenreClick.bind(this);
-
     Object.assign(
       this.timeline.props,
       {
-        onScrobblePointCreate: this.handleScrobblePointCreate,
-        onPlotMouseDown: this.handlePlotMouseDown,
-        onPlotMouseUp: this.handlePlotMouseUpOrOut,
-        onPlotMouseOut: this.handlePlotMouseUpOrOut,
-        onPlotMouseMove: this.handlePlotMouseMove,
-        onPlotWheel: this.handlePlotWheel,
-        onLegendGenreClick: this.handleLegendGenreClick,
+        onScrobblePointCreate: this.handleScrobblePointCreate.bind(this),
+        onPlotMouseDown: this.handlePlotMouseDown.bind(this),
+        onPlotMouseUp: this.handlePlotMouseUpOrOut.bind(this),
+        onPlotMouseOut: this.handlePlotMouseUpOrOut.bind(this),
+        onPlotMouseMove: this.handlePlotMouseMove.bind(this),
+        onPlotWheel: this.handlePlotWheel.bind(this),
+        onLegendGenreMouseEnter: this.handleLegendGenreMouseEnter.bind(this),
       },
     );
   }
 
   subscribe() {
-    window.addEventListener('resize', this.handleWindowResize);
-    document.addEventListener('keydown', this.handleDocumentKeydown);
+    window.addEventListener('resize', this.handleWindowResize.bind(this));
+    document.addEventListener('keydown', this.handleDocumentKeydown.bind(this));
   }
 
   resetScales() {
@@ -361,8 +352,13 @@ export default class TimelineInteractive {
     this.resetUi();
   }
 
-  handlePlotMouseDown() {
-    this.isPlotMouseDown = true;
+  handlePlotMouseDown(event) {
+    const {button} = event;
+
+    // main button (usually the left button)
+    if (button === 0) {
+      this.isPlotMouseDown = true;
+    }
   }
 
   handlePlotMouseUpOrOut() {
@@ -386,7 +382,7 @@ export default class TimelineInteractive {
     this.zoomPlot(event);
   }
 
-  handleLegendGenreClick(genre, genreGroup) {
+  handleLegendGenreMouseEnter(genre, genreGroup) {
     this.selectGenre(genre, genreGroup);
   }
 

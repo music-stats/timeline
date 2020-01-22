@@ -5,11 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
 * Bugfix: adjacent points flicker during zooming when their x-coords change from same to different and back (introduced by `v0.0.3`).
+* Improvement: genres selection on mouse enter instead of on click (consistent with scrobbles selection).
+* Improvement: selected artist label is more recognizable because of background color.
 
 ## [0.0.4] - 2020-01-17
 ### Changed
-* Bugfix: zoomed scrobbles collection contains extra scrobbles outside of zoomed time range.
+* Bugfix: zoomed scrobbles collection contains one extra scrobble out of each side of zoomed time range.
 * Bugfix: time axis labels show time of those extra scrobbles, not actual time range.
 * Performance: avoiding reselecting of the same scrobble on mouse move.
 * Performance: cleanup artist labels all at once.

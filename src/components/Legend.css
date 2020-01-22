@@ -15,7 +15,7 @@
   transition-delay: 200ms;
 }
 
-.Legend__genre--highlight {
+.Legend__genre--highlighted {
   transform: rotate(-4deg) scaleX(1.2);
   transform-origin: top center;
   z-index: 1;
@@ -34,10 +34,6 @@
   transform: rotate(90deg) translateY(-50%);
   transform-origin: top left;
   cursor: default;
-}
-
-.Legend__genre:hover:not(.Legend__genre--highlight) .Legend__genre-caption {
-  color: var(--color-light-grey-3);
 }
 
 @media all and (min-width: 800px) {

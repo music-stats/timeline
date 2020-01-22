@@ -30,20 +30,12 @@ export default class ArtistLabelCollection {
     labelElement.classList.add('ArtistLabelCollection__label');
     labelElement.innerText = value;
 
-    Object.assign(
-      labelElement.style,
-      {
-        top: `${y}px`,
-        color: color,
-      },
-    );
-
     if (isHighlighted) {
       if (this.highlightedLabelElement) {
-        this.highlightedLabelElement.remove();
+        this.highlightedLabelElement.classList.remove('ArtistLabelCollection__label--highlighted');
       }
 
-      labelElement.style.fontWeight = 'bold';
+      labelElement.classList.add('ArtistLabelCollection__label--highlighted');
       this.highlightedLabelElement = labelElement;
     }
 
@@ -70,8 +62,10 @@ export default class ArtistLabelCollection {
     Object.assign(
       labelElement.style,
       {
+        top: `${y}px`,
         left,
         right,
+        color,
       },
     );
   }

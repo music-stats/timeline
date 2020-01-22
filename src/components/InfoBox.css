@@ -1,7 +1,7 @@
 .InfoBox {
   position: absolute;
   /* "z-index" should be greater than the one for ".ArtistLabelCollection" */
-  z-index: 1;
+  z-index: 2;
   top: 0;
   left: 0;
   /* allows the canvas to receive mouse events under the info box */

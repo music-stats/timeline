@@ -46,7 +46,7 @@ export default class Timeline {
       onPlotMouseOut,
       onPlotMouseMove,
       onPlotWheel,
-      onLegendGenreClick,
+      onLegendGenreMouseEnter,
     } = this.props;
 
     this.children.plot = new PlotInteractive(
@@ -89,7 +89,7 @@ export default class Timeline {
 
     this.children.legend = new LegendInteractive(
       {
-        onGenreClick: onLegendGenreClick,
+        onGenreMouseEnter: onLegendGenreMouseEnter,
       },
       new Legend({
         scrobbleList,

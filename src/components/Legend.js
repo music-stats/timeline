@@ -13,8 +13,6 @@ export default class Legend {
     this.genreElementCollection = [];
     this.genreList = getGenreSortedList(props.scrobbleList);
     this.heightScale = this.getHeightScale();
-
-    this.setGenreElementsHeight = this.setGenreElementsHeight.bind(this);
   }
 
   initializeElements() {
@@ -33,7 +31,7 @@ export default class Legend {
 
   afterRender() {
     this.initializeElements();
-    requestAnimationFrame(this.setGenreElementsHeight);
+    requestAnimationFrame(this.setGenreElementsHeight.bind(this));
   }
 
   setGenreElementsHeight() {

@@ -12,6 +12,7 @@ body {
   --color-light-grey-4: #f8f8f8;
   --color-light-blue: #1d91c0;
   --color-white: #fff;
+  --color-white-semitransparent: rgba(255, 255, 255, 0.2);
 
   --font-size-root: 0.95em;
   --font-size-normal: 0.625rem;

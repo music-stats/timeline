@@ -6,14 +6,14 @@ export default class LegendInteractive {
   }
 
   subscribe() {
-    const {onGenreClick} = this.props;
+    const {onGenreMouseEnter} = this.props;
     const {genreElementCollection, genreList} = this.legend;
 
     for (let i = 0; i < genreElementCollection.length; i += 1) {
       const genreElement = genreElementCollection[i];
       const {name, group} = genreList[i];
 
-      genreElement.addEventListener('click', () => onGenreClick(name, group));
+      genreElement.addEventListener('mouseenter', () => onGenreMouseEnter(name, group));
     }
   }
 
@@ -23,7 +23,7 @@ export default class LegendInteractive {
     const genreElement = genreElementCollection[genreIndex];
     const {highlightedColor} = genreList[genreIndex];
 
-    genreElement.classList.add('Legend__genre--highlight');
+    genreElement.classList.add('Legend__genre--highlighted');
     genreElement.style.backgroundColor = highlightedColor;
 
     this.highlightedGenreIndex = genreIndex;
@@ -35,7 +35,7 @@ export default class LegendInteractive {
       const genreElement = genreElementCollection[this.highlightedGenreIndex];
       const {color} = genreList[this.highlightedGenreIndex];
 
-      genreElement.classList.remove('Legend__genre--highlight');
+      genreElement.classList.remove('Legend__genre--highlighted');
       genreElement.style.backgroundColor = color;
 
       this.highlightedGenreIndex = null;
