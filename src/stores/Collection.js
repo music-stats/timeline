@@ -7,8 +7,8 @@ export default class Collection {
     this.list = [];
   }
 
-  push(item) {
-    this.list.push(item);
+  push(...items) {
+    return this.list.push(...items);
   }
 
   getAll() {
