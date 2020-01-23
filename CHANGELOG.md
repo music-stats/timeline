@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.0] - 2020-01-23
 ### Changed
+* Feature: artist labels are distributed vertically to avoid collisions.
 * Bugfix: adjacent points flicker during zooming when their x-coords change from same to different and back (introduced by `v0.0.3`).
 * Improvement: genres selection on mouse enter instead of on click (consistent with scrobbles selection).
 * Improvement: selected artist label is more recognizable because of background color.

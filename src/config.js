@@ -56,6 +56,11 @@ export default {
       },
     },
 
+    labels: {
+      areaPadding: 4,
+      margin: 1,
+    },
+
     timeAxis: {
       width: 2,
       color: cssColors.darkGrey2,
