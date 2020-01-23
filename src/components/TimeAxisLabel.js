@@ -39,12 +39,12 @@ export default class TimeAxisLabel {
     this.element.innerText = '';
   }
 
-  renderText(x, canvasWidth, value) {
+  renderText(x, text, areaWidth) {
     const {timeline: {point: {size: padding}}} = config;
 
-    this.element.innerText = value;
+    this.element.innerText = text;
 
-    // text must be rendered before the "offsetWidth" is measured
+    // text must be rendered (added to DOM) before element dimensions are measured
     const halfWidth = Math.ceil(this.element.offsetWidth / 2);
 
     const [left, right] = (() => {
@@ -54,7 +54,7 @@ export default class TimeAxisLabel {
       }
 
       // stick to right
-      if (x + halfWidth > canvasWidth - padding) {
+      if (x + halfWidth > areaWidth - padding) {
         return ['auto', `${padding}px`];
       }
 

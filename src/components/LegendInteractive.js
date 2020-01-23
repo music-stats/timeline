@@ -11,9 +11,9 @@ export default class LegendInteractive {
 
     for (let i = 0; i < genreElementCollection.length; i += 1) {
       const genreElement = genreElementCollection[i];
-      const {name, group} = genreList[i];
+      const {name} = genreList[i];
 
-      genreElement.addEventListener('mouseenter', () => onGenreMouseEnter(name, group));
+      genreElement.addEventListener('mouseenter', () => onGenreMouseEnter(name));
     }
   }
 

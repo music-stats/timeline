@@ -64,7 +64,7 @@ export default class TimelineInteractive {
     artistLabelCollection.removeAllLabels();
   }
 
-  highlightGenre(genre, genreGroup, artistNameToSkip = null, toRenderArtistLabelCollection = true) {
+  highlightGenre(genre, artistNameToSkip = null, toRenderArtistLabelCollection = true) {
     const {plot, artistLabelCollection} = this.timeline.children;
     const [plotWidth] = plot.getDimensions();
     const artistLastPoints = {};
@@ -72,14 +72,10 @@ export default class TimelineInteractive {
     this.genrePointRegistry.getItemList(genre).forEach(({
       x,
       y,
-      scrobble: {
-        artist: {name: artistName},
-        album: {playcount},
-      },
+      highlightedGenreColor: color,
+      scrobble: {artist: {name: artistName}},
     }) => {
       if (artistName !== artistNameToSkip) {
-        const color = this.timeline.getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, true, false);
-
         this.pointCollectionHighlighted.push({x, y});
         artistLastPoints[artistName] = {x, y, color};
         plot.drawPoint(x, y, color);
@@ -87,10 +83,12 @@ export default class TimelineInteractive {
     });
 
     if (toRenderArtistLabelCollection) {
-      for (const artistName in artistLastPoints) {
-        const {x, y, color} = artistLastPoints[artistName];
-        artistLabelCollection.renderLabel(x, y, plotWidth, artistName, color, false);
-      }
+      // points are sorted by Y coord (i.e. artist total playcount),
+      // so labels are also sorted and are getting placed closer to their points
+      Object.entries(artistLastPoints)
+        .map(([artistName, point]) => ({text: artistName, ...point}))
+        .sort((a, b) => b.y - a.y)
+        .forEach((point) => artistLabelCollection.renderLabel(point, plotWidth, false));
     }
   }
 
@@ -104,15 +102,13 @@ export default class TimelineInteractive {
     this.artistPointRegistry.getItemList(artist.name).forEach(({
       x,
       y,
+      highlightedArtistColor: color,
       scrobble: {
         index: scrobbleGlobalIndex,
         timestamp,
-        album: {playcount},
         track: {name},
       },
     }) => {
-      const color = this.timeline.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, playcount, false, true);
-
       this.pointCollectionHighlighted.push({x, y});
       lastPoint = {x, y, color};
 
@@ -124,14 +120,14 @@ export default class TimelineInteractive {
       }
 
       if (scrobbleGlobalIndex === index) {
-        selectedScrobbleTimeLabel.renderText(x, plotWidth, timestampToDateTimeString(timestamp));
+        selectedScrobbleTimeLabel.renderText(x, timestampToDateTimeString(timestamp), plotWidth);
       }
     });
 
     sameTrackPointList.forEach(({x, y}) => plot.drawPoint(x, y, selectedTrackColor));
 
     if (toRenderArtistLabelCollection) {
-      artistLabelCollection.renderLabel(lastPoint.x, lastPoint.y, plotWidth, artist.name, lastPoint.color, true);
+      artistLabelCollection.renderLabel({text: artist.name, ...lastPoint}, plotWidth, true);
     }
   }
 
@@ -145,7 +141,7 @@ export default class TimelineInteractive {
     this.pointCollectionHighlighted.reset();
   }
 
-  selectGenre(genre, genreGroup) {
+  selectGenre(genre) {
     const {legend} = this.timeline.children;
 
     // clean old
@@ -154,7 +150,7 @@ export default class TimelineInteractive {
     this.resetUi();
 
     // show new
-    this.highlightGenre(genre, genreGroup);
+    this.highlightGenre(genre);
     legend.highlightGenre(genre);
   }
 
@@ -178,7 +174,7 @@ export default class TimelineInteractive {
 
     // show new
     if (artist.genre) {
-      this.highlightGenre(artist.genre, artist.genreGroup, artist.name, isNewArtist);
+      this.highlightGenre(artist.genre, artist.name, isNewArtist);
 
       if (isNewArtist) {
         legend.highlightGenre(artist.genre);
@@ -382,8 +378,8 @@ export default class TimelineInteractive {
     this.zoomPlot(event);
   }
 
-  handleLegendGenreMouseEnter(genre, genreGroup) {
-    this.selectGenre(genre, genreGroup);
+  handleLegendGenreMouseEnter(genre) {
+    this.selectGenre(genre);
   }
 
   draw() {

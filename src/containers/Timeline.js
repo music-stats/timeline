@@ -178,26 +178,29 @@ export default class Timeline {
     return scales;
   }
 
-  getGenreGroupColorByAlbumPlaycount(genreGroup, playcount, toHighlightGenre = false, toHighlightArtist = false) {
+  createScrobblePointColors(genreGroup, albumPlaycount) {
     const {timeline: {point: {colorValueFactors}}} = config;
     const colorScale = this.genreGroupColorScales[genreGroup] || this.unknownGenreColorScale;
-    const color = d3Color.hsl(colorScale(playcount));
+    const baseColor = colorScale(albumPlaycount);
 
-    if (toHighlightGenre) {
-      color.s *= colorValueFactors.genre.saturation;
-      color.l *= colorValueFactors.genre.lightness;
-      return color;
-    }
-
-    if (toHighlightArtist) {
-      color.s *= colorValueFactors.artist.saturation;
-      color.l *= colorValueFactors.artist.lightness;
-      return color;
-    }
+    const color = d3Color.hsl(baseColor);
+    const highlightedGenreColor = d3Color.hsl(baseColor);
+    const highlightedArtistColor = d3Color.hsl(baseColor);
 
     color.s *= colorValueFactors.other.saturation;
     color.l *= colorValueFactors.other.lightness;
-    return color;
+
+    highlightedGenreColor.s *= colorValueFactors.genre.saturation;
+    highlightedGenreColor.l *= colorValueFactors.genre.lightness;
+
+    highlightedArtistColor.s *= colorValueFactors.artist.saturation;
+    highlightedArtistColor.l *= colorValueFactors.artist.lightness;
+
+    return {
+      color,
+      highlightedGenreColor,
+      highlightedArtistColor,
+    };
   }
 
   createScrobblePoint(scrobble) {
@@ -206,7 +209,7 @@ export default class Timeline {
     return {
       x: this.plotScales.x(timestamp),
       y: this.plotScales.y(artist.playcount),
-      color: this.getGenreGroupColorByAlbumPlaycount(artist.genreGroup, album.playcount),
+      ...this.createScrobblePointColors(artist.genreGroup, album.playcount),
       scrobble,
     };
   }
@@ -238,8 +241,8 @@ export default class Timeline {
 
     plot.drawTimeAxis(leftX, rightX);
 
-    leftTimeLabel.renderText(leftX, plotWidth, timestampToDateTimeString(leftTimestamp));
-    rightTimeLabel.renderText(rightX, plotWidth, timestampToDateTimeString(rightTimestamp));
+    leftTimeLabel.renderText(leftX, timestampToDateTimeString(leftTimestamp), plotWidth);
+    rightTimeLabel.renderText(rightX, timestampToDateTimeString(rightTimestamp), plotWidth);
   }
 
   // things needed for the first render
