@@ -2,7 +2,7 @@ import * as d3Scale from 'd3-scale';
 import html from '../lib/html';
 
 import config from '../config';
-import {getGenreSortedList} from '../utils/dataset';
+import {getGenreSortedList} from '../dataset/genre';
 
 import './Legend.css';
 

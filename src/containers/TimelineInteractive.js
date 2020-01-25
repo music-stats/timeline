@@ -72,8 +72,10 @@ export default class TimelineInteractive {
     this.genrePointRegistry.getItemList(genre).forEach(({
       x,
       y,
-      highlightedGenreColor: color,
-      scrobble: {artist: {name: artistName}},
+      scrobble: {
+        artist: {name: artistName},
+        highlightedGenreColor: color,
+      },
     }) => {
       if (artistName !== artistNameToSkip) {
         this.pointCollectionHighlighted.push({x, y});
@@ -102,11 +104,11 @@ export default class TimelineInteractive {
     this.artistPointRegistry.getItemList(artist.name).forEach(({
       x,
       y,
-      highlightedArtistColor: color,
       scrobble: {
         index: scrobbleGlobalIndex,
         timestamp,
         track: {name},
+        highlightedArtistColor: color,
       },
     }) => {
       this.pointCollectionHighlighted.push({x, y});
@@ -136,7 +138,7 @@ export default class TimelineInteractive {
     const {plot} = this.timeline.children;
 
     this.pointCollectionHighlighted.getAll().forEach(
-      ({x, y}) => plot.drawPoint(x, y, pointBuffer.getPoint(x, y).color),
+      ({x, y}) => plot.drawPoint(x, y, pointBuffer.getPoint(x, y).scrobble.color),
     );
     this.pointCollectionHighlighted.reset();
   }
@@ -155,7 +157,7 @@ export default class TimelineInteractive {
   }
 
   selectScrobble(scrobble) {
-    const {scrobbleListSummary} = this.timeline;
+    const {summary} = this.props;
     const {infoBox, legend, artistLabelCollection} = this.timeline.children;
     const {artist} = scrobble;
     const isNewArtist = !(this.selectedScrobble && this.selectedScrobble.artist.name === artist.name);
@@ -184,10 +186,7 @@ export default class TimelineInteractive {
     // artist scrobbles are rendered on top of genre scrobbles and artist labels
     this.highlightArtist(scrobble, isNewArtist);
 
-    infoBox.renderScrobbleInfo({
-      scrobble,
-      totals: scrobbleListSummary.getTotals(scrobble),
-    });
+    infoBox.renderScrobbleInfo(scrobble, summary.getScrobbleTotals(scrobble));
   }
 
   selectVerticallyAdjacentScrobble(shift) {

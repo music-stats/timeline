@@ -1,9 +1,8 @@
 import * as d3Color from 'd3-color';
 
 import config from '../config';
-import {dateTimeStringToTimestamp} from './date';
 
-export function enrichScrobbleList(scrobbleList, artistsByGenres) {
+export function insertGenres(scrobbleList, artistsByGenres) {
   const {genreGroups} = config;
   const genreGroupsByGenres = {};
   const genresByArtists = {};
@@ -16,10 +15,9 @@ export function enrichScrobbleList(scrobbleList, artistsByGenres) {
     artistsByGenres[genre].forEach((artistName) => genresByArtists[artistName] = genre);
   }
 
-  return scrobbleList.map((scrobble, index) => {
+  return scrobbleList.map((scrobble) => {
     const genre = genresByArtists[scrobble.artist.name];
     const genreGroup = genreGroupsByGenres[genre];
-    const timestamp = dateTimeStringToTimestamp(scrobble.date);
 
     return {
       ...scrobble,
@@ -30,8 +28,6 @@ export function enrichScrobbleList(scrobbleList, artistsByGenres) {
           genre, // e.g. 'Classic Rock'
         },
       }),
-      index,
-      timestamp,
     };
   });
 }

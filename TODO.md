@@ -1,6 +1,5 @@
 # TODO
 ## Performance optimizations
-* Generate scrobble colors once (in `enrichScrobbleList()`). Currently they are created on the fly - when points are drawn.
 * Use sliding indices instead of recreating the `scrobbleCollectionZoomed` on zooming/panning. This will also allow to rely on global indices in `Collection.prototype.getAdjacent()` and locate an item by index instead of running a ".find()" loop.
 
 ## Improvements

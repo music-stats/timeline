@@ -28,16 +28,17 @@ Codebase is organized according to simple rules:
 ```
 src/
 ├── components  # "dumb" components - layout and styling
-├── containers  # "smart" components - data processing, interaction and mediation logic
+├── containers  # "smart" components - plot rendering and user interaction handlers
+├── dataset     # initial data transformation steps
 ├── lib         # configured dependencies
 ├── stores      # stateful classes acting as data accessors
-├── utils       # stateless helpers, no app logic
+├── utils       # stateless general purpose utils, no app logic
 ├── app.js      # app entry point
 └── config.js   # hardcoded values go there (including plot-specific styling)
 ```
 
 Among containers and components there are `<...Interactive />` classes that act as decorators.
-Such classes add various handlers and control static classes they decorate (e.g. highlighting on mouse move).
+Such classes add various handlers that define behavior for classes they decorate (e.g. highlighting on mouse move).
 
 ## What makes it possible?
 ### data source
