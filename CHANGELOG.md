@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+* Improvement: selected artist label stays closer to related scrobble point.
 * Performance: generating scrobble colors once instead of doing it on the fly when points are drawn.
 
 ## [0.1.0] - 2020-01-23

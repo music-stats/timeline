@@ -11,6 +11,7 @@
   transform: translateY(calc(-100% - 4px));
   white-space: nowrap;
   font-size: var(--font-size-normal);
+  text-shadow: 0 0 2px var(--color-dark-grey-blue);
 }
 
 .ArtistLabelCollection__label--highlighted {

@@ -64,10 +64,9 @@ export default class TimelineInteractive {
     artistLabelCollection.removeAllLabels();
   }
 
-  highlightGenre(genre, artistNameToSkip = null, toRenderArtistLabelCollection = true) {
-    const {plot, artistLabelCollection} = this.timeline.children;
-    const [plotWidth] = plot.getDimensions();
-    const artistLastPoints = {};
+  highlightGenre(genre, artistNameToSkip = null) {
+    const {plot} = this.timeline.children;
+    const lastPoints = {};
 
     this.genrePointRegistry.getItemList(genre).forEach(({
       x,
@@ -79,24 +78,17 @@ export default class TimelineInteractive {
     }) => {
       if (artistName !== artistNameToSkip) {
         this.pointCollectionHighlighted.push({x, y});
-        artistLastPoints[artistName] = {x, y, color};
+        lastPoints[artistName] = {x, y, color};
         plot.drawPoint(x, y, color);
       }
     });
 
-    if (toRenderArtistLabelCollection) {
-      // points are sorted by Y coord (i.e. artist total playcount),
-      // so labels are also sorted and are getting placed closer to their points
-      Object.entries(artistLastPoints)
-        .map(([artistName, point]) => ({text: artistName, ...point}))
-        .sort((a, b) => b.y - a.y)
-        .forEach((point) => artistLabelCollection.renderLabel(point, plotWidth, false));
-    }
+    return lastPoints;
   }
 
-  highlightArtist({index, artist, track}, toRenderArtistLabelCollection = true) {
+  highlightArtist({index, artist, track}) {
     const {timeline: {point: {selectedColor: selectedTrackColor}}} = config;
-    const {plot, selectedScrobbleTimeLabel, artistLabelCollection} = this.timeline.children;
+    const {plot, selectedScrobbleTimeLabel} = this.timeline.children;
     const [plotWidth] = plot.getDimensions();
     const sameTrackPointList = [];
     let lastPoint = null;
@@ -128,9 +120,7 @@ export default class TimelineInteractive {
 
     sameTrackPointList.forEach(({x, y}) => plot.drawPoint(x, y, selectedTrackColor));
 
-    if (toRenderArtistLabelCollection) {
-      artistLabelCollection.renderLabel({text: artist.name, ...lastPoint}, plotWidth, true);
-    }
+    return lastPoint;
   }
 
   removePointsHighlight() {
@@ -152,19 +142,19 @@ export default class TimelineInteractive {
     this.resetUi();
 
     // show new
-    this.highlightGenre(genre);
+    this.renderArtistsLabels(this.highlightGenre(genre));
     legend.highlightGenre(genre);
   }
 
   selectScrobble(scrobble) {
     const {summary} = this.props;
-    const {infoBox, legend, artistLabelCollection} = this.timeline.children;
+    const {plot, infoBox, legend, artistLabelCollection} = this.timeline.children;
+    const [plotWidth] = plot.getDimensions();
     const {artist} = scrobble;
     const isNewArtist = !(this.selectedScrobble && this.selectedScrobble.artist.name === artist.name);
+    let otherArtistsLastScrobblePoints = {};
 
     this.selectedScrobble = scrobble;
-
-    // clean old
     this.removePointsHighlight();
     infoBox.hideIntroMessage();
 
@@ -174,17 +164,22 @@ export default class TimelineInteractive {
       artistLabelCollection.removeAllLabels();
     }
 
-    // show new
     if (artist.genre) {
-      this.highlightGenre(artist.genre, artist.name, isNewArtist);
+      otherArtistsLastScrobblePoints = this.highlightGenre(artist.genre, artist.name);
 
       if (isNewArtist) {
         legend.highlightGenre(artist.genre);
       }
     }
 
-    // artist scrobbles are rendered on top of genre scrobbles and artist labels
-    this.highlightArtist(scrobble, isNewArtist);
+    // artist scrobbles are rendered on top of genre scrobbles
+    const artistLastScrobblePoint = this.highlightArtist(scrobble);
+
+    // artist label is inserted before other artists labels
+    if (isNewArtist) {
+      artistLabelCollection.renderLabel({text: artist.name, ...artistLastScrobblePoint}, plotWidth, true);
+      this.renderArtistsLabels(otherArtistsLastScrobblePoints);
+    }
 
     infoBox.renderScrobbleInfo(scrobble, summary.getScrobbleTotals(scrobble));
   }
@@ -392,6 +387,18 @@ export default class TimelineInteractive {
   afterRender() {
     this.timeline.afterRender();
     this.subscribe();
+  }
+
+  renderArtistsLabels(points) {
+    const {plot, artistLabelCollection} = this.timeline.children;
+    const [plotWidth] = plot.getDimensions();
+
+    // points are sorted by Y coord (i.e. artist total playcount),
+    // so labels are also sorted and are getting placed closer to their points
+    Object.entries(points)
+      .map(([text, point]) => ({text, ...point}))
+      .sort((a, b) => b.y - a.y)
+      .forEach((point) => artistLabelCollection.renderLabel(point, plotWidth, false));
   }
 
   render() {
