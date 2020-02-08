@@ -1,8 +1,4 @@
 {
-  "Bluegrass": [
-    "Larkin Poe",
-    "Punch Brothers"
-  ],
   "Alternative Rock": [
     "30 Seconds to Mars",
     "Akute",
@@ -27,7 +23,6 @@
     "Halestorm",
     "Hawking",
     "John Frusciante",
-    "Motor'rolla",
     "Puddle of Mudd",
     "Seether",
     "Sinoptik",
@@ -49,10 +44,30 @@
     "Океан Ельзи",
     "ПНД"
   ],
+  "Ambient": [
+    "A Winged Victory for the Sullen",
+    "Angelo Badalamenti",
+    "Boards of Canada",
+    "Johannes Bornlöf",
+    "Jóhann Jóhannsson",
+    "Karunesh",
+    "Low Roar",
+    "Saudade",
+    "Stars of the Lid",
+    "Tor Lundvall",
+    "Tycho",
+    "Wickerbird",
+    "Zymosis",
+    "Ólafur Arnalds"
+  ],
   "Art Pop": [
     "David Bowie",
     "Florence + the Machine",
     "Люсі"
+  ],
+  "Bluegrass": [
+    "Larkin Poe",
+    "Punch Brothers"
   ],
   "Black Metal": [
     "1914",
@@ -77,41 +92,11 @@
     "Sidus Atrum",
     "Xasthur"
   ],
-  "Ambient": [
-    "A Winged Victory for the Sullen",
-    "Angelo Badalamenti",
-    "Boards of Canada",
-    "Johannes Bornlöf",
-    "Jóhann Jóhannsson",
-    "Karunesh",
-    "Low Roar",
-    "Saudade",
-    "Stars of the Lid",
-    "Tor Lundvall",
-    "Tycho",
-    "Wickerbird",
-    "Zymosis",
-    "Ólafur Arnalds"
-  ],
-  "Classical": [
-    "Arthur Rubinstein",
-    "Bernard Herrmann",
-    "Camille Saint-Saëns",
-    "Claude Debussy",
-    "Edvard Grieg",
-    "Erik Satie",
-    "Franz Liszt",
-    "Frédéric Chopin",
-    "Gustav Holst",
-    "Henryk Górecki",
-    "Karlheinz Stockhausen",
-    "Kurt Weill",
-    "Ludovico Einaudi",
-    "Maurice Ravel",
-    "Otto Totland",
-    "Richard Wagner",
-    "Shye Ben Tzur",
-    "Wolfgang Amadeus Mozart"
+  "Blues": [
+    "Eric Bell",
+    "She Keeps Bees",
+    "Simon McBride",
+    "Yemen Blues"
   ],
   "Classic Rock": [
     "Aerosmith",
@@ -138,15 +123,6 @@
     "Uli Jon Roth",
     "Whitesnake"
   ],
-  "Blues": [
-    "Eric Bell",
-    "She Keeps Bees",
-    "Simon McBride",
-    "Yemen Blues"
-  ],
-  "Death Metal": [
-    "Blood Incantation"
-  ],
   "Darkwave": [
     "Claire Voyant",
     "Coma Alliance",
@@ -157,6 +133,26 @@
     "Les chants du hasard",
     "Lycia",
     "Pulatova"
+  ],
+  "Classical": [
+    "Arthur Rubinstein",
+    "Bernard Herrmann",
+    "Camille Saint-Saëns",
+    "Claude Debussy",
+    "Edvard Grieg",
+    "Erik Satie",
+    "Franz Liszt",
+    "Frédéric Chopin",
+    "Gustav Holst",
+    "Henryk Górecki",
+    "Karlheinz Stockhausen",
+    "Kurt Weill",
+    "Ludovico Einaudi",
+    "Maurice Ravel",
+    "Otto Totland",
+    "Richard Wagner",
+    "Shye Ben Tzur",
+    "Wolfgang Amadeus Mozart"
   ],
   "Dark Folk": [
     "Dzivia",
@@ -173,6 +169,9 @@
     "Ulver",
     "Vàli",
     "Wardruna"
+  ],
+  "Death Metal": [
+    "Blood Incantation"
   ],
   "Deathcore": [
     "All Shall Perish",
@@ -265,19 +264,16 @@
     "Веремій",
     "Чур"
   ],
-  "Folk": [
-    "Casa Ukrania",
-    "Corvus Corax",
-    "Estampie",
-    "Kaunan",
-    "Kyiv Ethno Trio",
-    "Omnia",
-    "Strikha-project",
-    "The Deep Dark Woods",
-    "torban",
-    "Божичі",
-    "Дахабраха",
-    "Стары Ольса"
+  "Freak Folk": [
+    "Angel Olsen",
+    "Ben von Wildenhaus",
+    "Chelsea Wolfe",
+    "CocoRosie",
+    "Dakh Daughters",
+    "Eivør Pálsdóttir",
+    "Emily Jane White",
+    "Marissa Nadler",
+    "Vera Sola"
   ],
   "Funk": [
     "BLOOMS CORDA",
@@ -292,16 +288,19 @@
     "Вій",
     "Тінь Сонця"
   ],
-  "Freak Folk": [
-    "Angel Olsen",
-    "Ben von Wildenhaus",
-    "Chelsea Wolfe",
-    "CocoRosie",
-    "Dakh Daughters",
-    "Eivør Pálsdóttir",
-    "Emily Jane White",
-    "Marissa Nadler",
-    "Vera Sola"
+  "Folk": [
+    "Casa Ukrania",
+    "Corvus Corax",
+    "Estampie",
+    "Kaunan",
+    "Kyiv Ethno Trio",
+    "Omnia",
+    "Strikha-project",
+    "The Deep Dark Woods",
+    "torban",
+    "Божичі",
+    "Дахабраха",
+    "Стары Ольса"
   ],
   "Gothic Metal": [
     "Crematory",
@@ -321,16 +320,13 @@
     "Кому Вниз",
     "Полинове Поле"
   ],
-  "Gothic Rock": [
-    "Charon",
-    "Fields of the Nephilim",
-    "Ghost",
-    "Him",
-    "Lord of the Lost",
-    "The 69 Eyes",
-    "The Rasmus",
-    "Two Witches",
-    "Type O Negative"
+  "Groove Metal": [
+    "Biohazard",
+    "Godsmack",
+    "Life of Agony",
+    "Machine Head",
+    "Pantera",
+    "Velikhan"
   ],
   "Grunge": [
     "Etwas Unders",
@@ -340,14 +336,6 @@
     "Димна Суміш",
     "Друг Самурая"
   ],
-  "Groove Metal": [
-    "Biohazard",
-    "Godsmack",
-    "Life of Agony",
-    "Machine Head",
-    "Pantera",
-    "Velikhan"
-  ],
   "Hardcore": [
     "Agnostic Front",
     "Amok",
@@ -356,6 +344,51 @@
     "The Comes",
     "The Symbioz",
     "Кат"
+  ],
+  "Heavy Metal": [
+    "Angel Witch",
+    "Avenged Sevenfold",
+    "Doro",
+    "Grave Digger",
+    "Iron Griffin",
+    "Iron Maiden",
+    "Ironsword",
+    "Judas Priest",
+    "Manowar",
+    "Morton",
+    "Motörhead",
+    "Rage",
+    "Screamer",
+    "W.A.S.P.",
+    "Yngwie Malmsteen"
+  ],
+  "Industrial Metal": [
+    "Eisbrecher",
+    "Fear Factory",
+    "Oomph!",
+    "Rammstein",
+    "Ruoska"
+  ],
+  "Hip-hop": [
+    "Afterclapp",
+    "Childish Gambino",
+    "Como Asesinar a Felipes",
+    "Eminem",
+    "FREEL",
+    "Logic",
+    "Neneh Cherry",
+    "Paul Rosenberg",
+    "R.A. the Rugged Man",
+    "Run–D.M.C.",
+    "The Cancel",
+    "The Herbaliser",
+    "Zombo",
+    "Довгий Пес",
+    "Кашляючий Ед",
+    "Тартак",
+    "ТНМК",
+    "Тулим",
+    "Ціна Ритму"
   ],
   "Indie Rock": [
     "alt-J",
@@ -386,7 +419,6 @@
     "Radiohead",
     "Saint Motel",
     "Tame Impala",
-    "Teleman",
     "The Cinematics",
     "The Firewood Project",
     "The National",
@@ -401,127 +433,25 @@
     "Один в Каное",
     "Оркестр Че"
   ],
-  "Heavy Metal": [
-    "Angel Witch",
-    "Avenged Sevenfold",
-    "Doro",
-    "Grave Digger",
-    "Iron Griffin",
-    "Iron Maiden",
-    "Ironsword",
-    "Judas Priest",
-    "Manowar",
-    "Morton",
-    "Motörhead",
-    "Rage",
-    "Screamer",
-    "W.A.S.P.",
-    "Yngwie Malmsteen"
-  ],
-  "Industrial Metal": [
-    "Eisbrecher",
-    "Fear Factory",
-    "Oomph!",
-    "Rammstein",
-    "Ruoska"
-  ],
-  "Jazz": [
-    "Allan Holdsworth",
-    "Austin Peralta",
-    "Brad Mehldau",
-    "Charles Mingus",
-    "Colin Stetson",
-    "Daymé Arocena",
-    "Eric Reed",
-    "Freddie Hubbard",
-    "GoGo Penguin",
-    "Jaga Jazzist",
-    "Kamaal Williams",
-    "Myroslav Levytsky",
-    "Nick Walters",
-    "okvsho",
-    "Organic Noises",
-    "Robohands",
-    "Stan Getz",
-    "Stanley Clarke",
-    "T.R.A.M.",
-    "Tenderlonious",
-    "The Cinematic Orchestra",
-    "The Classical Jazz Quartet",
-    "The Comet Is Coming",
-    "The Evergreen Trio",
-    "Trioscapes",
-    "Yussef Kamaal"
-  ],
-  "Hip-hop": [
-    "Afterclapp",
-    "Childish Gambino",
-    "Como Asesinar a Felipes",
-    "Eminem",
-    "FREEL",
-    "Logic",
-    "Neneh Cherry",
-    "Paul Rosenberg",
-    "R.A. the Rugged Man",
-    "Run–D.M.C.",
-    "The Cancel",
-    "The Herbaliser",
-    "Zombo",
-    "Довгий Пес",
-    "Кашляючий Ед",
-    "Тартак",
-    "ТНМК",
-    "Тулим",
-    "Ціна Ритму"
-  ],
   "Industrial Rock": [
     "John 5",
     "Marilyn Manson",
     "Rob Zombie"
   ],
-  "Melodic Death Metal": [
-    "Amon Amarth",
-    "Arch Enemy",
-    "Be'lakor",
-    "Children of Bodom",
-    "Dark Tranquillity",
-    "Die Apokalyptischen Reiter",
-    "In Flames",
-    "Infinite Tales",
-    "Inner Maze",
-    "Kalmah",
-    "Mors Principium Est",
-    "Norther",
-    "Omnium Gatherum"
+  "Gothic Rock": [
+    "Charon",
+    "Fields of the Nephilim",
+    "Ghost",
+    "Him",
+    "Lord of the Lost",
+    "The 69 Eyes",
+    "The Rasmus",
+    "Two Witches",
+    "Type O Negative"
   ],
-  "Nu Metal": [
-    "Cold",
-    "Deftones",
-    "DevilDriver",
-    "Disturbed",
-    "Drowning Pool",
-    "Ill Niño",
-    "Infected Rain",
-    "Jane Air",
-    "Jonathan Davis",
-    "Kittie",
-    "Korn",
-    "Linkin Park",
-    "Merva",
-    "Morphine Suffering",
-    "Mudvayne",
-    "P.O.D.",
-    "Papa Roach",
-    "Rage Against the Machine",
-    "Skinhate",
-    "Slipknot",
-    "Static-X",
-    "System of a Down",
-    "Trivium",
-    "Анна",
-    "Покруч",
-    "Психея",
-    "ТОЛ"
+  "Industrial": [
+    "How to Destroy Angels",
+    "Nine Inch Nails"
   ],
   "Metalcore": [
     "All That Remains",
@@ -559,19 +489,101 @@
     "Underoath",
     "While She Sleeps"
   ],
-  "Industrial": [
-    "How to Destroy Angels",
-    "Nine Inch Nails"
+  "Nu Metal": [
+    "Cold",
+    "Deftones",
+    "DevilDriver",
+    "Disturbed",
+    "Drowning Pool",
+    "Ill Niño",
+    "Infected Rain",
+    "Jane Air",
+    "Jonathan Davis",
+    "Kittie",
+    "Korn",
+    "Linkin Park",
+    "Merva",
+    "Morphine Suffering",
+    "Mudvayne",
+    "P.O.D.",
+    "Papa Roach",
+    "Rage Against the Machine",
+    "Skinhate",
+    "Slipknot",
+    "Static-X",
+    "System of a Down",
+    "Trivium",
+    "Анна",
+    "Покруч",
+    "Психея",
+    "ТОЛ"
   ],
-  "Post-punk": [
-    "Bauhaus",
-    "Braii",
-    "Killing Joke",
-    "Nick Cave & The Bad Seeds",
-    "Slowness",
-    "Swans",
-    "The Cure",
-    "Петля Пристрастия"
+  "Jazz": [
+    "Allan Holdsworth",
+    "Austin Peralta",
+    "Brad Mehldau",
+    "Charles Mingus",
+    "Colin Stetson",
+    "Daymé Arocena",
+    "Eric Reed",
+    "Freddie Hubbard",
+    "GoGo Penguin",
+    "Jaga Jazzist",
+    "Kamaal Williams",
+    "Myroslav Levytsky",
+    "Nick Walters",
+    "okvsho",
+    "Organic Noises",
+    "Robohands",
+    "Stan Getz",
+    "Stanley Clarke",
+    "T.R.A.M.",
+    "Tenderlonious",
+    "The Cinematic Orchestra",
+    "The Classical Jazz Quartet",
+    "The Comet Is Coming",
+    "The Evergreen Trio",
+    "Trioscapes",
+    "Yussef Kamaal"
+  ],
+  "Melodic Death Metal": [
+    "Amon Amarth",
+    "Arch Enemy",
+    "Be'lakor",
+    "Children of Bodom",
+    "Dark Tranquillity",
+    "Die Apokalyptischen Reiter",
+    "In Flames",
+    "Infinite Tales",
+    "Inner Maze",
+    "Kalmah",
+    "Mors Principium Est",
+    "Norther",
+    "Omnium Gatherum"
+  ],
+  "Pop": [
+    "Alanis Morissette",
+    "Amalie Bruun",
+    "Between Friends",
+    "Cloves",
+    "Julyan Brynn",
+    "Maru",
+    "panivalkova",
+    "Solange",
+    "Teleman",
+    "The Hardkiss",
+    "Yeyo.",
+    "Ансамбль Арніка",
+    "Ансамбль Водограй",
+    "Ансамбль Візерунки Шляхів",
+    "Ансамбль Калина",
+    "Василь Зінкевич",
+    "Лідія Відаш",
+    "Надія Пащенко",
+    "Назарій Яремчук",
+    "Ніна Злобіна",
+    "Ніна Матвієнко",
+    "Тарас Чубай"
   ],
   "Post-black": [
     "Alcest",
@@ -582,6 +594,16 @@
     "Sylvaine",
     "Sólstafir",
     "White Ward"
+  ],
+  "Post-punk": [
+    "Bauhaus",
+    "Braii",
+    "Killing Joke",
+    "Nick Cave & The Bad Seeds",
+    "Slowness",
+    "Swans",
+    "The Cure",
+    "Петля Пристрастия"
   ],
   "Post-rock": [
     "65daysofstatic",
@@ -614,29 +636,6 @@
     "Tides From Nebula",
     "Way Station"
   ],
-  "Pop": [
-    "Alanis Morissette",
-    "Amalie Bruun",
-    "Between Friends",
-    "Cloves",
-    "Julyan Brynn",
-    "Maru",
-    "panivalkova",
-    "Solange",
-    "The Hardkiss",
-    "Yeyo.",
-    "Ансамбль Арніка",
-    "Ансамбль Водограй",
-    "Ансамбль Візерунки Шляхів",
-    "Ансамбль Калина",
-    "Василь Зінкевич",
-    "Лідія Відаш",
-    "Надія Пащенко",
-    "Назарій Яремчук",
-    "Ніна Злобіна",
-    "Ніна Матвієнко",
-    "Тарас Чубай"
-  ],
   "Progressive Death Metal": [
     "Atheist",
     "Death",
@@ -647,32 +646,6 @@
     "The Faceless",
     "Veil of Maya",
     "Virvum"
-  ],
-  "Progressive Rock": [
-    "5R6",
-    "A Perfect Circle",
-    "Anathema",
-    "Antimatter",
-    "Emerson, Lake & Palmer",
-    "Gazpacho",
-    "Genesis",
-    "Gentle Giant",
-    "Jethro Tull",
-    "King Crimson",
-    "La Horsa Bianca",
-    "Maraton",
-    "Marillion",
-    "Mike Mckenzie",
-    "Nick Johnston",
-    "Peter Gabriel",
-    "Porcupine Tree",
-    "Rishloo",
-    "Riverside",
-    "The Gathering",
-    "The Mars Volta",
-    "Van der Graaf Generator",
-    "Wolverine",
-    "Обійми Дощу"
   ],
   "Power Metal": [
     "Blind Guardian",
@@ -740,8 +713,31 @@
     "The Offspring",
     "Тостер"
   ],
-  "Rockabilly": [
-    "The HYPNOTUNEZ"
+  "Progressive Rock": [
+    "5R6",
+    "A Perfect Circle",
+    "Anathema",
+    "Antimatter",
+    "Emerson, Lake & Palmer",
+    "Gazpacho",
+    "Genesis",
+    "Gentle Giant",
+    "Jethro Tull",
+    "King Crimson",
+    "La Horsa Bianca",
+    "Maraton",
+    "Marillion",
+    "Mike Mckenzie",
+    "Nick Johnston",
+    "Peter Gabriel",
+    "Porcupine Tree",
+    "Rishloo",
+    "Riverside",
+    "The Gathering",
+    "The Mars Volta",
+    "Van der Graaf Generator",
+    "Wolverine",
+    "Обійми Дощу"
   ],
   "Rock And Roll": [
     "Chuck Berry",
@@ -755,6 +751,16 @@
     "Heaven in Her Arms",
     "Orchid",
     "Yotsuya Kaidan"
+  ],
+  "Ska Punk": [
+    "Brutto",
+    "Брати Гадюкіни",
+    "Воплі Відоплясова",
+    "Жадан і собаки",
+    "Ляпис Трубецкой"
+  ],
+  "Rockabilly": [
+    "The HYPNOTUNEZ"
   ],
   "Singer-songwriter": [
     "Agnes Obel",
@@ -788,13 +794,6 @@
     "stonefromthesky",
     "Zoanthropy"
   ],
-  "Ska Punk": [
-    "Brutto",
-    "Брати Гадюкіни",
-    "Воплі Відоплясова",
-    "Жадан і собаки",
-    "Ляпис Трубецкой"
-  ],
   "Speed Metal": [
     "Racer X"
   ],
@@ -815,16 +814,23 @@
     "Vovk",
     "Witchcraft"
   ],
+  "Symphonic Metal": [
+    "Apocalyptica",
+    "Ayreon",
+    "Nightwish",
+    "The Gentle Storm",
+    "Therion"
+  ],
+  "Tango": [
+    "Astor Piazzolla",
+    "Carlos Gardel"
+  ],
   "Thrash Metal": [
     "Anthrax",
     "Megadeth",
     "Metallica",
     "Sepultura",
     "Vulture"
-  ],
-  "Tango": [
-    "Astor Piazzolla",
-    "Carlos Gardel"
   ],
   "Trip Hop": [
     "Beth Gibbons",
@@ -837,12 +843,5 @@
     "Portishead",
     "Red Snapper",
     "✝✝✝ (Crosses)"
-  ],
-  "Symphonic Metal": [
-    "Apocalyptica",
-    "Ayreon",
-    "Nightwish",
-    "The Gentle Storm",
-    "Therion"
   ]
 }
