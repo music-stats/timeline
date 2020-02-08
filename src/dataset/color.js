@@ -32,11 +32,26 @@ export function insertColors(scrobbleList, maxAlbumPlaycount) {
     highlightedArtistColor.s *= colorValueFactors.artist.saturation;
     highlightedArtistColor.l *= colorValueFactors.artist.lightness;
 
+    const artistLabelColor = d3Color.hsl(baseColor);
+    artistLabelColor.s *= colorValueFactors.artistLabel.saturation;
+    artistLabelColor.l *= colorValueFactors.artistLabel.lightness;
+
+    [
+      color,
+      highlightedGenreColor,
+      highlightedArtistColor,
+      artistLabelColor,
+    ].forEach((c) => {
+      if (c.s > 1) { c.s = 1; }
+      if (c.l > 1) { c.l = 1; }
+    });
+
     return {
       ...scrobble,
       color,
       highlightedGenreColor,
       highlightedArtistColor,
+      artistLabelColor,
     };
   });
 }

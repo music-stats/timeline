@@ -1,4 +1,3 @@
-import * as d3Color from 'd3-color';
 import html from '../lib/html';
 import config from '../config';
 
@@ -67,13 +66,12 @@ export default class ArtistLabelCollection {
     return minY;
   }
 
-  renderLabel({x, y, color: baseColor, text}, areaWidth, isHighlighted = false) {
-    const {timeline: {point: {colorValueFactors}}} = config;
+  renderLabel({x, y, text, scrobble: {artistLabelColor}}, areaWidth, isHighlighted = false) {
+    const {timeline: {labels: {highlightedColor}}} = config;
     const labelElement = document.createElement('span');
-    const color = d3Color.hsl(baseColor);
-
-    color.s *= colorValueFactors.artistLabel.saturation;
-    color.l *= colorValueFactors.artistLabel.lightness;
+    const color = isHighlighted
+      ? highlightedColor
+      : artistLabelColor;
 
     labelElement.classList.add('ArtistLabelCollection__label');
     labelElement.innerText = text;

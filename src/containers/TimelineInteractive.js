@@ -68,18 +68,13 @@ export default class TimelineInteractive {
     const {plot} = this.timeline.children;
     const lastPoints = {};
 
-    this.genrePointRegistry.getItemList(genre).forEach(({
-      x,
-      y,
-      scrobble: {
-        artist: {name: artistName},
-        highlightedGenreColor: color,
-      },
-    }) => {
+    this.genrePointRegistry.getItemList(genre).forEach((point) => {
+      const {x, y, scrobble: {artist: {name: artistName}, highlightedGenreColor}} = point;
+
       if (artistName !== artistNameToSkip) {
         this.pointCollectionHighlighted.push({x, y});
-        lastPoints[artistName] = {x, y, color};
-        plot.drawPoint(x, y, color);
+        lastPoints[artistName] = point;
+        plot.drawPoint(x, y, highlightedGenreColor);
       }
     });
 
@@ -93,24 +88,26 @@ export default class TimelineInteractive {
     const sameTrackPointList = [];
     let lastPoint = null;
 
-    this.artistPointRegistry.getItemList(artist.name).forEach(({
-      x,
-      y,
-      scrobble: {
-        index: scrobbleGlobalIndex,
-        timestamp,
-        track: {name},
-        highlightedArtistColor: color,
-      },
-    }) => {
+    this.artistPointRegistry.getItemList(artist.name).forEach((point) => {
+      const {
+        x,
+        y,
+        scrobble: {
+          index: scrobbleGlobalIndex,
+          timestamp,
+          track: {name},
+          highlightedArtistColor,
+        },
+      } = point;
+
       this.pointCollectionHighlighted.push({x, y});
-      lastPoint = {x, y, color};
+      lastPoint = point;
 
       // skipping same track scrobbles, those will be rendered after the main loop (to appear on top)
       if (name === track.name) {
         sameTrackPointList.push({x, y});
       } else {
-        plot.drawPoint(x, y, color);
+        plot.drawPoint(x, y, highlightedArtistColor);
       }
 
       if (scrobbleGlobalIndex === index) {

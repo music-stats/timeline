@@ -59,6 +59,7 @@ export default {
     labels: {
       areaPadding: 4,
       margin: 1,
+      highlightedColor: cssColors.white,
     },
 
     timeAxis: {
