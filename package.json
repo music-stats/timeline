@@ -37,20 +37,20 @@
   },
   "homepage": "https://github.com/music-stats/timeline#readme",
   "devDependencies": {
-    "@babel/core": "7.8.3",
-    "@babel/preset-env": "7.8.3",
+    "@babel/core": "7.8.4",
+    "@babel/preset-env": "7.8.4",
     "@babel/register": "7.8.3",
     "eslint": "6.8.0",
     "eslint-config-developit": "1.1.1",
     "gh-pages": "2.2.0",
     "ignore-styles": "5.0.1",
     "npm-check": "5.9.0",
-    "rollup": "1.29.0",
+    "rollup": "1.31.0",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-eslint": "7.0.0",
     "rollup-plugin-node-resolve": "5.2.0",
-    "rollup-plugin-postcss": "2.0.3",
+    "rollup-plugin-postcss": "2.0.6",
     "rollup-plugin-uglify": "6.0.4",
     "tap-spec": "5.0.0",
     "tape": "4.13.0"
@@ -59,7 +59,7 @@
     "classnames": "2.2.6",
     "d3-color": "1.4.0",
     "d3-scale": "3.2.1",
-    "htm": "2.2.1",
+    "htm": "3.0.3",
     "vhtml": "2.2.0"
   }
 }
