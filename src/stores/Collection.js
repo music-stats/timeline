@@ -1,10 +1,19 @@
 export default class Collection {
   constructor(list = []) {
     this.list = list;
+    this.firstVisibleIndex = 0;
+    this.lastVisibleIndex = this.list.length - 1;
   }
 
   reset() {
     this.list = [];
+    this.firstVisibleIndex = 0;
+    this.lastVisibleIndex = 0;
+  }
+
+  setVisibleIndexRange(firstVisibleIndex, lastVisibleIndex) {
+    this.firstVisibleIndex = firstVisibleIndex;
+    this.lastVisibleIndex = lastVisibleIndex;
   }
 
   push(...items) {
@@ -23,6 +32,20 @@ export default class Collection {
     return this.list[this.list.length - 1];
   }
 
+  getFirstVisible() {
+    return this.list[this.firstVisibleIndex];
+  }
+
+  getLastVisible() {
+    return this.list[this.lastVisibleIndex];
+  }
+
+  forEachVisible(callback) {
+    for (let i = this.firstVisibleIndex; i <= this.lastVisibleIndex; i += 1) {
+      callback(this.list[i]);
+    }
+  }
+
   findFirst(filter) {
     return this.list.find(filter);
   }
@@ -39,17 +62,14 @@ export default class Collection {
     return undefined;
   }
 
-  getAdjacent(item, shift, filter = () => true) {
-    let {index} = item;
-    const {index: firstIndex} = this.getFirst();
-    const {index: lastIndex} = this.getLast();
+  getAdjacentVisible(index, shift, filter = () => true) {
     const stepCondition = shift > 0
-      ? () => index < lastIndex
-      : () => index > firstIndex;
+      ? () => index < this.lastVisibleIndex
+      : () => index > this.firstVisibleIndex;
 
     while (stepCondition()) {
       index += shift;
-      const adjacentItem = this.list.find(({index: i}) => i === index);
+      const adjacentItem = this.list[index];
 
       if (adjacentItem && filter(adjacentItem)) {
         return adjacentItem;

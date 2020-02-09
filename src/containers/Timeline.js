@@ -26,8 +26,7 @@ export default class Timeline {
 
     this.scrobbleHalfSize = Math.ceil(scrobbleSize / 2);
 
-    this.scrobbleCollectionFull = new Collection(scrobbleList);
-    this.scrobbleCollectionZoomed = new Collection(scrobbleList);
+    this.scrobbleCollection = new Collection(scrobbleList);
     this.pointBuffer = new PointBuffer(this.scrobbleHalfSize);
 
     // to be initialized after render, since it relies on plot dimensions
@@ -61,8 +60,8 @@ export default class Timeline {
 
     this.children.infoBox = new InfoBox({
       dates: {
-        firstScrobbleDate: this.scrobbleCollectionFull.getFirst().date,
-        lastScrobbleDate: this.scrobbleCollectionFull.getLast().date,
+        firstScrobbleDate: this.scrobbleCollection.getFirst().date,
+        lastScrobbleDate: this.scrobbleCollection.getLast().date,
       },
       summary,
     });
@@ -121,19 +120,29 @@ export default class Timeline {
       }
     }
     const plotTop = plotBottom - plotHeight;
+    const plotLeft = plotPadding;
+    const plotRight = width - plotPadding;
+
+    const fullTimeRangeScale = d3Scale.scaleLinear()
+      .domain([
+        this.scrobbleCollection.getFirst().timestamp,
+        this.scrobbleCollection.getLast().timestamp,
+      ])
+      .rangeRound([plotLeft, plotRight]);
 
     const timeRangeScale = d3Scale.scaleLinear()
       .domain([
-        this.scrobbleCollectionZoomed.getFirst().timestamp,
-        this.scrobbleCollectionZoomed.getLast().timestamp,
+        this.scrobbleCollection.getFirstVisible().timestamp,
+        this.scrobbleCollection.getLastVisible().timestamp,
       ])
-      .rangeRound([plotPadding, width - plotPadding]);
+      .rangeRound([plotLeft, plotRight]);
 
     const artistPlaycountScale = d3Scale.scaleLinear()
       .domain([1, summary.maxArtistPlaycount])
       .rangeRound([plotBottom, plotTop]);
 
     return {
+      timeAxis: fullTimeRangeScale,
       x: timeRangeScale,
       y: artistPlaycountScale,
     };
@@ -155,10 +164,12 @@ export default class Timeline {
     const [plotWidth] = plot.getDimensions();
     const [leftTimestamp, rightTimestamp] = this.plotScales.x.domain();
     const [leftX, rightX] = this.plotScales.x.range();
+    const leftTimeX = this.plotScales.timeAxis(leftTimestamp);
+    const rightTimeX = this.plotScales.timeAxis(rightTimestamp);
 
     plot.drawBackground();
 
-    this.scrobbleCollectionZoomed.getAll().forEach((scrobble) => {
+    this.scrobbleCollection.forEachVisible((scrobble) => {
       const point = this.createScrobblePoint(scrobble);
 
       // Points with same coords are getting overridden in the buffer and drawn outside of this loop.
@@ -174,7 +185,7 @@ export default class Timeline {
 
     this.pointBuffer.forEachPoint((x, y, {scrobble: {color}}) => plot.drawPoint(x, y, color));
 
-    plot.drawTimeAxis(leftX, rightX);
+    plot.drawTimeAxis(leftX, rightX, leftTimeX, rightTimeX);
 
     leftTimeLabel.renderText(leftX, timestampToDateTimeString(leftTimestamp), plotWidth);
     rightTimeLabel.renderText(rightX, timestampToDateTimeString(rightTimestamp), plotWidth);

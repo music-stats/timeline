@@ -82,6 +82,14 @@ export function getGenreSortedList(scrobbleList) {
     highlightedColor.s *= colorValueFactors.genre.saturation;
     highlightedColor.l *= colorValueFactors.genre.lightness;
 
+    [
+      color,
+      highlightedColor,
+    ].forEach((c) => {
+      if (c.s > 1) { c.s = 1; }
+      if (c.l > 1) { c.l = 1; }
+    });
+
     genreList.push({
       name: genre,
       group: genreGroup,

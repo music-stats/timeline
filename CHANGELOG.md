@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2020-02-09
+### Added
+* Feature: a scrollbar-like indicator is added to the time axis.
+
+### Changed
+* Improvement: artist labels are better distributed vertically.
+* Performance: using sliding indices for zooming/panning instead of slicing an array of points.
+
 ## [0.1.1] - 2020-02-08
 ### Changed
 * Improvement: selected artist label stays closer to related scrobble point.

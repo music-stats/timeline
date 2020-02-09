@@ -56,16 +56,23 @@ export default class Plot {
     this.ctx.fillRect(0, 0, width, height);
   }
 
-  drawTimeAxis(xFrom, xTo) {
-    const {timeline: {plot: {padding}, timeAxis: {width, color}}} = config;
+  drawTimeAxis(leftX, rightX, leftTimeX, rightTimeX) {
+    const {timeline: {plot: {padding}, timeAxis: {width, timeFullColor, timeRangeColor}}} = config;
     const height = this.dimensions[1];
     const y = height - padding;
 
-    this.ctx.strokeStyle = color;
     this.ctx.lineWidth = width;
+
+    this.ctx.strokeStyle = timeFullColor;
     this.ctx.beginPath();
-    this.ctx.moveTo(xFrom, y);
-    this.ctx.lineTo(xTo, y);
+    this.ctx.moveTo(leftX, y);
+    this.ctx.lineTo(rightX, y);
+    this.ctx.stroke();
+
+    this.ctx.strokeStyle = timeRangeColor;
+    this.ctx.beginPath();
+    this.ctx.moveTo(leftTimeX, y);
+    this.ctx.lineTo(rightTimeX, y);
     this.ctx.stroke();
   }
 

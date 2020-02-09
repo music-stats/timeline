@@ -8,7 +8,6 @@
 
 .ArtistLabelCollection__label {
   position: absolute;
-  transform: translateY(calc(-100% - 4px));
   white-space: nowrap;
   font-size: var(--font-size-normal);
   text-shadow: 0 0 2px var(--color-dark-grey-blue);
@@ -28,6 +27,6 @@
   }
 
   .ArtistLabelCollection__label--highlighted {
-    padding: 1px 3px;
+    padding: 3px 3px 2px;
   }
 }

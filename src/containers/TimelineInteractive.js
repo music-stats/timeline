@@ -1,6 +1,7 @@
 import * as d3Scale from 'd3-scale';
 
 import config from '../config';
+import {createProxyMethod} from '../utils/decorator';
 import {clamp} from '../utils/number';
 import {timestampToDateTimeString} from '../utils/date';
 
@@ -31,6 +32,12 @@ export default class TimelineInteractive {
         onLegendGenreMouseEnter: this.handleLegendGenreMouseEnter.bind(this),
       },
     );
+
+    [
+      'draw',
+      'beforeRender',
+      'render',
+    ].forEach(createProxyMethod(this, this.timeline));
   }
 
   subscribe() {
@@ -182,10 +189,10 @@ export default class TimelineInteractive {
   }
 
   selectVerticallyAdjacentScrobble(shift) {
-    const {scrobbleCollectionZoomed} = this.timeline;
+    const {scrobbleCollection} = this.timeline;
 
     if (this.selectedScrobble) {
-      const adjacentScrobble = scrobbleCollectionZoomed.getAdjacent(this.selectedScrobble, shift);
+      const adjacentScrobble = scrobbleCollection.getAdjacentVisible(this.selectedScrobble.index, shift);
 
       if (adjacentScrobble) {
         this.selectScrobble(adjacentScrobble);
@@ -194,11 +201,11 @@ export default class TimelineInteractive {
   }
 
   selectHorizontallyAdjacentScrobble(shift) {
-    const {scrobbleCollectionZoomed} = this.timeline;
+    const {scrobbleCollection} = this.timeline;
 
     if (this.selectedScrobble) {
       const filter = ({artist: {playcount}}) => playcount === this.selectedScrobble.artist.playcount;
-      const adjacentScrobble = scrobbleCollectionZoomed.getAdjacent(this.selectedScrobble, shift, filter);
+      const adjacentScrobble = scrobbleCollection.getAdjacentVisible(this.selectedScrobble.index, shift, filter);
 
       if (adjacentScrobble) {
         this.selectScrobble(adjacentScrobble);
@@ -217,11 +224,10 @@ export default class TimelineInteractive {
   }
 
   panPlot(event) {
-    const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
     const {offsetX: x} = event;
-    const minTimestamp = scrobbleCollectionFull.getFirst().timestamp;
-    const maxTimestamp = scrobbleCollectionFull.getLast().timestamp;
-
+    const {timestamp: minTimestamp} = scrobbleCollection.getFirst();
+    const {timestamp: maxTimestamp} = scrobbleCollection.getLast();
     const [leftTimestamp, rightTimestamp] = timeRangeScale.domain();
 
     if (rightTimestamp - leftTimestamp >= maxTimestamp - minTimestamp) {
@@ -250,7 +256,7 @@ export default class TimelineInteractive {
 
   zoomPlot(event) {
     const {timeline: {zoomDeltaFactor, minTimeRange, plot: {padding: plotPadding}}} = config;
-    const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
     const {plot} = this.timeline.children;
     const {offsetX, deltaY} = event;
     const timeRangeZoomed = timeRangeScale.domain();
@@ -271,31 +277,30 @@ export default class TimelineInteractive {
       this.updatePlotTimeRange(
         Math.max(
           xTimestamp - leftTimeDiff,
-          scrobbleCollectionFull.getFirst().timestamp,
+          scrobbleCollection.getFirst().timestamp,
         ),
         Math.min(
           xTimestamp + rightTimeDiff,
-          scrobbleCollectionFull.getLast().timestamp,
+          scrobbleCollection.getLast().timestamp,
         ),
       );
     }
   }
 
   updatePlotTimeRange(leftTimestamp, rightTimestamp) {
-    const {scrobbleList} = this.props;
-    const {scrobbleCollectionFull, plotScales: {x: timeRangeScale}} = this.timeline;
-    const leftScrobble = scrobbleCollectionFull.findFirst(({timestamp}) => timestamp >= leftTimestamp);
-    const rightScrobble = scrobbleCollectionFull.findLast(({timestamp}) => timestamp <= rightTimestamp);
+    const {scrobbleCollection, plotScales: {x: timeRangeScale}} = this.timeline;
+    const {index: leftIndex} = scrobbleCollection.findFirst(({timestamp}) => timestamp >= leftTimestamp);
+    const {index: rightIndex} = scrobbleCollection.findLast(({timestamp}) => timestamp <= rightTimestamp);
 
     timeRangeScale.domain([
       leftTimestamp,
       rightTimestamp,
     ]);
 
-    this.timeline.scrobbleCollectionZoomed = new Collection(scrobbleList.slice(
-      leftScrobble.index,
-      rightScrobble.index + 1,
-    ));
+    scrobbleCollection.setVisibleIndexRange(
+      leftIndex,
+      rightIndex,
+    );
 
     this.resetState();
     this.draw();
@@ -373,14 +378,6 @@ export default class TimelineInteractive {
     this.selectGenre(genre);
   }
 
-  draw() {
-    this.timeline.draw();
-  }
-
-  beforeRender() {
-    this.timeline.beforeRender();
-  }
-
   afterRender() {
     this.timeline.afterRender();
     this.subscribe();
@@ -396,9 +393,5 @@ export default class TimelineInteractive {
       .map(([text, point]) => ({text, ...point}))
       .sort((a, b) => b.y - a.y)
       .forEach((point) => artistLabelCollection.renderLabel(point, plotWidth, false));
-  }
-
-  render() {
-    return this.timeline.render();
   }
 }

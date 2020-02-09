@@ -65,5 +65,31 @@ test('Collection', (t) => {
     '".findLast()" returns "undefined" if no elements match',
   );
 
+  collection.setVisibleIndexRange(1, 2);
+
+  t.equal(
+    collection.getFirstVisible(),
+    1,
+    '".getFirstVisible()" return the first element from the visible range',
+  );
+
+  t.equal(
+    collection.getLastVisible(),
+    2,
+    '".getLastVisible()" return the last element from the visible range',
+  );
+
+  t.equal(
+    collection.getAdjacentVisible(1, +1, (value) => value % 2 === 0),
+    2,
+    '".getAdjacentVisible()" finds the nearest visible matching element (searching to the right)',
+  );
+
+  t.equal(
+    collection.getAdjacentVisible(3, -1, (value) => value % 2 === 1),
+    1,
+    '".getAdjacentVisible()" finds the nearest visible matching element (searching to the left)',
+  );
+
   t.end();
 });

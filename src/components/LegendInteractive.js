@@ -1,8 +1,12 @@
+import {createProxyMethod} from '../utils/decorator';
+
 export default class LegendInteractive {
   constructor(props, legend) {
     this.props = props;
     this.legend = legend;
     this.highlightedGenreIndex = null;
+
+    createProxyMethod(this, this.legend)('render');
   }
 
   subscribe() {
@@ -45,9 +49,5 @@ export default class LegendInteractive {
   afterRender() {
     this.legend.afterRender();
     this.subscribe();
-  }
-
-  render() {
-    return this.legend.render();
   }
 }

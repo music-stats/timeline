@@ -39,7 +39,7 @@ export default class ArtistLabelCollection {
   }
 
   getLabelMinY(minX, maxX, y, height) {
-    const {timeline: {labels: {margin}}} = config;
+    const {timeline: {point: {size: pointSize}, labels: {margin}}} = config;
 
     // filtering out bounding boxes that don't collide by X
     const bboxListVertical = this.bboxList
@@ -49,14 +49,14 @@ export default class ArtistLabelCollection {
       ))
       .sort((a, b) => b.minY - a.minY);
 
-    let minY = y;
-    let maxY = y + height;
+    let maxY = y - pointSize;
+    let minY = maxY - height;
 
     // checking if each bbox collides by Y and shifting up by its height when it does
     for (const bbox of bboxListVertical) {
       if (!(
-        minY > bbox.maxY + margin ||
-        maxY < bbox.minY - margin
+        maxY < bbox.minY - margin ||
+        minY > bbox.maxY + margin
       )) {
         maxY = bbox.minY - margin;
         minY = maxY - height;

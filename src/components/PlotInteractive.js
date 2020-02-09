@@ -1,7 +1,18 @@
+import {createProxyMethod} from '../utils/decorator';
+
 export default class PlotInteractive {
   constructor(props, plot) {
     this.props = props;
     this.plot = plot;
+
+    [
+      'getDimensions',
+      'scale',
+      'drawBackground',
+      'drawTimeAxis',
+      'drawPoint',
+      'render',
+    ].forEach(createProxyMethod(this, this.plot));
   }
 
   subscribe() {
@@ -15,32 +26,8 @@ export default class PlotInteractive {
     element.addEventListener('wheel', onWheel);
   }
 
-  getDimensions() {
-    return this.plot.getDimensions();
-  }
-
-  scale() {
-    this.plot.scale();
-  }
-
-  drawBackground() {
-    this.plot.drawBackground();
-  }
-
-  drawTimeAxis(xFrom, xTo) {
-    this.plot.drawTimeAxis(xFrom, xTo);
-  }
-
-  drawPoint(x, y, color) {
-    this.plot.drawPoint(x, y, color);
-  }
-
   afterRender() {
     this.plot.afterRender();
     this.subscribe();
-  }
-
-  render() {
-    return this.plot.render();
   }
 }
