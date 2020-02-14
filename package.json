@@ -10,7 +10,7 @@
     "test": "tape -r @babel/register -r ignore-styles ./src/**/*.spec.js | tap-spec",
     "clean": "rm -rf ./dist/* && mkdir -p ./dist/",
     "copy:data": "cp -r ./data/ ./dist/data/",
-    "copy:favicon": "cp ./assets/favicon.ico ./dist/",
+    "copy:favicon": "cp ./assets/favicon.png ./dist/",
     "copy:dev": "cp ./src/index-dev.html ./dist/index.html && npm run copy:data && npm run copy:favicon",
     "copy:prod": "cp ./src/index-prod.html ./dist/index.html && npm run copy:data && npm run copy:favicon",
     "build:dev": "npm run clean && npm run copy:dev && set -o allexport && source .env-dev && rollup --config --no-treeshake",
