@@ -45,7 +45,7 @@
     "gh-pages": "2.2.0",
     "ignore-styles": "5.0.1",
     "npm-check": "5.9.0",
-    "rollup": "1.31.0",
+    "rollup": "1.31.1",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-eslint": "7.0.0",
@@ -60,6 +60,7 @@
     "d3-color": "1.4.0",
     "d3-scale": "3.2.1",
     "htm": "3.0.3",
+    "micro-conductor": "git+https://github.com/oleksmarkh/micro-conductor.git#v0.1.0",
     "vhtml": "2.2.0"
   }
 }

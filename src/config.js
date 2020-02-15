@@ -1,8 +1,11 @@
 import cssColors from './app-theme';
 
 export default {
+  defaultDataYear: '2020',
+
   dataUrls: {
-    scrobbles: 'data/scrobbles.json',
+    yearList: 'data/years.json',
+    yearsBase: 'data/years',
     artistsByGenres: 'data/artists-by-genres.json',
   },
 
@@ -59,6 +62,7 @@ export default {
     labels: {
       areaPadding: 4,
       margin: 1,
+      highlightedHeight: 16, // not used for label styling, only for limiting plot Y-scale
       highlightedColor: cssColors.white,
     },
 

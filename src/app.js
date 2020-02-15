@@ -1,5 +1,6 @@
-import config from './config';
+import Router, {parse} from 'micro-conductor';
 
+import config from './config';
 import getSummary from './dataset/summary';
 import {insertGenres} from './dataset/genre';
 import {insertColors} from './dataset/color';
@@ -11,16 +12,23 @@ import TimelineInteractive from './containers/TimelineInteractive';
 import './app.css';
 import './app-theme.css';
 
+const cache = {};
+
 function retrieveAll(urlList) {
   return Promise.all(urlList.map(retrieve));
 }
 
 function retrieve(url) {
+  if (cache[url]) {
+    return Promise.resolve(cache[url]);
+  }
+
   return fetch(url)
-    .then((response) => response.json());
+    .then((response) => response.json())
+    .then((data) => cache[url] = data);
 }
 
-function transform([scrobbleListOriginal, artistsByGenres]) {
+function transform([yearList, scrobbleListOriginal, artistsByGenres]) {
   const scrobbleList = scrobbleListOriginal.map((scrobble, index) => ({
     ...scrobble,
     index,
@@ -29,6 +37,7 @@ function transform([scrobbleListOriginal, artistsByGenres]) {
   const summary = getSummary(scrobbleList);
 
   return {
+    yearList,
     summary,
     scrobbleList: insertColors(
       insertGenres(scrobbleList, artistsByGenres),
@@ -45,22 +54,25 @@ function render(props) {
   timeline.afterRender();
   timeline.draw();
 
+  // for debugging only
+  // window.timeline = timeline;
+
   return timeline;
 }
 
-function debug(timeline) {
-  let toDebug = false;
-  // toDebug = true;
-
-  if (toDebug) {
-    window.timeline = timeline;
-  }
+function createTimeline(year) {
+  retrieveAll([
+    config.dataUrls.yearList,
+    `${config.dataUrls.yearsBase}/${year}.json`,
+    config.dataUrls.artistsByGenres,
+  ])
+    .then(transform)
+    .then(render);
 }
 
-retrieveAll([
-  config.dataUrls.scrobbles,
-  config.dataUrls.artistsByGenres,
-])
-  .then(transform)
-  .then(render)
-  .then(debug);
+const router = new Router({
+  '': () => document.location.hash = config.defaultDataYear,
+  [parse`${/\d{4}/}`]: createTimeline,
+});
+
+router.start();

@@ -97,6 +97,7 @@ export default class Timeline {
         plot: {padding: plotPadding},
         point: {size: scrobbleSize, maxMargin: scrobbleMaxMargin},
         timeAxis: {width: timeAxisWidth},
+        labels: {areaPadding: labelAreaPadding, highlightedHeight: highlightedLabelHeight},
       },
     } = config;
 
@@ -106,7 +107,7 @@ export default class Timeline {
 
     // plot height calculation is ensuring equal vertical gaps between points
     const plotBottom = height - plotPadding - timeAxisWidth / 2 - scrobbleSize;
-    const plotMaxHeight = plotBottom - plotPadding;
+    const plotMaxHeight = plotBottom - labelAreaPadding - highlightedLabelHeight - scrobbleSize;
     let scrobbleMargin = scrobbleMaxMargin;
     let plotHeight = plotMaxHeight;
     while (scrobbleMargin >= 0) {
