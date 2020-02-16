@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Feature: multiple datasets support (each year is represented by URL hash).
 
+### Changed
+* Performance: compressed scrobbles (arrays instead of objects) are transported over network.
+
 ## [0.1.2] - 2020-02-09
 ### Added
 * Feature: a scrollbar-like indicator is added to the time axis.

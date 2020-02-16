@@ -4,6 +4,7 @@ import config from './config';
 import getSummary from './dataset/summary';
 import {insertGenres} from './dataset/genre';
 import {insertColors} from './dataset/color';
+import {uncompress} from './dataset/scrobble';
 import {dateTimeStringToTimestamp} from './utils/date';
 
 import Timeline from './containers/Timeline';
@@ -30,10 +31,10 @@ function retrieve(url) {
 }
 
 function transform([yearList, scrobbleListOriginal, artistsByGenres]) {
-  const scrobbleList = scrobbleListOriginal.map((scrobble, index) => ({
-    ...scrobble,
+  const scrobbleList = scrobbleListOriginal.map((compressedScrobble, index) => ({
+    ...uncompress(compressedScrobble),
     index,
-    timestamp: dateTimeStringToTimestamp(scrobble.date),
+    timestamp: dateTimeStringToTimestamp(compressedScrobble[0]),
   }));
   const summary = getSummary(scrobbleList);
 
