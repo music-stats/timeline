@@ -27,14 +27,14 @@ This is a dataviz app that runs a couple of steps:
 Codebase is organized according to simple rules:
 ```
 src/
-├── components  # "dumb" components - layout and styling
-├── containers  # "smart" components - plot rendering and user interaction handlers
-├── dataset     # initial data transformation steps
-├── lib         # configured dependencies
-├── stores      # stateful classes acting as data accessors
-├── utils       # stateless general purpose utils, no app logic
-├── app.js      # app entry point
-└── config.js   # hardcoded values go there (including plot-specific styling)
+├── components/  # "dumb" components - layout and styling
+├── containers/  # "smart" components - plot rendering and user interaction handlers
+├── dataset/     # initial data transformation steps
+├── lib/         # configured dependencies
+├── stores/      # stateful classes acting as data accessors
+├── utils/       # stateless general purpose utils, no app logic
+├── app.js       # app entry point
+└── config.js    # hardcoded values go there (including plot-specific styling)
 ```
 
 Among containers and components there are `<...Interactive />` classes that act as decorators.
@@ -42,7 +42,15 @@ Such classes add various handlers that define behavior for classes they decorate
 
 ## What makes it possible?
 ### data source
-See [scripts supporting the scrobble timeline](https://github.com/music-stats/scripts#scrobble-timeline).
+Datasets are supplied by [scripts](https://github.com/music-stats/scripts#scrobble-timeline) and served from the following URL structure (see `src/config.js`):
+```
+data/
+├── years.json              # a list of years available, e.g. ["2012", "2013", ..., "2020"]
+├── years/                  # scrobble lists for each year
+│   ├── ...
+│   └── 2020.json
+└── artists-by-genres.json  # enables the legend and colorcoding
+```
 
 ### dev deps
 * linter: [`eslint`](https://eslint.org/)

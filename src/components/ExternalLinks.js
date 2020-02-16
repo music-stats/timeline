@@ -9,7 +9,7 @@ export default class ExternalLinks {
 
     return html`
       <aside
-        class="ExternalLinks list-box"
+        class="ExternalLinks list-box list-box--with-rows"
       >
         <p
           class="ExternalLinks__field list-box__field"

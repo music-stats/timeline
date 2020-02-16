@@ -107,7 +107,7 @@ export default class InfoBox {
 
     return html`
       <aside
-        class="InfoBox list-box list-box--with-bg"
+        class="InfoBox list-box list-box--with-rows list-box--with-bg"
       >
         <p
           class="InfoBox__field--intro-message list-box__field"

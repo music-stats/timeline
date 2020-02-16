@@ -1,0 +1,25 @@
+.YearNavigation {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+}
+
+.YearNavigation__year-link {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.YearNavigation__year-link:last-child {
+  margin-right: 0;
+}
+
+.YearNavigation__year-link--current {
+  text-decoration: underline;
+}
+
+@media all and (max-width: 400px) {
+  .YearNavigation {
+    font-size: var(--font-size-normal);
+  }
+}

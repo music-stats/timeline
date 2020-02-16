@@ -31,9 +31,12 @@ a::selection {
 }
 
 .list-box {
+  margin: 12px;
+}
+
+.list-box--with-rows {
   display: grid;
   grid-row-gap: 4px;
-  margin: 12px;
 }
 
 .list-box--with-bg {

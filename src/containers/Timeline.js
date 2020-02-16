@@ -10,6 +10,7 @@ import PointBuffer from '../stores/PointBuffer';
 import Plot from '../components/Plot';
 import PlotInteractive from '../components/PlotInteractive';
 import TimeAxisLabel from '../components/TimeAxisLabel';
+import YearNavigation from '../components/YearNavigation';
 import InfoBox from '../components/InfoBox';
 import ExternalLinks from '../components/ExternalLinks';
 import Legend from '../components/Legend';
@@ -36,6 +37,7 @@ export default class Timeline {
   initializeChildrenComponents() {
     const {
       summary,
+      yearList,
       scrobbleList,
       onPlotMouseDown,
       onPlotMouseUp,
@@ -57,6 +59,11 @@ export default class Timeline {
         pointHalfSize: this.scrobbleHalfSize,
       }),
     );
+
+    this.children.yearNavigation = new YearNavigation({
+      currentYear: document.location.hash.slice(1),
+      yearList,
+    });
 
     this.children.infoBox = new InfoBox({
       dates: {

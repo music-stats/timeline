@@ -2,7 +2,7 @@
   position: absolute;
   /* "z-index" should be greater than the one for ".ArtistLabelCollection" */
   z-index: 2;
-  top: 0;
+  top: 42px;
   left: 0;
   /* allows the canvas to receive mouse events under the info box */
   pointer-events: none;
@@ -19,6 +19,7 @@
 
 @media all and (max-width: 400px) {
   .InfoBox {
+    top: 40px;
     font-size: var(--font-size-normal);
   }
 }
