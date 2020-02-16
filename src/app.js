@@ -12,20 +12,21 @@ import TimelineInteractive from './containers/TimelineInteractive';
 import './app.css';
 import './app-theme.css';
 
-const cache = {};
+const dataCache = {};
+let currentTimeline = null;
 
 function retrieveAll(urlList) {
   return Promise.all(urlList.map(retrieve));
 }
 
 function retrieve(url) {
-  if (cache[url]) {
-    return Promise.resolve(cache[url]);
+  if (dataCache[url]) {
+    return Promise.resolve(dataCache[url]);
   }
 
   return fetch(url)
     .then((response) => response.json())
-    .then((data) => cache[url] = data);
+    .then((data) => dataCache[url] = data);
 }
 
 function transform([yearList, scrobbleListOriginal, artistsByGenres]) {
@@ -49,13 +50,16 @@ function transform([yearList, scrobbleListOriginal, artistsByGenres]) {
 function render(props) {
   const timeline = new TimelineInteractive(props, new Timeline(props));
 
+  if (currentTimeline) {
+    currentTimeline.unsubscribe();
+  }
+
   timeline.beforeRender();
   document.body.innerHTML = timeline.render();
   timeline.afterRender();
   timeline.draw();
 
-  // for debugging only
-  // window.timeline = timeline;
+  currentTimeline = timeline;
 
   return timeline;
 }

@@ -5,6 +5,7 @@ export default class LegendInteractive {
     this.props = props;
     this.legend = legend;
     this.highlightedGenreIndex = null;
+    this.eventListeners = {};
 
     createProxyMethod(this, this.legend)('render');
   }
@@ -16,8 +17,21 @@ export default class LegendInteractive {
     for (let i = 0; i < genreElementCollection.length; i += 1) {
       const genreElement = genreElementCollection[i];
       const {name} = genreList[i];
+      const onMouseEnter = () => onGenreMouseEnter(name);
 
-      genreElement.addEventListener('mouseenter', () => onGenreMouseEnter(name));
+      this.eventListeners[name] = onMouseEnter;
+      genreElement.addEventListener('mouseenter', onMouseEnter);
+    }
+  }
+
+  unsubscribe() {
+    const {genreElementCollection, genreList} = this.legend;
+
+    for (let i = 0; i < genreElementCollection.length; i += 1) {
+      const genreElement = genreElementCollection[i];
+      const {name} = genreList[i];
+
+      genreElement.removeEventListener('mouseenter', this.eventListeners[name]);
     }
   }
 

@@ -38,11 +38,25 @@ export default class TimelineInteractive {
       'beforeRender',
       'render',
     ].forEach(createProxyMethod(this, this.timeline));
+
+    this.handleWindowResize = this.handleWindowResize.bind(this);
+    this.handleDocumentKeydown = this.handleDocumentKeydown.bind(this);
   }
 
   subscribe() {
-    window.addEventListener('resize', this.handleWindowResize.bind(this));
-    document.addEventListener('keydown', this.handleDocumentKeydown.bind(this));
+    window.addEventListener('resize', this.handleWindowResize);
+    document.addEventListener('keydown', this.handleDocumentKeydown);
+  }
+
+  unsubscribe() {
+    Object.values(this.timeline.children).forEach((child) => {
+      if (typeof child.unsubscribe === 'function') {
+        child.unsubscribe();
+      }
+    });
+
+    window.removeEventListener('resize', this.handleWindowResize);
+    document.removeEventListener('keydown', this.handleDocumentKeydown);
   }
 
   resetScales() {

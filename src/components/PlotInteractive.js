@@ -26,6 +26,17 @@ export default class PlotInteractive {
     element.addEventListener('wheel', onWheel);
   }
 
+  unsubscribe() {
+    const {onMouseDown, onMouseUp, onMouseOut, onMouseMove, onWheel} = this.props;
+    const {element} = this.plot;
+
+    element.removeEventListener('mousedown', onMouseDown);
+    element.removeEventListener('mouseup', onMouseUp);
+    element.removeEventListener('mouseout', onMouseOut);
+    element.removeEventListener('mousemove', onMouseMove);
+    element.removeEventListener('wheel', onWheel);
+  }
+
   afterRender() {
     this.plot.afterRender();
     this.subscribe();
