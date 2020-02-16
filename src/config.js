@@ -36,7 +36,7 @@ export default {
     },
 
     point: {
-      size: 4,
+      size: 3,
       maxMargin: 1,
       selectedColor: cssColors.white,
       colorValueFactors: {
@@ -73,7 +73,7 @@ export default {
     },
 
     legend: {
-      height: 140,
+      height: 150, // the longest genre label should fit
     },
 
     // grey
@@ -137,6 +137,7 @@ export default {
       genres: [
         'Folk',
         'Bluegrass',
+        'Blackgrass',
         'Folk Rock',
         'Folk Metal',
         'Dark Folk',
@@ -150,7 +151,9 @@ export default {
 
       genres: [
         'Classic Rock',
+        'Instrumental Rock',
         'Alternative Rock',
+        'Soviet Rock',
         'Gothic Rock',
         'Grunge',
         'Indie Rock',
@@ -167,6 +170,7 @@ export default {
 
       genres: [
         'Black Metal',
+        'Melodic Black Metal',
         'Post-black',
         'Heavy Metal',
         'Power Metal',

@@ -77,6 +77,7 @@ function createTimeline(year) {
 
 const router = new Router({
   '': () => document.location.hash = config.defaultDataYear,
+  'all': createTimeline,
   [parse`${/\d{4}/}`]: createTimeline,
 });
 
