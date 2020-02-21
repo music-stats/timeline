@@ -15289,5 +15289,986 @@
     1,
     "Vokonis",
     1
+  ],
+  [
+    "2020-02-19 10:15",
+    "Sunless Hymnal",
+    1,
+    "Grasping Time",
+    2,
+    "Vokonis",
+    2
+  ],
+  [
+    "2020-02-19 10:20",
+    "I Hear the Siren",
+    1,
+    "Grasping Time",
+    3,
+    "Vokonis",
+    3
+  ],
+  [
+    "2020-02-19 10:22",
+    "Exiled",
+    1,
+    "Grasping Time",
+    4,
+    "Vokonis",
+    4
+  ],
+  [
+    "2020-02-19 10:24",
+    "Ashes",
+    1,
+    "Grasping Time",
+    5,
+    "Vokonis",
+    5
+  ],
+  [
+    "2020-02-19 10:24",
+    "Embers",
+    1,
+    "Grasping Time",
+    6,
+    "Vokonis",
+    6
+  ],
+  [
+    "2020-02-19 23:48",
+    "Мексиканець",
+    1,
+    "Мертві голоси",
+    1,
+    "Zwyntar",
+    1
+  ],
+  [
+    "2020-02-19 23:52",
+    "Мої сестри - відьми",
+    1,
+    "Мертві голоси",
+    2,
+    "Zwyntar",
+    2
+  ],
+  [
+    "2020-02-19 23:55",
+    "Муншайн",
+    1,
+    "Мертві голоси",
+    3,
+    "Zwyntar",
+    3
+  ],
+  [
+    "2020-02-19 23:59",
+    "Микола",
+    1,
+    "Мертві голоси",
+    4,
+    "Zwyntar",
+    4
+  ],
+  [
+    "2020-02-20 00:03",
+    "Кажани",
+    1,
+    "Мертві голоси",
+    5,
+    "Zwyntar",
+    5
+  ],
+  [
+    "2020-02-20 00:08",
+    "На Болоті",
+    1,
+    "Мертві голоси",
+    6,
+    "Zwyntar",
+    6
+  ],
+  [
+    "2020-02-20 00:13",
+    "Мертві голоси",
+    1,
+    "Мертві голоси",
+    7,
+    "Zwyntar",
+    7
+  ],
+  [
+    "2020-02-20 09:17",
+    "Hey Porter",
+    1,
+    "The Essential Johnny Cash",
+    1,
+    "Johnny Cash",
+    1
+  ],
+  [
+    "2020-02-20 09:19",
+    "Cry, Cry, Cry - 1988 Version",
+    1,
+    "The Essential Johnny Cash",
+    2,
+    "Johnny Cash",
+    2
+  ],
+  [
+    "2020-02-20 09:21",
+    "I Walk the Line",
+    1,
+    "The Essential Johnny Cash",
+    3,
+    "Johnny Cash",
+    3
+  ],
+  [
+    "2020-02-20 09:24",
+    "Get Rhythm",
+    1,
+    "The Essential Johnny Cash",
+    4,
+    "Johnny Cash",
+    4
+  ],
+  [
+    "2020-02-20 09:26",
+    "There You Go",
+    1,
+    "The Essential Johnny Cash",
+    5,
+    "Johnny Cash",
+    5
+  ],
+  [
+    "2020-02-20 09:29",
+    "Ballad Of A Teenage Queen",
+    1,
+    "The Essential Johnny Cash",
+    6,
+    "Johnny Cash",
+    6
+  ],
+  [
+    "2020-02-20 09:31",
+    "Big River",
+    1,
+    "The Essential Johnny Cash",
+    7,
+    "Johnny Cash",
+    7
+  ],
+  [
+    "2020-02-20 09:33",
+    "Guess Things Happen That Way",
+    1,
+    "The Essential Johnny Cash",
+    8,
+    "Johnny Cash",
+    8
+  ],
+  [
+    "2020-02-20 09:35",
+    "All over Again",
+    1,
+    "The Essential Johnny Cash",
+    9,
+    "Johnny Cash",
+    9
+  ],
+  [
+    "2020-02-20 09:38",
+    "Don't Take Your Guns to Town",
+    1,
+    "The Essential Johnny Cash",
+    10,
+    "Johnny Cash",
+    10
+  ],
+  [
+    "2020-02-20 09:41",
+    "Five Feet High And Rising",
+    1,
+    "The Essential Johnny Cash",
+    11,
+    "Johnny Cash",
+    11
+  ],
+  [
+    "2020-02-20 09:42",
+    "The Rebel-Johnny Yuma",
+    1,
+    "The Essential Johnny Cash",
+    12,
+    "Johnny Cash",
+    12
+  ],
+  [
+    "2020-02-20 09:44",
+    "Tennessee Flat-Top Box",
+    1,
+    "The Essential Johnny Cash",
+    13,
+    "Johnny Cash",
+    13
+  ],
+  [
+    "2020-02-20 09:47",
+    "I Still Miss Someone",
+    1,
+    "The Essential Johnny Cash",
+    14,
+    "Johnny Cash",
+    14
+  ],
+  [
+    "2020-02-20 09:50",
+    "Ring of Fire",
+    1,
+    "The Essential Johnny Cash",
+    15,
+    "Johnny Cash",
+    15
+  ],
+  [
+    "2020-02-20 09:52",
+    "The Ballad Of Ira Hayes",
+    1,
+    "The Essential Johnny Cash",
+    16,
+    "Johnny Cash",
+    16
+  ],
+  [
+    "2020-02-20 09:57",
+    "Orange Blossom Special",
+    1,
+    "The Essential Johnny Cash",
+    17,
+    "Johnny Cash",
+    17
+  ],
+  [
+    "2020-02-20 10:00",
+    "Were You There (When They Crucified My Lord)",
+    1,
+    "The Essential Johnny Cash",
+    18,
+    "Johnny Cash",
+    18
+  ],
+  [
+    "2020-02-20 10:04",
+    "It Ain't Me, Babe (with June Carter Cash)",
+    1,
+    "The Essential Johnny Cash",
+    19,
+    "Johnny Cash",
+    19
+  ],
+  [
+    "2020-02-20 10:09",
+    "Iz Magle",
+    1,
+    "Doline su ostale iza nas",
+    1,
+    "Bednja",
+    1
+  ],
+  [
+    "2020-02-20 10:14",
+    "Posljednji Krik",
+    1,
+    "Doline su ostale iza nas",
+    2,
+    "Bednja",
+    2
+  ],
+  [
+    "2020-02-20 10:17",
+    "Povratak Kralja",
+    1,
+    "Doline su ostale iza nas",
+    3,
+    "Bednja",
+    3
+  ],
+  [
+    "2020-02-20 10:25",
+    "Ledena Palaca",
+    1,
+    "Doline su ostale iza nas",
+    4,
+    "Bednja",
+    4
+  ],
+  [
+    "2020-02-20 10:31",
+    "Tisina Je Smrt",
+    1,
+    "Doline su ostale iza nas",
+    5,
+    "Bednja",
+    5
+  ],
+  [
+    "2020-02-20 10:35",
+    "Doline Su Ostale Iza Nas",
+    1,
+    "Doline su ostale iza nas",
+    6,
+    "Bednja",
+    6
+  ],
+  [
+    "2020-02-20 15:39",
+    "Black Trip",
+    1,
+    "Ceremony of Opposites",
+    1,
+    "Samael",
+    1
+  ],
+  [
+    "2020-02-20 15:42",
+    "Celebration of the Fourth",
+    1,
+    "Ceremony of Opposites",
+    2,
+    "Samael",
+    2
+  ],
+  [
+    "2020-02-20 15:45",
+    "Son of Earth",
+    1,
+    "Ceremony of Opposites",
+    3,
+    "Samael",
+    3
+  ],
+  [
+    "2020-02-20 15:49",
+    "Till We Meet Again",
+    1,
+    "Ceremony of Opposites",
+    4,
+    "Samael",
+    4
+  ],
+  [
+    "2020-02-20 15:53",
+    "Mask of the Red Death",
+    1,
+    "Ceremony of Opposites",
+    5,
+    "Samael",
+    5
+  ],
+  [
+    "2020-02-20 15:56",
+    "Baphomet's Throne",
+    1,
+    "Ceremony of Opposites",
+    6,
+    "Samael",
+    6
+  ],
+  [
+    "2020-02-20 16:00",
+    "Flagellation",
+    1,
+    "Ceremony of Opposites",
+    7,
+    "Samael",
+    7
+  ],
+  [
+    "2020-02-20 16:04",
+    "Crown",
+    1,
+    "Ceremony of Opposites",
+    8,
+    "Samael",
+    8
+  ],
+  [
+    "2020-02-20 16:08",
+    "To Our Martyrs",
+    1,
+    "Ceremony of Opposites",
+    9,
+    "Samael",
+    9
+  ],
+  [
+    "2020-02-20 16:10",
+    "Ceremony of Opposites",
+    1,
+    "Ceremony of Opposites",
+    10,
+    "Samael",
+    10
+  ],
+  [
+    "2020-02-20 16:23",
+    "Kuolon tanssi",
+    1,
+    "Chaos Born",
+    1,
+    "Catamenia",
+    1
+  ],
+  [
+    "2020-02-20 16:28",
+    "Calm Before the Storm",
+    1,
+    "Chaos Born",
+    2,
+    "Catamenia",
+    2
+  ],
+  [
+    "2020-02-20 16:34",
+    "The Fallen Angel , Pt.I",
+    1,
+    "Chaos Born",
+    3,
+    "Catamenia",
+    3
+  ],
+  [
+    "2020-02-20 16:40",
+    "The Fear's Shadow",
+    1,
+    "Chaos Born",
+    4,
+    "Catamenia",
+    4
+  ],
+  [
+    "2020-02-20 16:45",
+    "Mirrorized Thoughts",
+    1,
+    "Chaos Born",
+    5,
+    "Catamenia",
+    5
+  ],
+  [
+    "2020-02-20 16:49",
+    "Lost in Bitterness",
+    1,
+    "Chaos Born",
+    6,
+    "Catamenia",
+    6
+  ],
+  [
+    "2020-02-20 16:55",
+    "The Era",
+    1,
+    "Chaos Born",
+    7,
+    "Catamenia",
+    7
+  ],
+  [
+    "2020-02-20 16:57",
+    "The Fallen Angel , Pt.II",
+    1,
+    "Chaos Born",
+    8,
+    "Catamenia",
+    8
+  ],
+  [
+    "2020-02-20 17:01",
+    "One With Sorrow",
+    1,
+    "Chaos Born",
+    9,
+    "Catamenia",
+    9
+  ],
+  [
+    "2020-02-20 17:06",
+    "Hollow Out-Chaos Born",
+    1,
+    "Chaos Born",
+    10,
+    "Catamenia",
+    10
+  ],
+  [
+    "2020-02-20 17:11",
+    "Dreaded Time",
+    1,
+    "Scourge of Malice (Remastered)",
+    1,
+    "Graveworm",
+    1
+  ],
+  [
+    "2020-02-20 17:12",
+    "Unhallowed by the Infernal One",
+    1,
+    "Scourge of Malice (Remastered)",
+    2,
+    "Graveworm",
+    2
+  ],
+  [
+    "2020-02-20 17:18",
+    "Abandoned by Heaven",
+    1,
+    "Scourge of Malice (Remastered)",
+    3,
+    "Graveworm",
+    3
+  ],
+  [
+    "2020-02-20 17:25",
+    "Descending into Etherial Mist",
+    1,
+    "Scourge of Malice (Remastered)",
+    4,
+    "Graveworm",
+    4
+  ],
+  [
+    "2020-02-20 17:31",
+    "Threnody",
+    1,
+    "Scourge of Malice (Remastered)",
+    5,
+    "Graveworm",
+    5
+  ],
+  [
+    "2020-02-20 17:36",
+    "Demonic Dreams",
+    1,
+    "Scourge of Malice (Remastered)",
+    6,
+    "Graveworm",
+    6
+  ],
+  [
+    "2020-02-20 17:43",
+    "Fear of the Dark",
+    1,
+    "Scourge of Malice (Remastered)",
+    7,
+    "Graveworm",
+    7
+  ],
+  [
+    "2020-02-20 17:52",
+    "In Vengeance of Our Wrath",
+    1,
+    "Scourge of Malice (Remastered)",
+    8,
+    "Graveworm",
+    8
+  ],
+  [
+    "2020-02-20 19:16",
+    "Aimless Arrow",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    1,
+    "Converge",
+    1
+  ],
+  [
+    "2020-02-20 19:19",
+    "Trespasses",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    2,
+    "Converge",
+    2
+  ],
+  [
+    "2020-02-20 19:20",
+    "Tender Abuse",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    3,
+    "Converge",
+    3
+  ],
+  [
+    "2020-02-20 19:23",
+    "Sadness Comes Home",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    4,
+    "Converge",
+    4
+  ],
+  [
+    "2020-02-20 19:26",
+    "Empty on the Inside",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    5,
+    "Converge",
+    5
+  ],
+  [
+    "2020-02-20 19:27",
+    "Sparrow's Fall",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    6,
+    "Converge",
+    6
+  ],
+  [
+    "2020-02-20 19:32",
+    "Glacial Pace",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    7,
+    "Converge",
+    7
+  ],
+  [
+    "2020-02-20 19:33",
+    "No Light Escapes",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    8,
+    "Converge",
+    8
+  ],
+  [
+    "2020-02-20 19:34",
+    "Vicious Muse",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    9,
+    "Converge",
+    9
+  ],
+  [
+    "2020-02-20 19:37",
+    "Veins and Veils",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    10,
+    "Converge",
+    10
+  ],
+  [
+    "2020-02-20 19:42",
+    "Coral Blue",
+    1,
+    "All We Love We Leave Behind (Deluxe Edition)",
+    11,
+    "Converge",
+    11
+  ],
+  [
+    "2020-02-21 07:04",
+    "Sucker",
+    1,
+    "Kiss of Death",
+    1,
+    "Motörhead",
+    1
+  ],
+  [
+    "2020-02-21 07:07",
+    "One Night Stand",
+    1,
+    "Kiss of Death",
+    2,
+    "Motörhead",
+    2
+  ],
+  [
+    "2020-02-21 07:10",
+    "Devil I Know",
+    1,
+    "Kiss of Death",
+    3,
+    "Motörhead",
+    3
+  ],
+  [
+    "2020-02-21 07:13",
+    "Trigger",
+    1,
+    "Kiss of Death",
+    4,
+    "Motörhead",
+    4
+  ],
+  [
+    "2020-02-21 09:55",
+    "Living in the Past",
+    1,
+    "Kiss of Death",
+    5,
+    "Motörhead",
+    5
+  ],
+  [
+    "2020-02-21 09:59",
+    "WST",
+    1,
+    "Nighttime Stories",
+    1,
+    "Pelican",
+    1
+  ],
+  [
+    "2020-02-21 10:04",
+    "Midnight and Mescaline",
+    1,
+    "Nighttime Stories",
+    2,
+    "Pelican",
+    2
+  ],
+  [
+    "2020-02-21 10:09",
+    "Abyssal Plain",
+    1,
+    "Nighttime Stories",
+    3,
+    "Pelican",
+    3
+  ],
+  [
+    "2020-02-21 10:19",
+    "Cold Hope",
+    1,
+    "Nighttime Stories",
+    4,
+    "Pelican",
+    4
+  ],
+  [
+    "2020-02-21 15:23",
+    "Ayahuasca",
+    1,
+    "Ayahuasca",
+    1,
+    "Vancouver Sleep Clinic",
+    9
+  ],
+  [
+    "2020-02-21 15:32",
+    "Despondence",
+    1,
+    "Rabbits",
+    1,
+    "Brume",
+    1
+  ],
+  [
+    "2020-02-21 15:40",
+    "Scurry",
+    1,
+    "Rabbits",
+    2,
+    "Brume",
+    2
+  ],
+  [
+    "2020-02-21 15:49",
+    "Blue Jay",
+    1,
+    "Rabbits",
+    3,
+    "Brume",
+    3
+  ],
+  [
+    "2020-02-21 15:54",
+    "Lament",
+    1,
+    "Rabbits",
+    4,
+    "Brume",
+    4
+  ],
+  [
+    "2020-02-21 16:05",
+    "Autocrat's Fool",
+    1,
+    "Rabbits",
+    5,
+    "Brume",
+    5
+  ],
+  [
+    "2020-02-21 16:16",
+    "Intro",
+    1,
+    "Golden Tooth",
+    1,
+    "Sasha Boole",
+    1
+  ],
+  [
+    "2020-02-21 16:17",
+    "Play and Pray",
+    1,
+    "Golden Tooth",
+    2,
+    "Sasha Boole",
+    2
+  ],
+  [
+    "2020-02-21 16:22",
+    "Golden tooth",
+    1,
+    "Golden Tooth",
+    3,
+    "Sasha Boole",
+    3
+  ],
+  [
+    "2020-02-21 16:25",
+    "Пилю обріз",
+    1,
+    "Golden Tooth",
+    4,
+    "Sasha Boole",
+    4
+  ],
+  [
+    "2020-02-21 16:29",
+    "Not the Place Where I Belong",
+    1,
+    "Golden Tooth",
+    5,
+    "Sasha Boole",
+    5
+  ],
+  [
+    "2020-02-21 16:32",
+    "By the Sea",
+    1,
+    "Golden Tooth",
+    6,
+    "Sasha Boole",
+    6
+  ],
+  [
+    "2020-02-21 16:36",
+    "I Know For Sure",
+    1,
+    "Golden Tooth",
+    7,
+    "Sasha Boole",
+    7
+  ],
+  [
+    "2020-02-21 16:40",
+    "Down by the Riverside",
+    1,
+    "Golden Tooth",
+    8,
+    "Sasha Boole",
+    8
+  ],
+  [
+    "2020-02-21 16:44",
+    "Left Behind",
+    1,
+    "Golden Tooth",
+    9,
+    "Sasha Boole",
+    9
+  ],
+  [
+    "2020-02-21 18:33",
+    "Welcome to Violence",
+    1,
+    "God Told Me To",
+    1,
+    "John 5",
+    1
+  ],
+  [
+    "2020-02-21 18:42",
+    "Beat It",
+    1,
+    "God Told Me To",
+    2,
+    "John 5",
+    2
+  ],
+  [
+    "2020-02-21 18:45",
+    "Asland Bump",
+    1,
+    "God Told Me To",
+    3,
+    "John 5",
+    3
+  ],
+  [
+    "2020-02-21 18:45",
+    "Killa Fornia",
+    1,
+    "God Told Me To",
+    4,
+    "John 5",
+    4
+  ],
+  [
+    "2020-02-21 18:52",
+    "The Castle",
+    1,
+    "God Told Me To",
+    5,
+    "John 5",
+    5
+  ],
+  [
+    "2020-02-21 18:57",
+    "The Hill Of The Seven Jackals",
+    1,
+    "God Told Me To",
+    6,
+    "John 5",
+    6
+  ],
+  [
+    "2020-02-21 18:57",
+    "Noche Acosador",
+    1,
+    "God Told Me To",
+    7,
+    "John 5",
+    7
+  ],
+  [
+    "2020-02-21 19:00",
+    "The Lust Killer",
+    1,
+    "God Told Me To",
+    8,
+    "John 5",
+    8
+  ],
+  [
+    "2020-02-21 19:38",
+    "Partners",
+    1,
+    "Partners",
+    1,
+    "Peter Broderick",
+    1
   ]
 ]
