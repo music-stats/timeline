@@ -1,11 +1,14 @@
 import Router, {parse} from 'micro-conductor';
 
 import config from './config';
+
 import getSummary from './dataset/summary';
 import {insertGenres} from './dataset/genre';
 import {insertColors} from './dataset/color';
 import {uncompress} from './dataset/scrobble';
+
 import {dateTimeStringToTimestamp} from './utils/date';
+import {url} from './utils/string';
 
 import Timeline from './containers/Timeline';
 import TimelineInteractive from './containers/TimelineInteractive';
@@ -65,6 +68,24 @@ function render(props) {
   return timeline;
 }
 
+function logMissingGenreArtists(timeline) {
+  if (!config.debug) {
+    return;
+  }
+
+  Object.entries(
+    timeline.artistPointRegistry
+      .filter((itemList) => !('genre' in itemList[0].scrobble.artist)),
+  )
+    .filter((entry) => entry[1].length > 1)
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([artistName, artistScrobbleList]) => console.log(
+      artistScrobbleList.length,
+      artistName,
+      url`https://www.last.fm/music/${artistName}`,
+    ));
+}
+
 function createTimeline(year) {
   retrieveAll([
     config.dataUrls.yearList,
@@ -72,7 +93,8 @@ function createTimeline(year) {
     config.dataUrls.artistsByGenres,
   ])
     .then(transform)
-    .then(render);
+    .then(render)
+    .then(logMissingGenreArtists);
 }
 
 const router = new Router({

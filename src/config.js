@@ -1,6 +1,8 @@
 import cssColors from './app-theme';
 
 export default {
+  debug: false,
+
   defaultDataYear: '2020',
 
   dataUrls: {
@@ -96,9 +98,9 @@ export default {
       colorRange: ['#cb181d', '#fc9272'],
 
       genres: [
+        'Art Pop',
         'Pop',
         'Singer-songwriter',
-        'Art Pop',
       ],
     },
 
@@ -107,12 +109,12 @@ export default {
       colorRange: ['#cc4c02', '#fec44f'],
 
       genres: [
-        'Electronic',
         'Ambient',
         'Darkwave',
+        'Dream Pop',
+        'Electronic',
         'Industrial',
         'Trip Hop',
-        'Dream Pop',
       ],
     },
 
@@ -121,12 +123,13 @@ export default {
       colorRange: ['#fec44f', '#fff7bc'],
 
       genres: [
-        'Jazz',
         'Blues',
-        'Rockabilly',
-        'Rock And Roll',
         'Funk',
         'Hip-hop',
+        'Jazz',
+        'Rock And Roll',
+        'Rockabilly',
+        'Soul',
       ],
     },
 
@@ -135,12 +138,13 @@ export default {
       colorRange: ['#238b45', '#a1d99b'],
 
       genres: [
-        'Folk',
-        'Bluegrass',
+        'Acoustic',
         'Blackgrass',
-        'Folk Rock',
-        'Folk Metal',
+        'Bluegrass',
         'Dark Folk',
+        'Folk Metal',
+        'Folk Rock',
+        'Folk',
         'Freak Folk',
       ],
     },
@@ -150,17 +154,17 @@ export default {
       colorRange: ['#2171b5', '#9ecae1'],
 
       genres: [
-        'Classic Rock',
-        'Instrumental Rock',
         'Alternative Rock',
-        'Soviet Rock',
+        'Classic Rock',
         'Gothic Rock',
-        'Grunge',
         'Indie Rock',
+        'Industrial Rock',
+        'Instrumental Rock',
+        'Pop Rock',
         'Post-rock',
         'Progressive Rock',
+        'Rautalanka',
         'Stoner Rock',
-        'Industrial Rock',
       ],
     },
 
@@ -170,26 +174,25 @@ export default {
 
       genres: [
         'Black Metal',
-        'Melodic Black Metal',
-        'Post-black',
+        'Death Metal',
+        'Deathcore',
+        'Doom Metal',
+        'Gothic Metal',
+        'Groove Metal',
         'Heavy Metal',
+        'Industrial Metal',
+        'Melodic Black Metal',
+        'Melodic Death Metal',
+        'Metalcore',
+        'Nu Metal',
+        'Post-black',
         'Power Metal',
+        'Progressive Death Metal',
+        'Progressive Metal',
+        'Sludge Metal',
         'Speed Metal',
         'Symphonic Metal',
-        'Progressive Metal',
-        'Gothic Metal',
         'Thrash Metal',
-        'Groove Metal',
-        'Doom Metal',
-        'Death Metal',
-        'Melodic Death Metal',
-        'Progressive Death Metal',
-        'Industrial Metal',
-        'Nu Metal',
-        'Metalcore',
-        'Deathcore',
-        'Screamo',
-        'Sludge Metal',
       ],
     },
 
@@ -198,10 +201,12 @@ export default {
       colorRange: ['#ce1256', '#c994c7'],
 
       genres: [
-        'Punk Rock',
-        'Ska Punk',
-        'Post-punk',
+        'Grunge',
         'Hardcore',
+        'Post-punk',
+        'Punk Rock',
+        'Screamo',
+        'Ska Punk',
       ],
     },
   },

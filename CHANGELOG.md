@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 * Feature: multiple datasets support (each year is represented by URL hash).
+* Feature: log artists with missing genres (in debug mode).
 
 ### Changed
 * Performance: compressed scrobbles (arrays instead of objects) are transported over network.

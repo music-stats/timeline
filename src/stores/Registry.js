@@ -25,4 +25,18 @@ export default class Registry {
   getItemList(key) {
     return this.registry[key] || [];
   }
+
+  filter(filter) {
+    const registry = {};
+
+    for (const key in this.registry) {
+      const itemList = this.registry[key];
+
+      if (filter(itemList)) {
+        registry[key] = itemList;
+      }
+    }
+
+    return registry;
+  }
 }
