@@ -1102,31 +1102,13 @@
     "Witchy Woman",
     1,
     "Complete Greatest Hits CD1",
-    1,
-    "The Eagles",
-    1
-  ],
-  [
-    "2013-01-08 16:15",
-    "Midnight Flyer",
-    1,
-    "Complete Greatest Hits CD1",
     4,
     "Eagles",
     4
   ],
   [
-    "2013-01-08 16:18",
-    "Tequila Sunrise",
-    1,
-    "Complete Greatest Hits CD1",
-    2,
-    "The Eagles",
-    2
-  ],
-  [
-    "2013-01-08 16:22",
-    "On the Border",
+    "2013-01-08 16:15",
+    "Midnight Flyer",
     1,
     "Complete Greatest Hits CD1",
     5,
@@ -1134,8 +1116,8 @@
     5
   ],
   [
-    "2013-01-08 16:26",
-    "Lyin' Eyes",
+    "2013-01-08 16:18",
+    "Tequila Sunrise",
     1,
     "Complete Greatest Hits CD1",
     6,
@@ -1143,8 +1125,8 @@
     6
   ],
   [
-    "2013-01-08 16:33",
-    "James Dean",
+    "2013-01-08 16:22",
+    "On the Border",
     1,
     "Complete Greatest Hits CD1",
     7,
@@ -1152,13 +1134,31 @@
     7
   ],
   [
-    "2013-01-08 16:36",
-    "Take It to the Limit",
+    "2013-01-08 16:26",
+    "Lyin' Eyes",
     1,
     "Complete Greatest Hits CD1",
     8,
     "Eagles",
     8
+  ],
+  [
+    "2013-01-08 16:33",
+    "James Dean",
+    1,
+    "Complete Greatest Hits CD1",
+    9,
+    "Eagles",
+    9
+  ],
+  [
+    "2013-01-08 16:36",
+    "Take It to the Limit",
+    1,
+    "Complete Greatest Hits CD1",
+    10,
+    "Eagles",
+    10
   ],
   [
     "2013-01-08 18:03",
@@ -3326,7 +3326,7 @@
     1,
     "Вальсирующие во тьме",
     1,
-    "МРф",
+    "МРФ",
     1
   ],
   [
@@ -3335,7 +3335,7 @@
     1,
     "Вальсирующие во тьме",
     2,
-    "МРф",
+    "МРФ",
     2
   ],
   [
@@ -3344,7 +3344,7 @@
     1,
     "Вальсирующие во тьме",
     3,
-    "МРф",
+    "МРФ",
     3
   ],
   [
@@ -3353,7 +3353,7 @@
     1,
     "Вальсирующие во тьме",
     4,
-    "МРф",
+    "МРФ",
     4
   ],
   [
@@ -3362,7 +3362,7 @@
     1,
     "Вальсирующие во тьме",
     5,
-    "МРф",
+    "МРФ",
     5
   ],
   [
@@ -3371,7 +3371,7 @@
     1,
     "Вальсирующие во тьме",
     6,
-    "МРф",
+    "МРФ",
     6
   ],
   [
@@ -3380,7 +3380,7 @@
     1,
     "Вальсирующие во тьме",
     7,
-    "МРф",
+    "МРФ",
     7
   ],
   [
@@ -3389,7 +3389,7 @@
     1,
     "Вальсирующие во тьме",
     8,
-    "МРф",
+    "МРФ",
     8
   ],
   [
@@ -3398,7 +3398,7 @@
     1,
     "Вальсирующие во тьме",
     9,
-    "МРф",
+    "МРФ",
     9
   ],
   [
@@ -3641,7 +3641,7 @@
     1,
     "Great Classic Music",
     1,
-    "S.Prokoviev",
+    "Сергей Сергеевич Прокофьев",
     1
   ],
   [
@@ -7495,60 +7495,6 @@
     6,
     "Amorphis",
     10
-  ],
-  [
-    "2013-02-12 08:55",
-    "02 час испытания",
-    1,
-    "Эльфийская рукопись",
-    1,
-    "Эпидемия",
-    1
-  ],
-  [
-    "2013-02-12 09:00",
-    "03 рожденный для битвы",
-    1,
-    "Эльфийская рукопись",
-    2,
-    "Эпидемия",
-    2
-  ],
-  [
-    "2013-02-12 09:06",
-    "04 пройди свой путь",
-    1,
-    "Эльфийская рукопись",
-    3,
-    "Эпидемия",
-    3
-  ],
-  [
-    "2013-02-12 09:11",
-    "05 кровь эльфов",
-    1,
-    "Эльфийская рукопись",
-    4,
-    "Эпидемия",
-    4
-  ],
-  [
-    "2013-02-12 09:21",
-    "06 на пороге ада",
-    1,
-    "Эльфийская рукопись",
-    5,
-    "Эпидемия",
-    5
-  ],
-  [
-    "2013-02-12 09:27",
-    "07 вечный воитель",
-    1,
-    "Эльфийская рукопись",
-    6,
-    "Эпидемия",
-    6
   ],
   [
     "2013-02-12 12:00",
@@ -26618,7 +26564,7 @@
     1,
     "Вальсирующие во тьме",
     10,
-    "МРф",
+    "МРФ",
     10
   ],
   [
@@ -26627,7 +26573,7 @@
     1,
     "Вальсирующие во тьме",
     11,
-    "МРф",
+    "МРФ",
     11
   ],
   [
@@ -26636,7 +26582,7 @@
     1,
     "Вальсирующие во тьме",
     12,
-    "МРф",
+    "МРФ",
     12
   ],
   [
@@ -26645,7 +26591,7 @@
     1,
     "Вальсирующие во тьме",
     13,
-    "МРф",
+    "МРФ",
     13
   ],
   [
@@ -31290,7 +31236,7 @@
     "Complete Greatest Hits CD2",
     1,
     "Eagles",
-    9
+    11
   ],
   [
     "2013-05-31 08:22",
@@ -31299,7 +31245,7 @@
     "Complete Greatest Hits CD2",
     2,
     "Eagles",
-    10
+    12
   ],
   [
     "2013-05-31 08:25",
@@ -31308,7 +31254,7 @@
     "Complete Greatest Hits CD2",
     3,
     "Eagles",
-    11
+    13
   ],
   [
     "2013-05-31 08:29",
@@ -31317,7 +31263,7 @@
     "Complete Greatest Hits CD2",
     4,
     "Eagles",
-    12
+    14
   ],
   [
     "2013-06-02 11:25",
@@ -41676,7 +41622,7 @@
     "Desperado",
     1,
     "Eagles",
-    13
+    15
   ],
   [
     "2013-08-07 15:20",
@@ -41685,7 +41631,7 @@
     "Desperado",
     2,
     "Eagles",
-    14
+    16
   ],
   [
     "2013-08-07 15:23",
@@ -41694,7 +41640,7 @@
     "Desperado",
     3,
     "Eagles",
-    15
+    17
   ],
   [
     "2013-08-07 15:26",
@@ -41703,70 +41649,70 @@
     "Desperado",
     4,
     "Eagles",
-    16
+    18
   ],
   [
     "2013-08-07 15:29",
     "Desperado",
     1,
     "Desperado",
-    1,
-    "The Eagles",
-    3
+    5,
+    "Eagles",
+    19
   ],
   [
     "2013-08-07 15:32",
     "Certain Kind of Fool",
     1,
     "Desperado",
-    5,
+    6,
     "Eagles",
-    17
+    20
   ],
   [
     "2013-08-07 15:35",
     "Doolin-Dalton (Inst)",
     1,
     "Desperado",
-    6,
+    7,
     "Eagles",
-    18
+    21
   ],
   [
     "2013-08-07 15:36",
     "Outlaw Man",
     1,
     "Desperado",
-    7,
+    8,
     "Eagles",
-    19
+    22
   ],
   [
     "2013-08-07 15:40",
     "Saturday Night",
     1,
     "Desperado",
-    8,
+    9,
     "Eagles",
-    20
+    23
   ],
   [
     "2013-08-07 15:43",
     "Bitter Creek",
     1,
     "Desperado",
-    9,
+    10,
     "Eagles",
-    21
+    24
   ],
   [
     "2013-08-07 15:48",
     "Dooling Dalton-Desperado (Reprise)",
     1,
     "Desperado",
-    10,
+    11,
     "Eagles",
-    22
+    25
   ],
   [
     "2013-08-07 16:08",
@@ -42171,7 +42117,7 @@
     "On the Border",
     1,
     "Eagles",
-    23
+    26
   ],
   [
     "2013-08-09 10:14",
@@ -42180,7 +42126,7 @@
     "On the Border",
     2,
     "Eagles",
-    24
+    27
   ],
   [
     "2013-08-09 10:18",
@@ -42189,7 +42135,7 @@
     "On the Border",
     3,
     "Eagles",
-    25
+    28
   ],
   [
     "2013-08-09 10:22",
@@ -42198,7 +42144,7 @@
     "On the Border",
     4,
     "Eagles",
-    26
+    29
   ],
   [
     "2013-08-09 10:26",
@@ -42207,7 +42153,7 @@
     "On the Border",
     5,
     "Eagles",
-    27
+    30
   ],
   [
     "2013-08-09 10:30",
@@ -42216,7 +42162,7 @@
     "On the Border",
     6,
     "Eagles",
-    28
+    31
   ],
   [
     "2013-08-09 10:34",
@@ -42225,7 +42171,7 @@
     "On the Border",
     7,
     "Eagles",
-    29
+    32
   ],
   [
     "2013-08-09 10:38",
@@ -42234,7 +42180,7 @@
     "On the Border",
     8,
     "Eagles",
-    30
+    33
   ],
   [
     "2013-08-09 10:42",
@@ -42243,7 +42189,7 @@
     "On the Border",
     9,
     "Eagles",
-    31
+    34
   ],
   [
     "2013-08-09 10:46",
@@ -42252,7 +42198,7 @@
     "On the Border",
     10,
     "Eagles",
-    32
+    35
   ],
   [
     "2013-08-09 10:52",
@@ -43124,7 +43070,7 @@
     2,
     "Great Classic Music",
     2,
-    "S.Prokoviev",
+    "Сергей Сергеевич Прокофьев",
     2
   ],
   [
@@ -45248,7 +45194,7 @@
     1,
     "Вальсирующие во тьме",
     14,
-    "МРф",
+    "МРФ",
     14
   ],
   [
@@ -45257,7 +45203,7 @@
     1,
     "Вальсирующие во тьме",
     15,
-    "МРф",
+    "МРФ",
     15
   ],
   [
@@ -45266,7 +45212,7 @@
     1,
     "Вальсирующие во тьме",
     16,
-    "МРф",
+    "МРФ",
     16
   ],
   [
@@ -45275,7 +45221,7 @@
     1,
     "Вальсирующие во тьме",
     17,
-    "МРф",
+    "МРФ",
     17
   ],
   [
@@ -45284,7 +45230,7 @@
     2,
     "Вальсирующие во тьме",
     18,
-    "МРф",
+    "МРФ",
     18
   ],
   [
@@ -45293,7 +45239,7 @@
     2,
     "Вальсирующие во тьме",
     19,
-    "МРф",
+    "МРФ",
     19
   ],
   [
@@ -45302,7 +45248,7 @@
     2,
     "Вальсирующие во тьме",
     20,
-    "МРф",
+    "МРФ",
     20
   ],
   [
@@ -67235,7 +67181,7 @@
     1,
     "Underworld",
     1,
-    "David Bowie  - Feat. Maynard James Keenan & John Frusciante",
+    "David Bowie",
     1
   ],
   [
@@ -67559,7 +67505,7 @@
     2,
     "Underworld",
     2,
-    "David Bowie  - Feat. Maynard James Keenan & John Frusciante",
+    "David Bowie",
     2
   ],
   [
@@ -69818,7 +69764,7 @@
     3,
     "Underworld",
     3,
-    "David Bowie  - Feat. Maynard James Keenan & John Frusciante",
+    "David Bowie",
     3
   ],
   [
@@ -70331,7 +70277,7 @@
     4,
     "Underworld",
     4,
-    "David Bowie  - Feat. Maynard James Keenan & John Frusciante",
+    "David Bowie",
     4
   ],
   [
@@ -70682,8 +70628,8 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     1,
-    "Sergei Prokofiev",
-    1
+    "Сергей Сергеевич Прокофьев",
+    3
   ],
   [
     "2013-12-18 14:55",
@@ -70691,8 +70637,8 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     2,
-    "Sergei Prokofiev",
-    2
+    "Сергей Сергеевич Прокофьев",
+    4
   ],
   [
     "2013-12-18 14:57",
@@ -70700,8 +70646,8 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     3,
-    "Sergei Prokofiev",
-    3
+    "Сергей Сергеевич Прокофьев",
+    5
   ],
   [
     "2013-12-18 15:00",
@@ -70709,8 +70655,8 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     4,
-    "Sergei Prokofiev",
-    4
+    "Сергей Сергеевич Прокофьев",
+    6
   ],
   [
     "2013-12-18 15:06",
@@ -70718,8 +70664,8 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     5,
-    "Sergei Prokofiev",
-    5
+    "Сергей Сергеевич Прокофьев",
+    7
   ],
   [
     "2013-12-18 15:12",
@@ -70727,8 +70673,8 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     6,
-    "Sergei Prokofiev",
-    6
+    "Сергей Сергеевич Прокофьев",
+    8
   ],
   [
     "2013-12-18 15:15",
@@ -70736,7 +70682,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     1,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     1
   ],
   [
@@ -70745,7 +70691,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     2,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     2
   ],
   [
@@ -70754,7 +70700,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     3,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     3
   ],
   [
@@ -70763,7 +70709,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     4,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     4
   ],
   [
@@ -70772,7 +70718,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     5,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     5
   ],
   [
@@ -70781,7 +70727,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     6,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     6
   ],
   [
@@ -70790,7 +70736,7 @@
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
     7,
-    "Dmitry Shostakovich",
+    "Дмитрий Дмитриевич Шостакович",
     7
   ],
   [
@@ -70798,27 +70744,27 @@
     "Sonata for Viola and Piano, Op. 147: I. Moderato",
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
-    1,
+    8,
     "Дмитрий Дмитриевич Шостакович",
-    1
+    8
   ],
   [
     "2013-12-18 15:36",
     "Sonata for Viola and Piano, Op. 147: II. Allegretto",
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
-    2,
+    9,
     "Дмитрий Дмитриевич Шостакович",
-    2
+    9
   ],
   [
     "2013-12-18 15:43",
     "Sonata for Viola and Piano, Op. 147: III. Adagio",
     1,
     "Works by Prokofiev  Shostakovich arranged for viola  piano",
-    3,
+    10,
     "Дмитрий Дмитриевич Шостакович",
-    3
+    10
   ],
   [
     "2013-12-18 15:45",
