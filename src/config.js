@@ -93,27 +93,19 @@ export default {
       ],
     },
 
-    'Pop': {
-      // red
-      colorRange: ['#cb181d', '#fc9272'],
-
-      genres: [
-        'Art Pop',
-        'Pop',
-        'Singer-songwriter',
-      ],
-    },
-
-    'Electronic': {
+    'Electronic, Pop': {
       // brown
       colorRange: ['#cc4c02', '#fec44f'],
 
       genres: [
         'Ambient',
+        'Art Pop',
         'Darkwave',
         'Dream Pop',
         'Electronic',
         'Industrial',
+        'Pop',
+        'Singer-songwriter',
         'Trip Hop',
       ],
     },
@@ -139,8 +131,8 @@ export default {
 
       genres: [
         'Acoustic',
-        'Blackgrass',
         'Bluegrass',
+        'Dark Country',
         'Dark Folk',
         'Folk Metal',
         'Folk Rock',
