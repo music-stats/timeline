@@ -1,3 +1,11 @@
+const monthNameList = [
+         'Jan', 'Feb',
+  'Mar', 'Apr', 'May',
+  'Jun', 'Jul', 'Aug',
+  'Sep', 'Oct', 'Nov',
+  'Dec',
+];
+
 export function dateTimeStringToTimestamp(dateTimeString) {
   // The "T" is getting inserted between "YYYY-MM-DD" and "HH:MM"
   // to avoid "invalid date" errors in mobile browsers.
@@ -11,13 +19,13 @@ export function dateTimeStringToDateString(dateTimeString) {
 }
 
 export function timestampToDateTimeString(timestamp) {
-  // timezone offset is explicitly applied,
-  // in contrast to "dateTimeStringToTimestamp()"
-  // where "Date.parse()" already assumes a local timezone
-  const timestampOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
+  const date = new Date(timestamp);
+  const monthName = monthNameList[date.getMonth()];
+  const [day, hours, mins] = [
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+  ].map((value) => value.toString().padStart(2, '0'));
 
-  return (new Date(timestamp - timestampOffset))
-    .toISOString()
-    .slice(0, 16)
-    .replace('T', ' ');
+  return `${monthName} ${day} ${hours}:${mins}`;
 }

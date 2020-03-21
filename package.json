@@ -1,6 +1,6 @@
 {
   "name": "music-stats-timeline",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "visualization of listening habits",
   "main": "src/app.js",
   "scripts": {
@@ -45,12 +45,12 @@
     "gh-pages": "2.2.0",
     "ignore-styles": "5.0.1",
     "npm-check": "5.9.2",
-    "rollup": "1.32.0",
+    "rollup": "2.1.0",
     "rollup-plugin-babel": "4.4.0",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-eslint": "7.0.0",
     "rollup-plugin-node-resolve": "5.2.0",
-    "rollup-plugin-postcss": "2.3.0",
+    "rollup-plugin-postcss": "2.5.0",
     "rollup-plugin-uglify": "6.0.4",
     "tap-spec": "5.0.0",
     "tape": "4.13.2"

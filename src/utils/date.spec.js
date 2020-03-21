@@ -5,7 +5,7 @@ import {dateTimeStringToTimestamp, dateTimeStringToDateString, timestampToDateTi
 test('date utils: dateTimeStringToTimestamp()', (t) => {
   t.equal(
     dateTimeStringToTimestamp('2020-01-16 22:49:11'),
-    1579211351000,
+    1579207751000,
     'converts a "YYYY-MM-DD HH:MM" string to a timestamp',
   );
 
@@ -24,9 +24,9 @@ test('date utils: dateTimeStringToDateString()', (t) => {
 
 test('date utils: timestampToDateTimeString()', (t) => {
   t.equal(
-    timestampToDateTimeString(1579211351000),
-    '2020-01-16 22:49',
-    'converts a timestamp to a "YYYY-MM-DD HH:MM" string',
+    timestampToDateTimeString(1579207751000),
+    'Jan 16 22:49',
+    'converts a timestamp to a "Mon DD HH:MM" string',
   );
 
   t.end();

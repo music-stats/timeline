@@ -70,6 +70,7 @@ export default {
 
     timeAxis: {
       width: 2,
+      tickLabelCount: 40,
       timeFullColor: cssColors.darkGrey2,
       timeRangeColor: cssColors.darkGrey3,
     },

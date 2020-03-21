@@ -2,7 +2,6 @@ import * as d3Scale from 'd3-scale';
 import html from '../lib/html';
 
 import config from '../config';
-import {timestampToDateTimeString} from '../utils/date';
 
 import Collection from '../stores/Collection';
 import PointBuffer from '../stores/PointBuffer';
@@ -35,6 +34,7 @@ export default class Timeline {
   }
 
   initializeChildrenComponents() {
+    const {timeline: {timeAxis: {tickLabelCount}}} = config;
     const {
       summary,
       yearList,
@@ -75,16 +75,16 @@ export default class Timeline {
 
     this.children.externalLinks = new ExternalLinks();
 
-    this.children.leftTimeLabel = new TimeAxisLabel({
-      id: 'first-scrobble-time-label',
-    });
-    this.children.rightTimeLabel = new TimeAxisLabel({
-      id: 'last-scrobble-time-label',
-    });
     this.children.selectedScrobbleTimeLabel = new TimeAxisLabel({
       id: 'selected-scrobble-time-label',
       isMostTop: true,
     });
+
+    for (let index = 0; index < tickLabelCount; index += 1) {
+      this.children[`timeTickLabel${index}`] = new TimeAxisLabel({
+        id: `time-tick-label--${index}`,
+      });
+    }
 
     this.children.legend = new LegendInteractive(
       {
@@ -131,14 +131,14 @@ export default class Timeline {
     const plotLeft = plotPadding;
     const plotRight = width - plotPadding;
 
-    const fullTimeRangeScale = d3Scale.scaleLinear()
+    const fullTimeRangeScale = d3Scale.scaleTime()
       .domain([
         this.scrobbleCollection.getFirst().timestamp,
         this.scrobbleCollection.getLast().timestamp,
       ])
       .rangeRound([plotLeft, plotRight]);
 
-    const timeRangeScale = d3Scale.scaleLinear()
+    const timeRangeScale = d3Scale.scaleTime()
       .domain([
         this.scrobbleCollection.getFirstVisible().timestamp,
         this.scrobbleCollection.getLastVisible().timestamp,
@@ -167,13 +167,19 @@ export default class Timeline {
   }
 
   draw() {
+    const {timeline: {timeAxis: {tickLabelCount}}} = config;
     const {onScrobblePointCreate} = this.props;
-    const {plot, leftTimeLabel, rightTimeLabel} = this.children;
-    const [plotWidth] = plot.getDimensions();
-    const [leftTimestamp, rightTimestamp] = this.plotScales.x.domain();
-    const [leftX, rightX] = this.plotScales.x.range();
-    const leftTimeX = this.plotScales.timeAxis(leftTimestamp);
-    const rightTimeX = this.plotScales.timeAxis(rightTimestamp);
+    const {timeAxis: fullTimeRangeScale, x: timeRangeScale} = this.plotScales;
+    const {plot} = this.children;
+    const plotWidth = plot.getDimensions()[0];
+
+    const [leftDate, rightDate] = timeRangeScale.domain();
+    const [leftX, rightX] = timeRangeScale.range();
+    const leftTimeX = fullTimeRangeScale(leftDate);
+    const rightTimeX = fullTimeRangeScale(rightDate);
+
+    const tickList = timeRangeScale.ticks(plotWidth > 600 ? 12 : 4);
+    const tickFormat = timeRangeScale.tickFormat();
 
     plot.drawBackground();
 
@@ -195,8 +201,13 @@ export default class Timeline {
 
     plot.drawTimeAxis(leftX, rightX, leftTimeX, rightTimeX);
 
-    leftTimeLabel.renderText(leftX, timestampToDateTimeString(leftTimestamp), plotWidth);
-    rightTimeLabel.renderText(rightX, timestampToDateTimeString(rightTimestamp), plotWidth);
+    tickList.forEach((tick, index) => {
+      this.children[`timeTickLabel${index}`].renderText(timeRangeScale(tick), tickFormat(tick), plotWidth);
+    });
+
+    for (let index = tickList.length; index < tickLabelCount; index += 1) {
+      this.children[`timeTickLabel${index}`].clear();
+    }
   }
 
   // things needed for the first render

@@ -242,7 +242,7 @@ export default class TimelineInteractive {
     const {offsetX: x} = event;
     const {timestamp: minTimestamp} = scrobbleCollection.getFirst();
     const {timestamp: maxTimestamp} = scrobbleCollection.getLast();
-    const [leftTimestamp, rightTimestamp] = timeRangeScale.domain();
+    const [leftTimestamp, rightTimestamp] = timeRangeScale.domain().map((date) => Date.parse(date));
 
     if (rightTimestamp - leftTimestamp >= maxTimestamp - minTimestamp) {
       return;

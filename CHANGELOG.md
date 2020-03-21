@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2020-03-21
+### Added
+* Feature: time ticks labels (replacing time range labels).
+
 ## [0.2.0] - 2020-02-25
 ### Added
 * Feature: multiple datasets support (each year is represented by URL hash).
