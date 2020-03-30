@@ -9,12 +9,12 @@ Visualization of last.fm stats.
 Showcasing a ratio between different aspects of how musical taste evolves (or proving that it doesn't).
 
 ## Status
-*In progress*, *experimental*.
+*Ready*, but there's a short [todo list](/docs/todo.md) to finish.
 
 ## How does it look like?
 <p align="center">
-  <a href="https://user-images.githubusercontent.com/2470363/73010037-deb52100-3e11-11ea-856b-2f9022b47f52.png">
-    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/73010037-deb52100-3e11-11ea-856b-2f9022b47f52.png" />
+  <a href="https://user-images.githubusercontent.com/2470363/77892505-62a8e080-727b-11ea-8a2b-39e2838e70e0.png">
+    <img width="720" alt="screenshot" src="https://user-images.githubusercontent.com/2470363/77892505-62a8e080-727b-11ea-8a2b-39e2838e70e0.png" />
   </a>
 </p>
 
@@ -45,10 +45,11 @@ Such classes add various handlers that define behavior for classes they decorate
 Datasets are supplied by [scripts](https://github.com/music-stats/scripts#scrobble-timeline) and served from the following URL structure (see `src/config.js`):
 ```
 data/
-├── years.json              # a list of years available, e.g. ["2012", "2013", ..., "2020"]
-├── years/                  # scrobble lists for each year
+├── years.json              # a list of periods available, e.g. ["2012", "2013", ..., "2020", "all"]
+├── years/                  # scrobble lists for each period
 │   ├── ...
-│   └── 2020.json
+│   ├── 2020.json
+│   └── all.json
 └── artists-by-genres.json  # enables the legend and colorcoding
 ```
 
@@ -68,16 +69,13 @@ Color ranges for genres are picked from Cynthia A. Brewer’s [ColorBrewer](http
 ## Development setup
 ```bash
 $ npm i                  # install deps
-$ npm run lint           # lint scripts and styles
+$ npm run lint           # lint scripts
 $ npm test               # run unit tests
 $ npm run build:dev      # produce a build artifact for local development
 $ npm run build:prod     # produce a minified build artifact for production
 $ npm run serve          # run a local dev server (port: 8000)
 $ npm run deploy         # deploy to GitHub pages
 ```
-
-## Further evolvement
-See [the list of ideas](/docs/ideas.md).
 
 [license-image]: https://img.shields.io/github/license/music-stats/timeline.svg?style=flat-square
 [license-url]: https://github.com/music-stats/timeline/blob/master/LICENSE
