@@ -104,6 +104,7 @@ export default {
         'Darkwave',
         'Dream Pop',
         'Electronic',
+        'Indie Pop',
         'Industrial',
         'Pop',
         'Singer-songwriter',
