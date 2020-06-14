@@ -157,7 +157,6 @@ export default {
         'Pop Rock',
         'Post-rock',
         'Progressive Rock',
-        'Rautalanka',
         'Stoner Rock',
       ],
     },

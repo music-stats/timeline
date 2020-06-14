@@ -1,8 +1,7 @@
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
 import resolve from '@rollup/plugin-node-resolve';
-import {eslint} from 'rollup-plugin-eslint';
 import {uglify} from 'rollup-plugin-uglify';
 
 const {NODE_ENV} = process.env;
@@ -26,13 +25,14 @@ export default {
       minimize: IS_PROD,
     }),
 
-    eslint(),
     resolve({
       browser: true,
     }),
     commonjs(),
 
-    IS_PROD && babel(),
+    IS_PROD && babel({
+      babelHelpers: 'bundled',
+    }),
     IS_PROD && uglify(),
   ],
 };

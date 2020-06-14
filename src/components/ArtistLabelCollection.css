@@ -13,6 +13,10 @@
   text-shadow: 0 0 2px var(--color-dark-grey-blue);
 }
 
+.ArtistLabelCollection__label::selection {
+  text-shadow: none;
+}
+
 .ArtistLabelCollection__label--highlighted {
   z-index: 1;
   padding: 2px 4px 4px;

@@ -4,8 +4,6 @@
   ![code size][code-size-image]
 
 Visualization of last.fm stats.
-
-## Motivation/goals
 Showcasing a ratio between different aspects of how musical taste evolves (or proving that it doesn't).
 
 ## Status
