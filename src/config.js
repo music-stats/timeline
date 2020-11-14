@@ -1,7 +1,7 @@
 import cssColors from './app-theme';
 
 export default {
-  debug: false,
+  debug: '__buildEnv__' !== 'production',
 
   defaultDataYear: '2020',
 

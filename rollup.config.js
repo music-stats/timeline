@@ -1,6 +1,7 @@
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
+import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
 import {uglify} from 'rollup-plugin-uglify';
 
@@ -25,6 +26,9 @@ export default {
       minimize: IS_PROD,
     }),
 
+    replace({
+      __buildEnv__: NODE_ENV,
+    }),
     resolve({
       browser: true,
     }),
