@@ -3,7 +3,7 @@ import cssColors from './app-theme';
 export default {
   debug: '__buildEnv__' !== 'production',
 
-  defaultDataYear: '2020',
+  defaultDataYear: '2021',
 
   dataUrls: {
     yearList: 'data/years.json',
@@ -196,10 +196,12 @@ export default {
       genres: [
         'Grunge',
         'Hardcore',
+        'Post-hardcore',
         'Post-punk',
         'Punk Rock',
         'Screamo',
         'Ska Punk',
+        'Ska',
       ],
     },
   },
