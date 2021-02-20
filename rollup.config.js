@@ -3,7 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
-import {uglify} from 'rollup-plugin-uglify';
+import {terser} from 'rollup-plugin-terser';
 
 const {NODE_ENV} = process.env;
 const IS_PROD = NODE_ENV === 'production';
@@ -37,6 +37,6 @@ export default {
     IS_PROD && babel({
       babelHelpers: 'bundled',
     }),
-    IS_PROD && uglify(),
+    IS_PROD && terser(),
   ],
 };
