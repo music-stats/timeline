@@ -9,5 +9,11 @@ test('string utils: url`` tagged template', (t) => {
     'replaces spaces with "+" characters',
   );
 
+  t.equal(
+    url`https://example.org/${'some/other path'}?param=${'some/other value'}`,
+    'https://example.org/some%2Fother+path?param=some%2Fother+value',
+    'encodes URI components and replaces spaces with "+" characters',
+  );
+
   t.end();
 });
