@@ -100,7 +100,6 @@ export default {
 
       genres: [
         'Ambient',
-        'Art Pop',
         'Darkwave',
         'Dream Pop',
         'Electronic',
@@ -122,6 +121,7 @@ export default {
         'Hip-hop',
         'Jazz',
         'Low Rock',
+        'Reggae',
         'Rock And Roll',
         'Rockabilly',
         'Soul',
@@ -184,7 +184,6 @@ export default {
         'Progressive Death Metal',
         'Progressive Metal',
         'Sludge Metal',
-        'Speed Metal',
         'Symphonic Metal',
         'Thrash Metal',
       ],
