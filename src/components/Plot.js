@@ -27,7 +27,6 @@ export default class Plot {
 
     this.dimensions = [width, height];
 
-    // batch assignment is used to minimize reflows
     Object.assign(
       this.element,
       {
