@@ -43,11 +43,11 @@ Such classes add various handlers that define behavior for classes they decorate
 Datasets are supplied by [scripts](https://github.com/music-stats/scripts#scrobble-timeline) and served from the following URL structure (see `src/config.js`):
 ```
 data/
-├── years.json              # a list of periods available, e.g. ["2012", "2013", ..., "2021", "all"]
+├── years.json              # a list of periods available, e.g. ["2012", "2013", ..., "2022", "all"]
 ├── years/                  # scrobble lists for each period
-│   ├── ...
-│   ├── 2021.json
-│   └── all.json
+│   ├── ...
+│   ├── 2022.json
+│   └── all.json
 └── artists-by-genres.json  # enables the legend and colorcoding
 ```
 
