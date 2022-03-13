@@ -13,6 +13,18 @@
   opacity: 1;
 }
 
+.ExternalLinks__link--grid {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 4px;
+  align-items: center;
+}
+
+.ExternalLinks__flag {
+  width: 10px;
+  height: 10px;
+}
+
 .ExternalLinks__field {
   text-align: right;
 }

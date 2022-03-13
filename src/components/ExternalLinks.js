@@ -16,6 +16,17 @@ export default class ExternalLinks {
         >
           <a
             class="ExternalLinks__link"
+            href=${twitter.url}
+          >
+            ${twitter.text}
+          </a>
+        </p>
+
+        <p
+          class="ExternalLinks__field list-box__field"
+        >
+          <a
+            class="ExternalLinks__link"
             href=${github.url}
           >
             ${github.text}
@@ -26,10 +37,15 @@ export default class ExternalLinks {
           class="ExternalLinks__field list-box__field"
         >
           <a
-            class="ExternalLinks__link"
-            href=${twitter.url}
+            class="ExternalLinks__link ExternalLinks__link--grid"
+            href="https://supportukrainenow.org/"
           >
-            ${twitter.text}
+            <span>#StandWithUkraine<//>
+
+            <img
+              class="ExternalLinks__flag"
+              src="flag-ua-1x1.svg" alt="Flag of Ukraine"
+            />
           </a>
         </p>
       </aside>
