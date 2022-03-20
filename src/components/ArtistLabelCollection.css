@@ -19,7 +19,7 @@
 
 .ArtistLabelCollection__label--highlighted {
   z-index: 1;
-  padding: 2px 4px 4px;
+  padding: 3px 4px 4px;
   line-height: 1;
   font-weight: bold;
   background-color: var(--color-white-semitransparent);

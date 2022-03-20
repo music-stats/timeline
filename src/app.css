@@ -4,7 +4,7 @@ html {
 }
 
 body {
-  font-family: monospace;
+  font-family: Menlo, monospace;
   font-size: var(--font-size-root);
   height: 100%;
   overflow: hidden;

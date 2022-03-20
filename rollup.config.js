@@ -28,6 +28,7 @@ export default {
 
     replace({
       __buildEnv__: NODE_ENV,
+      preventAssignment: true,
     }),
     resolve({
       browser: true,
