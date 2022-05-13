@@ -35,28 +35,28 @@
   },
   "homepage": "https://github.com/music-stats/timeline#readme",
   "devDependencies": {
-    "@babel/core": "7.17.8",
-    "@babel/preset-env": "7.16.11",
+    "@babel/core": "7.18.5",
+    "@babel/preset-env": "7.18.2",
     "@babel/register": "7.17.7",
     "@rollup/plugin-babel": "5.3.1",
-    "@rollup/plugin-commonjs": "21.0.3",
-    "@rollup/plugin-node-resolve": "13.1.3",
+    "@rollup/plugin-commonjs": "22.0.0",
+    "@rollup/plugin-node-resolve": "13.3.0",
     "@rollup/plugin-replace": "4.0.0",
-    "eslint": "8.12.0",
-    "gh-pages": "3.2.3",
+    "eslint": "8.18.0",
+    "gh-pages": "4.0.0",
     "ignore-styles": "5.0.1",
     "npm-check": "5.9.2",
-    "rollup": "2.70.1",
+    "rollup": "2.75.6",
     "rollup-plugin-postcss": "4.0.2",
     "rollup-plugin-terser": "7.0.2",
     "tap-spec": "5.0.0",
-    "tape": "5.5.2"
+    "tape": "5.5.3"
   },
   "dependencies": {
     "classnames": "2.3.1",
-    "d3-color": "3.0.1",
+    "d3-color": "3.1.0",
     "d3-scale": "4.0.2",
-    "htm": "3.1.0",
+    "htm": "3.1.1",
     "micro-conductor": "git+https://github.com/oleksmarkh/micro-conductor.git#v0.1.0",
     "vhtml": "2.2.0"
   }
