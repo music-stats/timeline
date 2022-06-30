@@ -66,7 +66,7 @@ Color ranges for genres are picked from Cynthia A. Brewer’s [ColorBrewer](http
 
 ## Development setup
 ```bash
-$ npm i               # install deps
+$ npm ci              # install deps
 $ npm run lint        # lint scripts
 $ npm test            # run unit tests
 $ npm run build:dev   # produce a build artifact for local development
