@@ -141,6 +141,7 @@ export default {
         'Folk Rock',
         'Folk',
         'Freak Folk',
+        'Ukrainian Retro',
       ],
     },
 
