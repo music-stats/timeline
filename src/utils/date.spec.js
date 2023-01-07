@@ -5,8 +5,8 @@ import {dateTimeStringToTimestamp, dateTimeStringToDateString, timestampToDateTi
 test('date utils: dateTimeStringToTimestamp()', (t) => {
   t.equal(
     dateTimeStringToTimestamp('2020-01-16 22:49:11'),
-    1579211351000, // TZ-offset: -60
-    // 1579207751000, // TZ-offset: -120
+    // 1579211351000, // TZ-offset: -60
+    1579207751000, // TZ-offset: -120
     'converts a "YYYY-MM-DD HH:MM" string to a timestamp',
   );
 
@@ -26,8 +26,8 @@ test('date utils: dateTimeStringToDateString()', (t) => {
 test('date utils: timestampToDateTimeString()', (t) => {
   t.equal(
     timestampToDateTimeString(1579207751000),
-    'Jan 16 21:49', // TZ-offset: -60
-    // 'Jan 16 22:49', // TZ-offset: -120
+    // 'Jan 16 21:49', // TZ-offset: -60
+    'Jan 16 22:49', // TZ-offset: -120
     'converts a timestamp to a "Mon DD HH:MM" string',
   );
 
