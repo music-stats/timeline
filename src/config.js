@@ -21,11 +21,6 @@ export default {
       url: 'https://github.com/music-stats/timeline/',
       text: 'music-stats/timeline',
     },
-
-    twitter: {
-      url: 'https://twitter.com/oleksmarkh/',
-      text: '@oleksmarkh',
-    },
   },
 
   timeline: {

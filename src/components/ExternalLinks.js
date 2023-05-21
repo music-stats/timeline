@@ -5,7 +5,7 @@ import './ExternalLinks.css';
 
 export default class ExternalLinks {
   render() {
-    const {links: {github, twitter}} = config;
+    const {links} = config;
 
     return html`
       <aside
@@ -16,20 +16,9 @@ export default class ExternalLinks {
         >
           <a
             class="ExternalLinks__link"
-            href=${twitter.url}
+            href=${links.github.url}
           >
-            ${twitter.text}
-          </a>
-        </p>
-
-        <p
-          class="ExternalLinks__field list-box__field"
-        >
-          <a
-            class="ExternalLinks__link"
-            href=${github.url}
-          >
-            ${github.text}
+            ${links.github.text}
           </a>
         </p>
 
@@ -38,9 +27,9 @@ export default class ExternalLinks {
         >
           <a
             class="ExternalLinks__link ExternalLinks__link--grid"
-            href="https://supportukrainenow.org/"
+            href="https://savelife.in.ua/en/"
           >
-            <span>#StandWithUkraine<//>
+            <span>Come Back Alive<//>
 
             <img
               class="ExternalLinks__flag"
