@@ -135,6 +135,7 @@ export default {
         'Folk Metal',
         'Folk Rock',
         'Folk',
+        'Folktronica',
         'Freak Folk',
         'Ukrainian Retro',
       ],
@@ -190,6 +191,7 @@ export default {
       colorRange: ['#ce1256', '#c994c7'],
 
       genres: [
+        'Emo',
         'Grunge',
         'Hardcore',
         'Post-hardcore',
