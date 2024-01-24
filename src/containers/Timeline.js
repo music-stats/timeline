@@ -6,6 +6,7 @@ import config from '../config';
 import Collection from '../stores/Collection';
 import PointBuffer from '../stores/PointBuffer';
 
+import Panel from '../components/Panel';
 import Plot from '../components/Plot';
 import PlotInteractive from '../components/PlotInteractive';
 import TimeAxisLabel from '../components/TimeAxisLabel';
@@ -60,17 +61,21 @@ export default class Timeline {
       }),
     );
 
-    this.children.yearNavigation = new YearNavigation({
-      currentYear: document.location.hash.slice(1),
-      yearList,
-    });
-
-    this.children.infoBox = new InfoBox({
-      dates: {
-        firstScrobbleDate: this.scrobbleCollection.getFirst().date,
-        lastScrobbleDate: this.scrobbleCollection.getLast().date,
+    this.children.topLeftPanel = new Panel({
+      position: 'top-left',
+      children: {
+        yearNavigation: new YearNavigation({
+          currentYear: document.location.hash.slice(1),
+          yearList,
+        }),
+        infoBox: new InfoBox({
+          dates: {
+            firstScrobbleDate: this.scrobbleCollection.getFirst().date,
+            lastScrobbleDate: this.scrobbleCollection.getLast().date,
+          },
+          summary,
+        }),
       },
-      summary,
     });
 
     this.children.externalLinks = new ExternalLinks();

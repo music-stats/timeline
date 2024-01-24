@@ -1,6 +1,7 @@
 import html from '../lib/html';
 import config from '../config';
 
+import './Panel.css';
 import './ExternalLinks.css';
 
 export default class ExternalLinks {
@@ -9,7 +10,7 @@ export default class ExternalLinks {
 
     return html`
       <aside
-        class="ExternalLinks list-box list-box--with-rows list-box--with-bg"
+        class="ExternalLinks Panel Panel--bottom-right list-box--with-rows list-box--with-bg"
       >
         <p
           class="ExternalLinks__field list-box__field"

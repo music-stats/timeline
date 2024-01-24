@@ -31,7 +31,7 @@ export default class YearNavigation {
 
     return html`
       <nav
-        class="YearNavigation list-box list-box--with-bg"
+        class="YearNavigation list-box--with-bg"
       >
         ${yearList.map(this.renderYearLink, this)}
       </nav>

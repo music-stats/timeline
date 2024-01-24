@@ -3,7 +3,7 @@ import cssColors from './app-theme';
 export default {
   debug: '__buildEnv__' !== 'production',
 
-  defaultDataYear: '2023',
+  defaultDataYear: '2024',
 
   dataUrls: {
     yearList: 'data/years.json',

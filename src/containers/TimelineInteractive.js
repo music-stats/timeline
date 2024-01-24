@@ -77,7 +77,8 @@ export default class TimelineInteractive {
   }
 
   resetUi() {
-    const {infoBox, selectedScrobbleTimeLabel, legend, artistLabelCollection} = this.timeline.children;
+    const {topLeftPanel, selectedScrobbleTimeLabel, legend, artistLabelCollection} = this.timeline.children;
+    const {infoBox} = topLeftPanel.props.children;
 
     infoBox.showIntroMessage();
     selectedScrobbleTimeLabel.clear();
@@ -166,7 +167,8 @@ export default class TimelineInteractive {
 
   selectScrobble(scrobble) {
     const {summary} = this.props;
-    const {plot, infoBox, legend, artistLabelCollection} = this.timeline.children;
+    const {plot, topLeftPanel, legend, artistLabelCollection} = this.timeline.children;
+    const {infoBox} = topLeftPanel.props.children;
     const [plotWidth] = plot.getDimensions();
     const {artist} = scrobble;
     const isNewArtist = !(this.selectedScrobble && this.selectedScrobble.artist.name === artist.name);

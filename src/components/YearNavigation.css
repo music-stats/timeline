@@ -1,8 +1,6 @@
 .YearNavigation {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  left: 0;
+  pointer-events: auto;
+  margin-bottom: var(--panel-margin);
 }
 
 .YearNavigation__year-link {

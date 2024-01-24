@@ -1,0 +1,23 @@
+.Panel {
+  position: absolute;
+  /* "z-index" should be greater than the one for ".ArtistLabelCollection" */
+  z-index: 2;
+  /* allows the canvas to receive mouse events under the info box */
+  pointer-events: none;
+  margin: var(--panel-margin);
+}
+
+.Panel > * {
+  /* allows text to be selected and links to be clicked */
+  pointer-events: auto;
+}
+
+.Panel--top-left {
+  top: 0;
+  left: 0;
+}
+
+.Panel--bottom-right {
+  bottom: 0;
+  right: 0;
+}

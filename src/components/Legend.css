@@ -1,6 +1,6 @@
 .Legend {
   display: flex;
-  margin: 0 12px 12px 12px;
+  margin: 0 var(--panel-margin) var(--panel-margin) var(--panel-margin);
   font-size: var(--font-size-small);
 }
 

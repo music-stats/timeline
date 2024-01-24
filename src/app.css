@@ -30,12 +30,8 @@ a::selection {
   color: var(--color-dark-grey-blue);
 }
 
-.list-box {
-  margin: 12px;
-}
-
 .list-box--with-rows {
-  display: grid;
+  display: inline-grid;
   grid-row-gap: 4px;
 }
 
