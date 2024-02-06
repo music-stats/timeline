@@ -13,7 +13,7 @@
 .ExternalLinks__link--grid {
   display: inline-grid;
   grid-template-columns: auto auto;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
 }
 
